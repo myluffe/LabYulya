@@ -118,9 +118,9 @@ int MachineWorker::Work(char* filename)
 						if (_error)
 							return -2;
 					}
-					lexeme().Addlexeme(currentaut->CurrentLexName(),
+					/*lexeme().Addlexeme(currentaut->CurrentLexName(),
 						currentaut->CurrentLexType(), currentaut->Buffer(),
-						fr.CurrentLine(), currentaut->CurrentLexPos());
+						fr.CurrentLine(), currentaut->CurrentLexPos());*/
 					currentaut->UpdateStatus();
 					currentaut = _machines[0];
 					machinecount = 0;
@@ -191,7 +191,7 @@ int MachineWorker::NumberCheck(mStateMachine* curr, int line)
 
 	int count = strlen(number);
 	int i = 0;
-	while (i < strlen(number))
+	while (i < (int)(strlen(number)))
 	{
 		if (number[i] != '.')
 		{
@@ -211,7 +211,7 @@ int MachineWorker::NumberCheck(mStateMachine* curr, int line)
 
 	int j = 0;
 	int e_count = 0;
-	while (i < strlen(number))
+	while (i < (int)(strlen(number)))
 	{
 		if (number[i] == '.')
 		{

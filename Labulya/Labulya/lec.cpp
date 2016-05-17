@@ -1,13 +1,13 @@
 #include "stdafx.h"
 #include "lec.h"
 
-void lexeme::Addlexeme(char* name, char* type, char* data, int line, int startposition)
+void lexeme::Addlexeme(char* name, char* type, char* data, int line, int startposition, int priority)
 {
-	lex l = lex(name, type, data, line, startposition);
-	lexes.add(&l);
+	lex* l = new lex(name, type, data, line, startposition, priority);
+	lexes->add(l);
 }
 
 lexeme::~lexeme()
 {
-	lexes.~List();
+	lexes->~List();
 }

@@ -24,9 +24,9 @@ private:
 			_priority = priority;
 		}
 	};
-	List lexes = List(sizeof(lex));
+	List* lexes = new List(sizeof(lex));
 public:
-	void Addlexeme(char* name, char* type, char* data, int line, int startposition);
+	void Addlexeme(char* name, char* type, char* data, int line, int startposition, int priority);
 	~lexeme();
 };
 

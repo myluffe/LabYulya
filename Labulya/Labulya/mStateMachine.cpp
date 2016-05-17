@@ -10,7 +10,7 @@ mStateMachine::mStateMachine(char* name, char* lexname, char* lextype)
 	strcpy_s(_machineName, name);
 	strcpy_s(_currentLexemName, lexname);
 	strcpy_s(_currentLexemeType, lextype);
-	_currentLexemePosition = 0;
+	_currentLexemePosition = -100;
 	_step = 0;
 }
 
@@ -71,6 +71,7 @@ void mStateMachine::UpdateStatus()
 	_start = false;
 	_step = 0;
 	strcpy_s(_buffer, "");
+	_currentLexemePosition = -100;
 	ClearAdditional();
 }
 
@@ -113,7 +114,7 @@ void Type1Machine::CheckStart(char ch)
 
 void Type1Machine::EnterChar(char ch, int pos)
 {
-	if (_currentLexemePosition == 0)
+	if (_currentLexemePosition == -100)
 	{
 		_currentLexemePosition = pos;
 	}
