@@ -138,7 +138,7 @@ int MachineWorker::Work(char* filename)
 					}
 					else
 					{
-						s = currentaut->CurrentLexPos(); 
+						s = currentaut->CurrentLexPos() - 1; 
 						currentaut->UpdateStatus();
 						machinecount++;
 						currentaut = _machines[machinecount];
