@@ -6,6 +6,7 @@ mStateMachine::mStateMachine(char* name, char* lexname, char* lextype)
 	_isFinished = false;
 	_isError = false;
 	_start = false;
+	_buffer[0] = '\0';
 	strcpy_s(_machineName, name);
 	strcpy_s(_currentLexemName, lexname);
 	strcpy_s(_currentLexemeType, lextype);
@@ -95,12 +96,13 @@ void Type1Machine::CheckStart(char ch)
 	bool f = false;
 	for (int i = 0; i < listcount; i++)
 	{
-		_words.take(i, temp);
+		strcpy_s(temp, (char*)_words.get(i));
 		if (temp[0] == ch)
 		{
 			if (!f)
 			{
-				strcpy_s(temp, (char*)_words.get(i));
+				_buffer[_step++] = ch;
+				_buffer[_step] = '\0';
 				f = true;
 			}
 			_start = true;
@@ -122,10 +124,11 @@ void Type1Machine::EnterChar(char ch, int pos)
 		return;
 	}
 	int listcount = _potentialwords.count();
-	char temp[20];
+	char temp[30];
 	bool f = false;
 	for (int i = 0; i < listcount; i++)
 	{
+		strcpy_s(temp, (char*)_potentialwords.get(i));
 		if (temp[_step] != ch)
 		{
 			_potentialwords.remove(i);
@@ -134,19 +137,18 @@ void Type1Machine::EnterChar(char ch, int pos)
 		}
 		else if (!f)
 		{
-			strcpy_s(temp, (char*)_potentialwords.get(i));
+			_buffer[_step++] = ch;
+			_buffer[_step] = '\0';
 			f = true;
 		}
 	}
-	_step++;
 	if (listcount == 0)
 	{
 		_isError = true;
 	}
 	if (listcount == 1)
 	{
-		strcpy_s(temp, (char*)_potentialwords.get(0));
-		if (strcmp(_buffer, temp) == 0)
+		if (strcmp(_buffer, (char*)_potentialwords.get(0)) == 0)
 		{
 			_isFinished = true;
 			_potentialwords.~List();
@@ -163,12 +165,9 @@ Type2Machine::~Type2Machine()
 void Type2Machine::CheckStart(char ch)
 {
 	int listcount = _permissiblestart.count();
-	char temp;
 	for (int i = 0; i < listcount; i++)
 	{
-		temp = (char)_permissiblestart.get(i);
-		//_permissiblestart.take(i, temp);
-		if (temp == ch)
+		if ((char)_permissiblestart.get(i) == ch)
 		{
 			_start = true;
 			strcat_s(_buffer, &ch);
@@ -186,19 +185,14 @@ void Type2Machine::EnterChar(char ch, int pos)
 	if (!_start)
 	{
 		CheckStart(ch);
-	}
-	if (!_start)
-	{
-		_isError = true;
+		if (!_start) _isError = true;
+		return;
 	}
 	int listcount = _words.count();
-	char temp;
 	_isError = true;
 	for (int i = 0; i < listcount; i++)
 	{
-		temp = (char)_words.get(i);
-		//_words.take(i, &temp);
-		if (temp != ch)
+		if ((char)_words.get(i) != ch)
 		{
 			_isError = false;
 			strcat_s(_buffer, &ch);
