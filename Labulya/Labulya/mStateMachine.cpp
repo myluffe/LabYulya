@@ -155,6 +155,10 @@ void Type1Machine::EnterChar(char ch, int pos)
 			_potentialwords.~List();
 			_potentialwords = List(sizeof(char[30]));
 		}
+		else
+		{
+			_isError = true;
+		}
 	}
 }
 
