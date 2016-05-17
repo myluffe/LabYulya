@@ -146,8 +146,9 @@ void Type1Machine::EnterChar(char ch, int pos)
 	if (listcount == 0)
 	{
 		_isError = true;
+		return;
 	}
-	if (listcount == 1)
+	if (listcount == 1 && (strlen(_buffer) >= strlen((char*)_potentialwords.get(0))))
 	{
 		if (strcmp(_buffer, (char*)_potentialwords.get(0)) == 0)
 		{

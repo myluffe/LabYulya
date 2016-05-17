@@ -100,6 +100,7 @@ int MachineWorker::Work(char* filename)
 						if (strcmp(currentaut->Buffer(), "//") == 0)
 						{
 							strcpy_s(str, fr.ReadNextLine());
+							s = -1;
 							continue;
 						}
 						if (strcmp(currentaut->Buffer(), "/*") == 0)
