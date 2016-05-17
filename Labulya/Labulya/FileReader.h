@@ -7,6 +7,7 @@ using namespace std;
 class mFileReader
 {
 private:
+	char _lastreadstring[100];
 	char _filename[50];
 	int _currentline;
 	int _currentposiotion;

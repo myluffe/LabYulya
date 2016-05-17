@@ -78,7 +78,7 @@ int MachineWorker::Work(char* filename)
 	currentaut = _machines[0];
 	int machinecount = 0;
 	mFileReader fr = mFileReader(filename);
-	char* str;
+	char str[100];
 
 	bool EnterInComment = false;
 	int commentline = 0;
@@ -86,8 +86,7 @@ int MachineWorker::Work(char* filename)
 
 	while (!fr.EndFile())
 	{
-		//strcpy_s(str, fr.ReadNextLine());
-		str = fr.ReadNextLine();
+		strcpy_s(str, fr.ReadNextLine());
 		int lenght = (int)strlen(str);
 		for (int s = 0; s < lenght; s++)
 		{
@@ -100,8 +99,7 @@ int MachineWorker::Work(char* filename)
 					{
 						if (strcmp(currentaut->Buffer(), "//") == 0)
 						{
-							//strcpy_s(str, fr.ReadNextLine());
-							str = fr.ReadNextLine();
+							strcpy_s(str, fr.ReadNextLine());
 							continue;
 						}
 						if (strcmp(currentaut->Buffer(), "/*") == 0)

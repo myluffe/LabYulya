@@ -9,6 +9,7 @@ bool mFileReader::EndFile()
 mFileReader::mFileReader(char* filename)
 {
 	strcpy_s(_filename, filename);
+	_lastreadstring[0] = '\0';
 	_currentline = 0;
 	_currentposiotion = 0;
 	if (fopen_s(&file, _filename, "r") != 0)
@@ -32,20 +33,19 @@ char mFileReader::ReadChar(int position) // _currentposition не меняется
 char* mFileReader::ReadNextLine()
 {
 	char ch = 0;
-	char str[99];
 	int i = 0;
 	fseek(file, _currentposiotion, SEEK_SET);
 	while (ch != '\n' && ch != EOF)
 	{
 		ch = fgetc(file);
 		_currentposiotion++;
-		str[i++] = ch;
+		_lastreadstring[i++] = ch;
 	}
 	if (ch == EOF)
 		_end = true;
-	str[i] = '\0';
+	_lastreadstring[i] = '\0';
 	_currentline++;
-	return str;
+	return _lastreadstring;
 }
 
 mFileReader::~mFileReader()

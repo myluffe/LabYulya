@@ -110,7 +110,7 @@ void List::sort(bool dir, int method)
 
 void List::remove(int pos)
 {
-	if(pos > 0 && pos < _count)
+	if(pos >= 0 && pos < _count)
     {
         int i;
         Segment *current = first;
