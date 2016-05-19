@@ -117,9 +117,9 @@ int MachineWorker::Work(char* filename)
 						if (_error)
 							return -2;
 					}
-					/*lexeme().Addlexeme(currentaut->CurrentLexName(),
+					lexeme().Addlexeme(currentaut->CurrentLexName(),
 						currentaut->CurrentLexType(), currentaut->Buffer(),
-						fr.CurrentLine(), currentaut->CurrentLexPos());*/
+						fr.CurrentLine(), currentaut->CurrentLexPos(), currentaut->Priority);
 					currentaut->UpdateStatus();
 					currentaut = _machines[0];
 					machinecount = 0;

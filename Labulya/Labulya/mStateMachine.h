@@ -18,6 +18,7 @@ public:
 	void ChangeType(char* str);
 
 	int CurrentLexPos();
+	int Priority = 100;
 
 	void AddWord(void * word);
 	virtual void EnterChar(char ch, int pos) = 0;

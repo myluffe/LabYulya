@@ -73,6 +73,7 @@ void mStateMachine::UpdateStatus()
 	strcpy_s(_buffer, "");
 	_currentLexemePosition = -100;
 	ClearAdditional();
+	Priority = 100;
 }
 
 void Type1Machine::ClearAdditional()
@@ -173,18 +174,20 @@ void Type2Machine::CheckStart(char ch)
 	int listcount = _permissiblestart.count();
 	for (int i = 0; i < listcount; i++)
 	{
+		//char ayaya = (char)_permissiblestart.get(i);
 		if ((char)_permissiblestart.get(i) == ch)
 		{
 			_start = true;
 			strcat_s(_buffer, &ch);
 			_step++;
+			return;
 		}
 	}
 }
 
 void Type2Machine::EnterChar(char ch, int pos)
 {
-	if (_currentLexemePosition == 0)
+	if (_currentLexemePosition == -100)
 	{
 		_currentLexemePosition = pos;
 	}
