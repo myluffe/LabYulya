@@ -17,6 +17,10 @@ public:
 	char* CurrentLexType();
 	void ChangeType(char* str);
 
+	//Test
+	void PrintMachine();
+	//
+
 	int CurrentLexPos();
 	int Priority = 100;
 
@@ -25,9 +29,12 @@ public:
 	virtual void CheckStart(char ch) = 0;
 	void UpdateStatus();
 protected:
-	List _words = *new List(sizeof(char[30]));
+	List* _words = new List(sizeof(char[30]));
 
 	virtual void ClearAdditional() = 0;
+	//
+	virtual void PrintAdditionals() = 0;
+	//
 
 	char _machineName[30]; //name
 	char _buffer[50]; //current lexem
@@ -48,7 +55,7 @@ class Type1Machine : public mStateMachine
 public:
 	Type1Machine(char* name, char* lexname, char* lextype) : mStateMachine(name, lexname, lextype) 
 	{
-		_words = *new List(sizeof(char[30]));
+		_words = new List(sizeof(char[30]));
 	};
 	~Type1Machine();
 
@@ -57,6 +64,7 @@ public:
 	void ClearAdditional();
 private:
 	List _potentialwords = *new List(sizeof(char[30]));
+	void PrintAdditionals();
 };
 
 class Type2Machine : public mStateMachine
@@ -64,14 +72,17 @@ class Type2Machine : public mStateMachine
 public:
 	Type2Machine(char* name, char* lexname, char* lextype) : mStateMachine(name, lexname, lextype)
 	{
-		_words = *new List(sizeof(char));
+		_words = new List(sizeof(char[60]));
+		_permissiblestart[0] = '\0';
 	};
 	~Type2Machine();
 
 	void CheckStart(char ch);
 	void EnterChar(char ch, int pos);
 	void AddPerStartWord(char word);
+	void SetPerStartWords(char* words);
 	void ClearAdditional();
 private:
-	List _permissiblestart = *new List(sizeof(char));
+	char _permissiblestart[60];
+	void PrintAdditionals();
 };

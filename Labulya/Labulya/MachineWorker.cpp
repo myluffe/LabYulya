@@ -39,10 +39,7 @@ MachineWorker::MachineWorker()
 	char nm_optional[] = "e";
 	nm->AddWord(nm_perstart);
 	nm->AddWord(nm_optional);
-	for each (char var in nm_perstart)
-	{
-		nm->AddPerStartWord(var);
-	}
+	nm->SetPerStartWords(nm_perstart);
 	_addmachine(nm);
 
 	//Fourth Machine
@@ -51,10 +48,7 @@ MachineWorker::MachineWorker()
 	char vm_optional[] = "1234567890";
 	vm->AddWord(vm_perstart);
 	vm->AddWord(vm_optional);
-	for each (char var in vm_perstart)
-	{
-		vm->AddPerStartWord(var);
-	}
+	vm->SetPerStartWords(vm_perstart);
 	_addmachine(vm);
 
 	//Fifth Machine
@@ -65,6 +59,15 @@ MachineWorker::MachineWorker()
 		dm->AddWord(var);
 	}
 	_addmachine(dm);
+
+	
+	for (int klick = 0; klick < Count(); klick++)
+	{
+		_machines[klick]->PrintMachine();
+		printf("\n-------------\n");
+	}
+	printf("\n-------------\n");
+	
 }
 
 

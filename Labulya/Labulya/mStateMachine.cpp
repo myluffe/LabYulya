@@ -16,7 +16,7 @@ mStateMachine::mStateMachine(char* name, char* lexname, char* lextype)
 
 mStateMachine::~mStateMachine()
 {
-	_words.~List();
+	_words->~List();
 }
 
 char * mStateMachine::Buffer()
@@ -54,6 +54,17 @@ void mStateMachine::ChangeType(char* str)
 	strcpy_s(_currentLexemeType, str);
 }
 
+void mStateMachine::PrintMachine()
+{
+	printf("Machine: %s\nWords: ", MachineName());
+	for (int i = 0; i < _words->count(); i++)
+	{
+		printf("\"%s\" ", (char*)_words->get(i));
+	}
+	printf("\n");
+	PrintAdditionals();
+}
+
 int mStateMachine::CurrentLexPos()
 {
 	return _currentLexemePosition;
@@ -61,7 +72,7 @@ int mStateMachine::CurrentLexPos()
 
 void mStateMachine::AddWord(void * word)
 {
-	_words.add(word);
+	_words->add(word);
 }
 
 void mStateMachine::UpdateStatus()
@@ -82,8 +93,29 @@ void Type1Machine::ClearAdditional()
 	_potentialwords = List(sizeof(char[30]));
 }
 
+void Type1Machine::PrintAdditionals()
+{	
+	printf("Potential Words: ");
+	for (int i = 0; i < _potentialwords.count(); i++)
+	{
+		printf("\"%s\" ", (char*)_potentialwords.get(i));
+	}
+	printf("\n");
+}
+
 void Type2Machine::ClearAdditional()
 {
+}
+
+void Type2Machine::PrintAdditionals()
+{
+	printf("Permissible Start: ");
+	int count = strlen(_permissiblestart);
+	for (int i = 0; i < count; i++)
+	{
+		printf("\'%c\' ", _permissiblestart[i]);
+	}
+	printf("\n");
 }
 
 Type1Machine::~Type1Machine()
@@ -93,12 +125,12 @@ Type1Machine::~Type1Machine()
 
 void Type1Machine::CheckStart(char ch)
 {
-	int listcount = _words.count();
+	int listcount = _words->count();
 	char temp[20];
 	bool f = false;
 	for (int i = 0; i < listcount; i++)
 	{
-		strcpy_s(temp, (char*)_words.get(i));
+		strcpy_s(temp, (char*)_words->get(i));
 		if (temp[0] == ch)
 		{
 			if (!f)
@@ -166,16 +198,15 @@ void Type1Machine::EnterChar(char ch, int pos)
 
 Type2Machine::~Type2Machine()
 {
-	_permissiblestart.~List();
+	//nothing
 }
 
 void Type2Machine::CheckStart(char ch)
 {
-	int listcount = _permissiblestart.count();
+	int listcount = strlen(_permissiblestart);
 	for (int i = 0; i < listcount; i++)
 	{
-		//char ayaya = (char)_permissiblestart.get(i);
-		if ((char)_permissiblestart.get(i) == ch)
+		if (_permissiblestart[i] == ch)
 		{
 			_start = true;
 			strcat_s(_buffer, &ch);
@@ -197,11 +228,11 @@ void Type2Machine::EnterChar(char ch, int pos)
 		if (!_start) _isError = true;
 		return;
 	}
-	int listcount = _words.count();
+	int listcount = _words->count();
 	_isError = true;
 	for (int i = 0; i < listcount; i++)
 	{
-		if ((char)_words.get(i) != ch)
+		if ((char)_words->get(i) != ch)
 		{
 			_isError = false;
 			strcat_s(_buffer, &ch);
@@ -213,5 +244,10 @@ void Type2Machine::EnterChar(char ch, int pos)
 
 void Type2Machine::AddPerStartWord(char word)
 {
-	_permissiblestart.add(&word);
+	strcat_s(_permissiblestart, &word);
+}
+
+void Type2Machine::SetPerStartWords(char * words)
+{
+	strcpy_s(_permissiblestart, words);
 }

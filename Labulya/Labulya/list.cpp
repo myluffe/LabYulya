@@ -27,7 +27,7 @@ List::~List()
 
 void * List::get(int pos)
 {
-	if (pos < 0 && pos > _count)
+	if (pos < 0 && pos >= _count)
 	{
 		_error = true;
 		return nullptr;
@@ -63,7 +63,7 @@ void List::take_last(void * store)
 
 void List::take(int pos, void * store)
 {
-	if (pos < 0 && pos > _count)
+	if (pos < 0 && pos >= _count)
 	{
 		_error = true;
 	}
