@@ -142,6 +142,7 @@ void Type1Machine::CheckStart(char ch)
 			}
 			_start = true;
 			_potentialwords.add(temp);	
+			return;
 		}
 	}
 }
@@ -161,6 +162,28 @@ void Type1Machine::EnterChar(char ch, int pos)
 	int listcount = _potentialwords.count();
 	char temp[30];
 	bool f = false;
+	
+	if (listcount == 0)
+	{
+		_isError = true;
+		return;
+	}
+	if (listcount == 1 && (strlen(_buffer) >= strlen((char*)_potentialwords.get(0))))
+	{
+		if (strcmp(_buffer, (char*)_potentialwords.get(0)) == 0)
+		{
+			_isFinished = true;
+			_potentialwords.~List();
+			_potentialwords = List(sizeof(char[30]));
+			return;
+		}
+		else
+		{
+			_isError = true;
+			return;
+		}
+	}
+
 	for (int i = 0; i < listcount; i++)
 	{
 		strcpy_s(temp, (char*)_potentialwords.get(i));
@@ -175,24 +198,6 @@ void Type1Machine::EnterChar(char ch, int pos)
 			_buffer[_step++] = ch;
 			_buffer[_step] = '\0';
 			f = true;
-		}
-	}
-	if (listcount == 0)
-	{
-		_isError = true;
-		return;
-	}
-	if (listcount == 1 && (strlen(_buffer) >= strlen((char*)_potentialwords.get(0))))
-	{
-		if (strcmp(_buffer, (char*)_potentialwords.get(0)) == 0)
-		{
-			_isFinished = true;
-			_potentialwords.~List();
-			_potentialwords = List(sizeof(char[30]));
-		}
-		else
-		{
-			_isError = true;
 		}
 	}
 }
@@ -230,10 +235,10 @@ void Type2Machine::EnterChar(char ch, int pos)
 		return;
 	}
 	int listcount = _words->count();
-	_isError = true;
+	_isFinished = true;
 	for (int i = 0; i < listcount; i++)
 	{
-		if ((char)_words->get(i) != ch)
+		if (strchr((char*)_words->get(i), ch) != nullptr)
 		{
 			_isError = false;
 			strcat_s(_buffer, &ch);

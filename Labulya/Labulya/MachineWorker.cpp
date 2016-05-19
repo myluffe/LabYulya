@@ -93,7 +93,7 @@ int MachineWorker::Work(char* filename)
 		int lenght = (int)strlen(str);
 		for (int s = 0; s < lenght; s++)
 		{
-			if (!EnterInComment)
+			if (!EnterInComment && str[s] != ' ' && str[s] != '	')
 			{
 				currentaut->EnterChar(str[s], s);
 				if (currentaut->IsFinished())
@@ -125,14 +125,20 @@ int MachineWorker::Work(char* filename)
 						fr.CurrentLine(), currentaut->CurrentLexPos(), currentaut->Priority);
 					currentaut->UpdateStatus();
 					currentaut = _machines[0];
+					s--;
 					machinecount = 0;
 				}
 				if (currentaut->IsError())
 				{
-					if (machinecount >= _count)
+					if (machinecount >= _count - 1)
 					{
 						if (str[s] == ' ' || str[s] == '	')
+						{
+							currentaut->UpdateStatus();
+							currentaut = _machines[0];
+							machinecount = 0;
 							continue;
+						}	
 						else
 						{
 							currentaut->UpdateStatus();
