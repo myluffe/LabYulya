@@ -62,6 +62,7 @@ void mStateMachine::PrintMachine()
 		printf("\"%s\" ", (char*)_words->get(i));
 	}
 	printf("\n");
+	printf("Buffer: \"%s\"\n", _buffer);
 	PrintAdditionals();
 }
 
