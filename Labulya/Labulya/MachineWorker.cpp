@@ -91,9 +91,9 @@ int MachineWorker::Work(char* filename)
 	{
 		strcpy_s(str, fr.ReadNextLine());
 		int lenght = (int)strlen(str);
-		for (int s = 0; s < lenght; s++)
+		for (int s = 0; s < lenght - 1; s++)
 		{
-			if (!EnterInComment && str[s] != ' ' && str[s] != '	')
+			if (!EnterInComment && (currentaut->IsStart() || (str[s] != ' ' && str[s] != '	')))
 			{
 				currentaut->EnterChar(str[s], s);
 				if (currentaut->IsFinished())
@@ -214,11 +214,13 @@ int MachineWorker::NumberCheck(mStateMachine* curr, int line)
 		}
 		else break;
 	}
-	i++;
-	first[i] = 0;
+
+	first[i] = '\0';
 
 	int j = 0;
 	int e_count = 0;
+	i++;
+
 	while (i < (int)(strlen(number)))
 	{
 		if (number[i] == '.')
@@ -240,9 +242,9 @@ int MachineWorker::NumberCheck(mStateMachine* curr, int line)
 				return -3;
 			}
 		}
-		second[j++] = number[i++];
+		else second[j++] = number[i++];
 	}
-	second[j] = 0;
+	second[j] = '\0';
 	// a = 123
 	// b = e1
 	if (strlen(second) == 0)

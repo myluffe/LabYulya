@@ -12,6 +12,7 @@ public:
 
 	bool IsFinished();
 	bool IsError();
+	bool IsStart();
 
 	char* CurrentLexName();
 	char* CurrentLexType();

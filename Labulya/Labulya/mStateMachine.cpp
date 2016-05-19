@@ -39,6 +39,11 @@ bool mStateMachine::IsError()
 	return _isError;
 }
 
+bool mStateMachine::IsStart()
+{
+	return _start;
+}
+
 char * mStateMachine::CurrentLexName()
 {
 	return _currentLexemName;
@@ -240,7 +245,7 @@ void Type2Machine::EnterChar(char ch, int pos)
 	{
 		if (strchr((char*)_words->get(i), ch) != nullptr)
 		{
-			_isError = false;
+			_isFinished = false;
 			strcat_s(_buffer, &ch);
 			_step++;
 			break;
