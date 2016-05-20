@@ -23,10 +23,11 @@ public:
 	//
 
 	int CurrentLexPos();
+	int CurrentLexLine();
 	int Priority = 100;
 
 	void AddWord(void * word);
-	virtual void EnterChar(char ch, int pos) = 0;
+	virtual void EnterChar(char ch, int pos, int line) = 0;
 	virtual void CheckStart(char ch) = 0;
 	void UpdateStatus();
 protected:
@@ -48,6 +49,7 @@ protected:
 	char _currentLexemeType[30];
 
 	int _currentLexemePosition;
+	int _curlexline;
 	int _step;
 };
 
@@ -61,7 +63,7 @@ public:
 	~Type1Machine();
 
 	void CheckStart(char ch);
-	void EnterChar(char ch, int pos);
+	void EnterChar(char ch, int pos, int line);
 	void ClearAdditional();
 private:
 	List _potentialwords = *new List(sizeof(char[30]));
@@ -79,7 +81,7 @@ public:
 	~Type2Machine();
 
 	void CheckStart(char ch);
-	void EnterChar(char ch, int pos);
+	void EnterChar(char ch, int pos, int line);
 	void AddPerStartWord(char word);
 	void SetPerStartWords(char* words);
 	void ClearAdditional();

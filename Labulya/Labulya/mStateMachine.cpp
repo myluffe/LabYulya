@@ -11,6 +11,7 @@ mStateMachine::mStateMachine(char* name, char* lexname, char* lextype)
 	strcpy_s(_currentLexemName, lexname);
 	strcpy_s(_currentLexemeType, lextype);
 	_currentLexemePosition = -100;
+	_curlexline = -100;
 	_step = 0;
 }
 
@@ -76,6 +77,11 @@ int mStateMachine::CurrentLexPos()
 	return _currentLexemePosition;
 }
 
+int mStateMachine::CurrentLexLine()
+{
+	return _curlexline;
+}
+
 void mStateMachine::AddWord(void * word)
 {
 	_words->add(word);
@@ -89,6 +95,7 @@ void mStateMachine::UpdateStatus()
 	_step = 0;
 	strcpy_s(_buffer, "");
 	_currentLexemePosition = -100;
+	_curlexline = -100;
 	ClearAdditional();
 	Priority = 100;
 }
@@ -133,30 +140,28 @@ void Type1Machine::CheckStart(char ch)
 {
 	int listcount = _words->count();
 	char temp[20];
-	bool f = false;
 	for (int i = 0; i < listcount; i++)
 	{
 		strcpy_s(temp, (char*)_words->get(i));
 		if (temp[0] == ch)
 		{
-			if (!f)
+			if (!_start)
 			{
 				_buffer[_step++] = ch;
 				_buffer[_step] = '\0';
-				f = true;
+				_start = true;
 			}
-			_start = true;
-			_potentialwords.add(temp);	
-			return;
+			_potentialwords.add(temp);
 		}
 	}
 }
 
-void Type1Machine::EnterChar(char ch, int pos)
+void Type1Machine::EnterChar(char ch, int pos, int line)
 {
 	if (_currentLexemePosition == -100)
 	{
 		_currentLexemePosition = pos;
+		_curlexline = line;
 	}
 	if (!_start)
 	{
@@ -173,7 +178,11 @@ void Type1Machine::EnterChar(char ch, int pos)
 		_isError = true;
 		return;
 	}
-	if (listcount == 1 && (strlen(_buffer) >= strlen((char*)_potentialwords.get(0))))
+	//
+	int q = strlen((char*)_potentialwords.get(0));
+	char* tt4 = (char*)_potentialwords.get(0);
+	//
+	if (listcount == 1 && ((strlen(_buffer) >= strlen((char*)_potentialwords.get(0)))))
 	{
 		if (strcmp(_buffer, (char*)_potentialwords.get(0)) == 0)
 		{
@@ -227,11 +236,12 @@ void Type2Machine::CheckStart(char ch)
 	}
 }
 
-void Type2Machine::EnterChar(char ch, int pos)
+void Type2Machine::EnterChar(char ch, int pos, int line)
 {
 	if (_currentLexemePosition == -100)
 	{
 		_currentLexemePosition = pos;
+		_curlexline = line;
 	}
 	if (!_start)
 	{

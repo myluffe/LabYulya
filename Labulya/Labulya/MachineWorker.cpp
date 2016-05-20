@@ -25,13 +25,22 @@ MachineWorker::MachineWorker()
 	_addmachine(tm);
 
 	//Second Machine
-	om = new Type1Machine("Operations", "Operation", "Operation");
-	char* os[] = { "+", "-", "=", "/", "*", "++", "--", "==", "||", "|", "&&", "&", ">", "<", ">=", "<=", "%" };
+	om = new Type1Machine("Operations1", "Operation", "Operation");
+	char* os[] = { "++", "--", "==", "||", "&&", ">=", "<=" };
 	for each (char* var in os)
 	{
 		om->AddWord(var);
 	}
 	_addmachine(om);
+
+	//Operation2 Machine
+	om2 = new Type1Machine("Operations2", "Operation", "Operation");
+	char* os2[] = { "+", "-", "=", "/", "*", "|", "&", ">", "<", "%" };
+	for each (char* var in os2)
+	{
+		om2->AddWord(var);
+	}
+	_addmachine(om2);
 
 	//Third Machine
 	nm = new Type2Machine("Numbers", "Number", "float");
@@ -92,9 +101,10 @@ int MachineWorker::Work(char* filename, List* lexes)
 		int lenght = (int)strlen(str);
 		for (int s = 0; s < lenght; s++)
 		{
-			if (!EnterInComment && (_currentaut->IsStart() || (str[s] != ' ' && str[s] != '	')))
+			//if (!EnterInComment)
+			if (!EnterInComment && (_currentaut->IsStart() || (str[s] != ' ' && str[s] != '\t')))
 			{
-				_currentaut->EnterChar(str[s], s);
+				_currentaut->EnterChar(str[s], s, fr.CurrentLine());
 				if (_currentaut->IsFinished())
 				{
 					if (strcmp(_currentaut->MachineName(), "Special Words") == 0)
@@ -122,12 +132,9 @@ int MachineWorker::Work(char* filename, List* lexes)
 						if (_error)
 							return -2;
 					}
-					int curline = fr.CurrentLine();
-					if (s == 0 && _currentaut->CurrentLexPos() != 0)
-						curline--;
 					lexes->add(new lexeme(_currentaut->CurrentLexName(),
 						_currentaut->CurrentLexType(), _currentaut->Buffer(),
-						curline, _currentaut->CurrentLexPos(), _currentaut->Priority));
+						_currentaut->CurrentLexLine(), _currentaut->CurrentLexPos(), _currentaut->Priority));
 					UpdateMachines();
 					s--;		
 				}
@@ -135,7 +142,7 @@ int MachineWorker::Work(char* filename, List* lexes)
 				{
 					if (_curmachine >= _count - 1)
 					{
-						if (str[s] == ' ' || str[s] == '	')
+						if (str[s] == ' ' || str[s] == '\t')
 						{
 							UpdateMachines();
 							continue;

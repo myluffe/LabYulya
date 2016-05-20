@@ -6,7 +6,7 @@
 #include "lec.h"
 #include "ErrorReporter.h"
 
-#define MACHINES_COUNT 6
+#define MACHINES_COUNT 7
 
 static class MachineWorker
 {
@@ -18,6 +18,7 @@ public:
 private:
 	Type1Machine* sm;
 	Type1Machine* om;
+	Type1Machine* om2;
 	Type1Machine* dm;
 	Type1Machine* tm;
 

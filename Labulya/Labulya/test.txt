@@ -1,3 +1,8 @@
 int i = 36.e1;
 //dfdfdf
 for (i; i < 100; i++)
+{
+	/* not like this!
+i want close comment */
+	output("hi");
+}
