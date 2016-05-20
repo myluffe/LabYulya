@@ -3,30 +3,23 @@
 #include "stdafx.h"
 #include "list.h"
 
-static class lexeme
+class lexeme
 {
 private:
-	struct lex
-	{
-		char _name[50];
-		char _type[20];
-		char _data[256];
-		int _line;
-		int _startposition;
-		int _priority;
-	public: lex(char* name, char* type, char* data, int line, int startposition, int priority)
-		{
-			strcpy_s(_name, name);
-			strcpy_s(_type, type);
-			strcpy_s(_data, data);
-			_line = line;
-			_startposition = startposition;
-			_priority = priority;
-		}
-	};
-	List* lexes = new List(sizeof(lex));
-public:
-	void Addlexeme(char* name, char* type, char* data, int line, int startposition, int priority);
-	~lexeme();
+	char _name[50];
+	char _type[20];
+	char _data[256];
+	int _line;
+	int _startposition;
+	int _priority;
+public: 
+	lexeme(char* name, char* type, char* data, int line, int startposition, int priority);
+	void print();
+	char* Name() { return _name; }
+	char* Type() { return _type; }
+	char* Data() { return _data; }
+	int Line() { return _line; }
+	int Start_Position() { return _startposition; }
+	int Priority() { return _priority; }
 };
 

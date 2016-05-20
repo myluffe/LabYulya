@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "MachineWorker.h"
 #include "FileReader.h"
+#include "lec.h"
 
 int main(char* name)
 {
@@ -10,17 +11,19 @@ int main(char* name)
 	while (!test_reader->EndFile())
 	{	
 		char* temp = test_reader->ReadNextLine();
-		//temp[strlen(temp) - 1] = '\0';
-		printf("String Number %d: \" ", test_reader->CurrentLine());
-		for (int i = 0; i < strlen(temp); i++)
-		{
-			printf("\'%c\'", temp[i]);
-		}
-		printf(" \"\n");
+		printf("String Number %d: \"%s\"\n", test_reader->CurrentLine(), temp);	
 	}
-	printf("-----------\n");
-	lexeme();
-	MachineWorker().Work("test.txt");
+	printf("|-----------------|\n");
+
+	List* temp_lexes = new List(sizeof(lexeme));
+	MachineWorker().Work("test.txt", temp_lexes);
+	
+	int lcount = temp_lexes->count();
+	for (int j = 0; j < lcount; j++)
+	{
+		lexeme* temp = (lexeme*)temp_lexes->get(j);
+		temp->print();
+	}
 	return 0;
 }
 

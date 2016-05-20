@@ -61,7 +61,7 @@ MachineWorker::MachineWorker()
 	_addmachine(dm);
 
 	
-	for (int klick = 0; klick < Count(); klick++)
+	for (int klick = 0; klick < _count; klick++)
 	{
 		_machines[klick]->PrintMachine();
 		printf("\n-------------\n");
@@ -77,7 +77,7 @@ MachineWorker::~MachineWorker()
 {
 }
 
-int MachineWorker::Work(char* filename)
+int MachineWorker::Work(char* filename, List* lexes)
 {
 	mFileReader fr = mFileReader(filename);
 	char str[100];
@@ -124,9 +124,9 @@ int MachineWorker::Work(char* filename)
 					int curline = fr.CurrentLine();
 					if (s == 0 && _currentaut->CurrentLexPos() != 0)
 						curline--;
-					lexeme().Addlexeme(_currentaut->CurrentLexName(),
+					lexes->add(new lexeme(_currentaut->CurrentLexName(),
 						_currentaut->CurrentLexType(), _currentaut->Buffer(),
-						curline, _currentaut->CurrentLexPos(), _currentaut->Priority);
+						curline, _currentaut->CurrentLexPos(), _currentaut->Priority));
 					UpdateMachines();
 					s--;		
 				}

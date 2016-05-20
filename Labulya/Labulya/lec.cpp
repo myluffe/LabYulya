@@ -1,13 +1,17 @@
 #include "stdafx.h"
 #include "lec.h"
 
-void lexeme::Addlexeme(char* name, char* type, char* data, int line, int startposition, int priority)
+lexeme::lexeme(char * name, char * type, char * data, int line, int startposition, int priority)
 {
-	lex* l = new lex(name, type, data, line, startposition, priority);
-	lexes->add(l);
+	strcpy_s(_name, name);
+	strcpy_s(_type, type);
+	strcpy_s(_data, data);
+	_line = line;
+	_startposition = startposition;
+	_priority = priority;
 }
 
-lexeme::~lexeme()
+void lexeme::print()
 {
-	lexes->~List();
+	printf("Name: \"%s\" Type: \"%s\" Data: \"%s\" Line: \"%sd\" Start Position: \"%d\" Priority: \"%d\"\n", _name, _type, _data, _line, _startposition, _priority);
 }

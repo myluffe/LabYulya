@@ -13,7 +13,7 @@ static class MachineWorker
 public:
 	MachineWorker();
 	~MachineWorker();
-	int Work(char* filename);
+	int Work(char* filename, List* lexes);
 	int Count();
 private:
 	Type1Machine* sm;
@@ -34,6 +34,7 @@ private:
 	mStateMachine* _machines[MACHINES_COUNT];
 	int _count;
 	int _curmachine;
+
 	mStateMachine* _currentaut;
 };
 
