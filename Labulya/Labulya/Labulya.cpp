@@ -13,7 +13,7 @@ int main(char* name)
 		char* temp = test_reader->ReadNextLine();
 		printf("String Number %d: \"%s\"\n", test_reader->CurrentLine(), temp);	
 	}
-	printf("|-----------------|\n");
+	printf("\n-------------\n");
 
 	List* temp_lexes = new List(sizeof(lexeme));
 	MachineWorker().Work("test.txt", temp_lexes);

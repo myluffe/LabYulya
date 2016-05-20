@@ -1,11 +1,13 @@
 #include "stdafx.h"
 #include "mStateMachine.h"
+#include "ErrorReporter.h"
 
 mStateMachine::mStateMachine(char* name, char* lexname, char* lextype)
 {
 	_isFinished = false;
 	_isError = false;
 	_start = false;
+	_checkError = false;
 	_buffer[0] = '\0';
 	strcpy_s(_machineName, name);
 	strcpy_s(_currentLexemName, lexname);
@@ -43,6 +45,11 @@ bool mStateMachine::IsError()
 bool mStateMachine::IsStart()
 {
 	return _start;
+}
+
+bool mStateMachine::CheckError()
+{
+	return _checkError;
 }
 
 char * mStateMachine::CurrentLexName()
@@ -92,6 +99,7 @@ void mStateMachine::UpdateStatus()
 	_isError = false;
 	_isFinished = false;
 	_start = false;
+	_checkError = false;
 	_step = 0;
 	strcpy_s(_buffer, "");
 	_currentLexemePosition = -100;
@@ -178,10 +186,7 @@ void Type1Machine::EnterChar(char ch, int pos, int line)
 		_isError = true;
 		return;
 	}
-	//
-	int q = strlen((char*)_potentialwords.get(0));
-	char* tt4 = (char*)_potentialwords.get(0);
-	//
+
 	if (listcount == 1 && ((strlen(_buffer) >= strlen((char*)_potentialwords.get(0)))))
 	{
 		if (strcmp(_buffer, (char*)_potentialwords.get(0)) == 0)
@@ -249,6 +254,7 @@ void Type2Machine::EnterChar(char ch, int pos, int line)
 		if (!_start) _isError = true;
 		return;
 	}
+
 	int listcount = _words->count();
 	_isFinished = true;
 	for (int i = 0; i < listcount; i++)
@@ -271,4 +277,90 @@ void Type2Machine::AddPerStartWord(char word)
 void Type2Machine::SetPerStartWords(char * words)
 {
 	strcpy_s(_permissiblestart, words);
+}
+
+Type3Machine::~Type3Machine()
+{
+}
+
+void Type3Machine::EnterChar(char ch, int pos, int line)
+{
+	if (_currentLexemePosition == -100)
+	{
+		_currentLexemePosition = pos;
+		_curlexline = line;
+	}
+	if (!_start)
+	{
+		CheckStart(ch);
+		if (!_start) _isError = true;
+		return;
+	}
+
+	if (((_step - 1) > 0) && (_step - 1 != 0) && (_buffer[_step - 1] == _buffer[0]) && ch != '\\')
+	{
+		_isFinished = true;
+		CheckType();
+		return;
+	}
+
+	int listcount = _words->count();
+	_isFinished = true;
+	for (int i = 0; i < listcount; i++)
+	{
+		if (strchr((char*)_words->get(i), ch) != nullptr)
+		{
+			_isFinished = false;
+			strcat_s(_buffer, &ch);
+			_step++;
+			break;
+		}
+	}
+
+	if (_isFinished)
+	{
+		if (_buffer[strlen(_buffer) - 1] != _buffer[0])
+		{
+			_isFinished = false;
+			_isError = true;
+		}
+	}
+}
+
+void Type3Machine::CheckType()
+{
+	if (_buffer[0] == '\'')
+	{
+		strcpy_s(_currentLexemName, "Char");
+		strcpy_s(_currentLexemeType, "char");
+	}
+	char tbuffer[50];
+	for (int k = 1; k < strlen(_buffer) - 1; k++)
+	{
+		tbuffer[k - 1] = _buffer[k];
+	}
+	tbuffer[strlen(_buffer) - 2] = '\0';
+	strcpy_s(_buffer, tbuffer);
+	if (strcmp(_currentLexemeType, "char") == 0)
+	{
+		int slen = strlen(_buffer);
+		if (slen > 1)
+		{
+			if (slen != 2)
+			{
+				ErrorReporter().FReport(stdout, "To many symbols for char!", _curlexline, _currentLexemePosition);
+				_checkError = true;
+				return;
+			}
+			else
+			{
+				if (_buffer[0] != '\\')
+				{
+					ErrorReporter().FReport(stdout, "To many Symbols for char!", _curlexline, _currentLexemePosition);
+					_checkError = true;
+					return;
+				}
+			}
+		}
+	}
 }

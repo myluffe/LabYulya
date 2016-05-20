@@ -4,5 +4,7 @@ for (i; i < 100; i++)
 {
 	/* not like this!
 i want close comment */
-	output("hi");
+	output ("hi");
+	char s = 'b';
+	char s1 = '\n';
 }

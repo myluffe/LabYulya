@@ -5,8 +5,7 @@ MachineWorker::MachineWorker()
 {
 	_count = 0;
 
-	//First Machine
-	// add class, struct
+	// Special Words
 	sm = new Type1Machine("Special Words", "Special Word", "Special Word");
 	char* ss[] = { "//", "/*", "*/", "return ", "for ", "if ", "else ", "while ", "do ", "input ", "output ", "max ", "min " };
 	for each (char* var in ss)
@@ -15,7 +14,7 @@ MachineWorker::MachineWorker()
 	}
 	_addmachine(sm);
 
-	//Sixth Machine
+	// Types
 	tm = new Type1Machine("Types", "Type", "Type");
 	char* ts[] = { "class ", "struct ", "int ", "float ", "double ", "char ", "bool " };
 	for each (char* var in ts)
@@ -24,7 +23,7 @@ MachineWorker::MachineWorker()
 	}
 	_addmachine(tm);
 
-	//Second Machine
+	// Operations1
 	om = new Type1Machine("Operations1", "Operation", "Operation");
 	char* os[] = { "++", "--", "==", "||", "&&", ">=", "<=" };
 	for each (char* var in os)
@@ -33,7 +32,7 @@ MachineWorker::MachineWorker()
 	}
 	_addmachine(om);
 
-	//Operation2 Machine
+	// Operations2
 	om2 = new Type1Machine("Operations2", "Operation", "Operation");
 	char* os2[] = { "+", "-", "=", "/", "*", "|", "&", ">", "<", "%" };
 	for each (char* var in os2)
@@ -42,7 +41,7 @@ MachineWorker::MachineWorker()
 	}
 	_addmachine(om2);
 
-	//Third Machine
+	// Numbers
 	nm = new Type2Machine("Numbers", "Number", "float");
 	char nm_perstart[] = "0123456789.";
 	char nm_optional[] = "e";
@@ -51,7 +50,7 @@ MachineWorker::MachineWorker()
 	nm->SetPerStartWords(nm_perstart);
 	_addmachine(nm);
 
-	//Fourth Machine
+	// Variables
 	vm = new Type2Machine("Variables", "Variable", "Variable");
 	char vm_perstart[] = "_qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM";
 	char vm_optional[] = "1234567890";
@@ -60,15 +59,25 @@ MachineWorker::MachineWorker()
 	vm->SetPerStartWords(vm_perstart);
 	_addmachine(vm);
 
-	//Fifth Machine
+	// Deviders
 	dm = new Type1Machine("Deviders", "Devider", "Devider");
-	char* ds[] = { ";", "(", ")", "{", "}", "[", "]", "\"", "\'" };
+	char* ds[] = { ";", "(", ")", "{", "}", "[", "]"};
 	for each (char* var in ds)
 	{
 		dm->AddWord(var);
 	}
 	_addmachine(dm);
 
+	// String & Symbols
+	ssm = new Type3Machine("String & Symbols", "String", "char*");
+	char ssm_perstart[] = "\"\'";
+	char ssm_optional[] = "\\|:,<.>/?;\*]}[{-=!@#$%^&*()+`~";
+	ssm->AddWord(ssm_perstart);
+	ssm->AddWord(ssm_optional);
+	ssm->AddWord(vm_perstart);
+	ssm->AddWord(vm_optional);
+	ssm->SetPerStartWords(ssm_perstart);
+	_addmachine(ssm);
 	
 	for (int klick = 0; klick < _count; klick++)
 	{
@@ -107,6 +116,8 @@ int MachineWorker::Work(char* filename, List* lexes)
 				_currentaut->EnterChar(str[s], s, fr.CurrentLine());
 				if (_currentaut->IsFinished())
 				{
+					if (_currentaut->CheckError())
+						return -3;
 					if (strcmp(_currentaut->MachineName(), "Special Words") == 0)
 					{
 						if (strcmp(_currentaut->Buffer(), "//") == 0)
@@ -119,10 +130,10 @@ int MachineWorker::Work(char* filename, List* lexes)
 						}
 						if (strcmp(_currentaut->Buffer(), "/*") == 0)
 						{
-							UpdateMachines();
 							EnterInComment = true;
-							commentline = fr.CurrentLine();
-							commentpos = s - 2;
+							commentline = _currentaut->CurrentLexLine();
+							commentpos = _currentaut->CurrentLexPos();
+							UpdateMachines();
 							continue;
 						}
 					}
@@ -168,11 +179,11 @@ int MachineWorker::Work(char* filename, List* lexes)
 			{
 				if (fr.EndFile() && s >= strlen(str) - 1)
 				{
-					Error.FReport(stdout, "Maybe you forget to close the comment", 0, 0);
+					Error.FReport(stdout, "Maybe you forget to close the comment", commentline, commentpos);
 					_error = false;
 					return -1;
 				}
-				if (str[s] == '*' && str[s + 1] == '/')
+				if (str[s] == '/' && str[s - 1] == '*')
 				{
 					EnterInComment = false;
 					commentline = 0;
@@ -202,7 +213,7 @@ void MachineWorker::_addmachine(mStateMachine * machine)
 	_machines[_count++] = machine;
 }
 
-int MachineWorker::NumberCheck(mStateMachine* curr, int line)
+void MachineWorker::NumberCheck(mStateMachine* curr, int line)
 {
 	char first[30];
 	first[0] = 0;
@@ -223,7 +234,7 @@ int MachineWorker::NumberCheck(mStateMachine* curr, int line)
 			{
 				Error.FReport(stdout, "Uncorrect number. \"e\" - не может быть в числителе.", line, curr->CurrentLexPos() + i);
 				_error = true;
-				return -1;
+				return;
 			}
 			first[i] = number[i];
 			i++;
@@ -243,7 +254,7 @@ int MachineWorker::NumberCheck(mStateMachine* curr, int line)
 		{
 			Error.FReport(stdout, "Uncorrect number. \".\" - не может быть несколько.", line, curr->CurrentLexPos() + i);
 			_error = true;
-			return -2;
+			return;
 		}
 		if (number[i] == 'e')
 		{
@@ -255,7 +266,7 @@ int MachineWorker::NumberCheck(mStateMachine* curr, int line)
 			{
 				Error.FReport(stdout, "Uncorrect number. \"e\" - не может быть несколько.", line, curr->CurrentLexPos() + i);
 				_error = true;
-				return -3;
+				return;
 			}
 		}
 		else second[j++] = number[i++];
@@ -270,5 +281,5 @@ int MachineWorker::NumberCheck(mStateMachine* curr, int line)
 		else
 			curr->ChangeType("int");
 	}
-	return 1;
+	return;
 }

@@ -14,6 +14,8 @@ public:
 	bool IsError();
 	bool IsStart();
 
+	bool CheckError();
+
 	char* CurrentLexName();
 	char* CurrentLexType();
 	void ChangeType(char* str);
@@ -44,6 +46,8 @@ protected:
 	bool _isFinished;
 	bool _isError;
 	bool _start; // true if we are expect this type lexeme
+
+	bool _checkError;
 	
 	char _currentLexemName[30];
 	char _currentLexemeType[30];
@@ -81,11 +85,23 @@ public:
 	~Type2Machine();
 
 	void CheckStart(char ch);
-	void EnterChar(char ch, int pos, int line);
+	virtual void EnterChar(char ch, int pos, int line);
 	void AddPerStartWord(char word);
 	void SetPerStartWords(char* words);
 	void ClearAdditional();
-private:
+protected:
 	char _permissiblestart[60];
 	void PrintAdditionals();
+};
+
+class Type3Machine : public Type2Machine
+{
+public:
+	Type3Machine(char* name, char* lexname, char* lextype) : Type2Machine(name, lexname, lextype)
+	{ }
+	~Type3Machine();
+	void EnterChar(char ch, int pos, int line);
+private:
+	char _permissiblestart[60];
+	void CheckType();
 };

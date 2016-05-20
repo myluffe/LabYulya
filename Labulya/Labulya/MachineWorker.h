@@ -6,7 +6,7 @@
 #include "lec.h"
 #include "ErrorReporter.h"
 
-#define MACHINES_COUNT 7
+#define MACHINES_COUNT 8
 
 static class MachineWorker
 {
@@ -25,13 +25,15 @@ private:
 	Type2Machine* nm;
 	Type2Machine* vm;
 
+	Type3Machine* ssm;
+
 	ErrorReporter Error = ErrorReporter();
 	bool _error = false;
 
 	void UpdateMachines();
 	void _addmachine(mStateMachine* machine);
+	void NumberCheck(mStateMachine* curr, int line);
 
-	int NumberCheck(mStateMachine* curr, int line);
 	mStateMachine* _machines[MACHINES_COUNT];
 	int _count;
 	int _curmachine;
