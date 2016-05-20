@@ -24,6 +24,7 @@ int main(char* name)
 		lexeme tl = *(lexeme*)temp_lexes->get(j);
 		tl.Print();
 	}
+	getc(stdin);
 	return 0;
 }
 
