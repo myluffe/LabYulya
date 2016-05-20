@@ -11,7 +11,7 @@ lexeme::lexeme(char * name, char * type, char * data, int line, int startpositio
 	_priority = priority;
 }
 
-void lexeme::print()
+void lexeme::Print()
 {
-	printf("Name: \"%s\" Type: \"%s\" Data: \"%s\" Line: \"%sd\" Start Position: \"%d\" Priority: \"%d\"\n", _name, _type, _data, _line, _startposition, _priority);
+	printf("\"%s\" Name: \"%s\" Type: \"%s\" Line: \"%d\" Start Position: \"%d\" Priority: \"%d\"\n", _data, _name, _type, _line, _startposition, _priority);
 }

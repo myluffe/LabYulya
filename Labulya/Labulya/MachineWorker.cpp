@@ -26,7 +26,7 @@ MachineWorker::MachineWorker()
 
 	//Second Machine
 	om = new Type1Machine("Operations", "Operation", "Operation");
-	char* os[] = { "+", "-", "=", "/", "*", "++", "--", "==", "||", "|", "&&", "&", ">", ">=", "<=", "%" };
+	char* os[] = { "+", "-", "=", "/", "*", "++", "--", "==", "||", "|", "&&", "&", ">", "<", ">=", "<=", "%" };
 	for each (char* var in os)
 	{
 		om->AddWord(var);
@@ -102,6 +102,7 @@ int MachineWorker::Work(char* filename, List* lexes)
 						if (strcmp(_currentaut->Buffer(), "//") == 0)
 						{
 							strcpy_s(str, fr.ReadNextLine());
+							lenght = (int)strlen(str);
 							s = -1;
 							UpdateMachines();
 							continue;
@@ -141,8 +142,9 @@ int MachineWorker::Work(char* filename, List* lexes)
 						}	
 						else
 						{
+							if (str[s] != EOF)
+								Error.FReport(stdout, "Unprocessed word!", fr.CurrentLine(), _currentaut->CurrentLexPos());
 							UpdateMachines();
-							perror("Global Error! NO right machine!");
 							return -100;
 						}
 					}
@@ -157,9 +159,9 @@ int MachineWorker::Work(char* filename, List* lexes)
 			}
 			else
 			{
-				if (fr.EndFile())
+				if (fr.EndFile() && s >= strlen(str) - 1)
 				{
-					Error.FReport(stdout, "Не закрытый комментарий", 0, 0);
+					Error.FReport(stdout, "Maybe you forget to close the comment", 0, 0);
 					_error = false;
 					return -1;
 				}
@@ -212,7 +214,7 @@ int MachineWorker::NumberCheck(mStateMachine* curr, int line)
 		{
 			if (number[i] == 'e')
 			{
-				Error.FReport(stdout, "Некорректное число. \"e\" - не может быть в числителе.", line, curr->CurrentLexPos() + i);
+				Error.FReport(stdout, "Uncorrect number. \"e\" - не может быть в числителе.", line, curr->CurrentLexPos() + i);
 				_error = true;
 				return -1;
 			}
@@ -232,7 +234,7 @@ int MachineWorker::NumberCheck(mStateMachine* curr, int line)
 	{
 		if (number[i] == '.')
 		{
-			Error.FReport(stdout, "Некорректное число. \".\" - не может быть несколько.", line, curr->CurrentLexPos() + i);
+			Error.FReport(stdout, "Uncorrect number. \".\" - не может быть несколько.", line, curr->CurrentLexPos() + i);
 			_error = true;
 			return -2;
 		}
@@ -244,7 +246,7 @@ int MachineWorker::NumberCheck(mStateMachine* curr, int line)
 			}
 			else
 			{
-				Error.FReport(stdout, "Некорректное число. \"e\" - не может быть несколько.", line, curr->CurrentLexPos() + i);
+				Error.FReport(stdout, "Uncorrect number. \"e\" - не может быть несколько.", line, curr->CurrentLexPos() + i);
 				_error = true;
 				return -3;
 			}

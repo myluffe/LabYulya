@@ -21,8 +21,8 @@ int main(char* name)
 	int lcount = temp_lexes->count();
 	for (int j = 0; j < lcount; j++)
 	{
-		lexeme* temp = (lexeme*)temp_lexes->get(j);
-		temp->print();
+		lexeme tl = *(lexeme*)temp_lexes->get(j);
+		tl.Print();
 	}
 	return 0;
 }

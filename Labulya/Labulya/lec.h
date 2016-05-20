@@ -14,7 +14,7 @@ private:
 	int _priority;
 public: 
 	lexeme(char* name, char* type, char* data, int line, int startposition, int priority);
-	void print();
+	void Print();
 	char* Name() { return _name; }
 	char* Type() { return _type; }
 	char* Data() { return _data; }
