@@ -68,6 +68,8 @@ MachineWorker::MachineWorker()
 	}
 	printf("\n-------------\n");
 	
+	_currentaut = _machines[0];
+	_curmachine = 0;
 }
 
 
@@ -77,9 +79,6 @@ MachineWorker::~MachineWorker()
 
 int MachineWorker::Work(char* filename)
 {
-	mStateMachine* currentaut;
-	currentaut = _machines[0];
-	machinecount = 0;
 	mFileReader fr = mFileReader(filename);
 	char str[100];
 
@@ -93,67 +92,66 @@ int MachineWorker::Work(char* filename)
 		int lenght = (int)strlen(str);
 		for (int s = 0; s < lenght; s++)
 		{
-			if (!EnterInComment && (currentaut->IsStart() || (str[s] != ' ' && str[s] != '	')))
+			if (!EnterInComment && (_currentaut->IsStart() || (str[s] != ' ' && str[s] != '	')))
 			{
-				currentaut->EnterChar(str[s], s);
-				if (currentaut->IsFinished())
+				_currentaut->EnterChar(str[s], s);
+				if (_currentaut->IsFinished())
 				{
-					if (strcmp(currentaut->MachineName(), "Special Words") == 0)
+					if (strcmp(_currentaut->MachineName(), "Special Words") == 0)
 					{
-						if (strcmp(currentaut->Buffer(), "//") == 0)
+						if (strcmp(_currentaut->Buffer(), "//") == 0)
 						{
 							strcpy_s(str, fr.ReadNextLine());
 							s = -1;
-							UpdateMachines(currentaut);
+							UpdateMachines();
 							continue;
 						}
-						if (strcmp(currentaut->Buffer(), "/*") == 0)
+						if (strcmp(_currentaut->Buffer(), "/*") == 0)
 						{
-							UpdateMachines(currentaut);
+							UpdateMachines();
 							EnterInComment = true;
 							commentline = fr.CurrentLine();
 							commentpos = s - 2;
 							continue;
 						}
 					}
-					if (strcmp(currentaut->MachineName(), "Numbers") == 0)
+					if (strcmp(_currentaut->MachineName(), "Numbers") == 0)
 					{
-						NumberCheck(currentaut, fr.CurrentLine());
+						NumberCheck(_currentaut, fr.CurrentLine());
 						if (_error)
 							return -2;
 					}
 					int curline = fr.CurrentLine();
-					if (s == 0 && currentaut->CurrentLexPos() != 0)
+					if (s == 0 && _currentaut->CurrentLexPos() != 0)
 						curline--;
-					lexeme().Addlexeme(currentaut->CurrentLexName(),
-						currentaut->CurrentLexType(), currentaut->Buffer(),
-						curline, currentaut->CurrentLexPos(), currentaut->Priority);
-					UpdateMachines(currentaut);
-					s--;
-					
+					lexeme().Addlexeme(_currentaut->CurrentLexName(),
+						_currentaut->CurrentLexType(), _currentaut->Buffer(),
+						curline, _currentaut->CurrentLexPos(), _currentaut->Priority);
+					UpdateMachines();
+					s--;		
 				}
-				if (currentaut->IsError())
+				if (_currentaut->IsError())
 				{
-					if (machinecount >= _count - 1)
+					if (_curmachine >= _count - 1)
 					{
 						if (str[s] == ' ' || str[s] == '	')
 						{
-							UpdateMachines(currentaut);
+							UpdateMachines();
 							continue;
 						}	
 						else
 						{
-							UpdateMachines(currentaut);
+							UpdateMachines();
 							perror("Global Error! NO right machine!");
 							return -100;
 						}
 					}
 					else
 					{
-						s = currentaut->CurrentLexPos() - 1; 
-						currentaut->UpdateStatus();
-						machinecount++;
-						currentaut = _machines[machinecount];
+						s = _currentaut->CurrentLexPos() - 1; 
+						_currentaut->UpdateStatus();
+						_curmachine++;
+						_currentaut = _machines[_curmachine];
 					}
 				}
 			}
@@ -183,11 +181,11 @@ int MachineWorker::Count()
 	return _count;
 }
 
-void MachineWorker::UpdateMachines(mStateMachine* currentaut)
+void MachineWorker::UpdateMachines()
 {
-	currentaut->UpdateStatus();
-	currentaut = _machines[0];
-	machinecount = 0;
+	_currentaut->UpdateStatus();
+	_currentaut = _machines[0];
+	_curmachine = 0;
 }
 
 void MachineWorker::_addmachine(mStateMachine * machine)
