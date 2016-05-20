@@ -35,10 +35,15 @@ char* mFileReader::ReadNextLine()
 	char ch = 0;
 	int i = 0;
 	fseek(file, _currentposiotion, SEEK_SET);
-	while (ch != '\n' && ch != EOF)
+	while (ch != EOF)
 	{
 		ch = fgetc(file);
 		_currentposiotion++;
+		if (ch == '\n')
+		{
+			_currentposiotion++;
+			break;
+		}
 		_lastreadstring[i++] = ch;
 	}
 	if (ch == EOF)

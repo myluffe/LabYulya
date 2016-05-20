@@ -26,9 +26,13 @@ private:
 
 	ErrorReporter Error = ErrorReporter();
 	bool _error = false;
+
+	void UpdateMachines(mStateMachine* currentaut);
 	void _addmachine(mStateMachine* machine);
+
 	int NumberCheck(mStateMachine* curr, int line);
 	mStateMachine* _machines[MACHINES_COUNT];
 	int _count;
+	int machinecount = 0;
 };
 

@@ -53,7 +53,7 @@ MachineWorker::MachineWorker()
 
 	//Fifth Machine
 	dm = new Type1Machine("Deviders", "Devider", "Devider");
-	char* ds[] = { ";", "(", ")", "{", "}", "[", "]" };
+	char* ds[] = { ";", "(", ")", "{", "}", "[", "]", "\"", "\'" };
 	for each (char* var in ds)
 	{
 		dm->AddWord(var);
@@ -79,7 +79,7 @@ int MachineWorker::Work(char* filename)
 {
 	mStateMachine* currentaut;
 	currentaut = _machines[0];
-	int machinecount = 0;
+	machinecount = 0;
 	mFileReader fr = mFileReader(filename);
 	char str[100];
 
@@ -91,7 +91,7 @@ int MachineWorker::Work(char* filename)
 	{
 		strcpy_s(str, fr.ReadNextLine());
 		int lenght = (int)strlen(str);
-		for (int s = 0; s < lenght - 1; s++)
+		for (int s = 0; s < lenght; s++)
 		{
 			if (!EnterInComment && (currentaut->IsStart() || (str[s] != ' ' && str[s] != '	')))
 			{
@@ -104,10 +104,12 @@ int MachineWorker::Work(char* filename)
 						{
 							strcpy_s(str, fr.ReadNextLine());
 							s = -1;
+							UpdateMachines(currentaut);
 							continue;
 						}
 						if (strcmp(currentaut->Buffer(), "/*") == 0)
 						{
+							UpdateMachines(currentaut);
 							EnterInComment = true;
 							commentline = fr.CurrentLine();
 							commentpos = s - 2;
@@ -120,13 +122,15 @@ int MachineWorker::Work(char* filename)
 						if (_error)
 							return -2;
 					}
+					int curline = fr.CurrentLine();
+					if (s == 0 && currentaut->CurrentLexPos() != 0)
+						curline--;
 					lexeme().Addlexeme(currentaut->CurrentLexName(),
 						currentaut->CurrentLexType(), currentaut->Buffer(),
-						fr.CurrentLine(), currentaut->CurrentLexPos(), currentaut->Priority);
-					currentaut->UpdateStatus();
-					currentaut = _machines[0];
+						curline, currentaut->CurrentLexPos(), currentaut->Priority);
+					UpdateMachines(currentaut);
 					s--;
-					machinecount = 0;
+					
 				}
 				if (currentaut->IsError())
 				{
@@ -134,14 +138,12 @@ int MachineWorker::Work(char* filename)
 					{
 						if (str[s] == ' ' || str[s] == '	')
 						{
-							currentaut->UpdateStatus();
-							currentaut = _machines[0];
-							machinecount = 0;
+							UpdateMachines(currentaut);
 							continue;
 						}	
 						else
 						{
-							currentaut->UpdateStatus();
+							UpdateMachines(currentaut);
 							perror("Global Error! NO right machine!");
 							return -100;
 						}
@@ -179,6 +181,13 @@ int MachineWorker::Work(char* filename)
 int MachineWorker::Count()
 {
 	return _count;
+}
+
+void MachineWorker::UpdateMachines(mStateMachine* currentaut)
+{
+	currentaut->UpdateStatus();
+	currentaut = _machines[0];
+	machinecount = 0;
 }
 
 void MachineWorker::_addmachine(mStateMachine * machine)
