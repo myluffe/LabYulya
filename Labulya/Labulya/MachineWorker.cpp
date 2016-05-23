@@ -84,7 +84,6 @@ MachineWorker::MachineWorker()
 		_machines[klick]->PrintMachine();
 		printf("\n-------------\n");
 	}
-	printf("\n-------------\n");
 	
 	_currentaut = _machines[0];
 	_curmachine = 0;
@@ -145,7 +144,7 @@ int MachineWorker::Work(char* filename, List* lexes)
 					}
 					lexes->add(new lexeme(_currentaut->CurrentLexName(),
 						_currentaut->CurrentLexType(), _currentaut->Buffer(),
-						_currentaut->CurrentLexLine(), _currentaut->CurrentLexPos(), _currentaut->Priority));
+						_currentaut->CurrentLexLine(), _currentaut->CurrentLexPos(), _currentaut->Priority)->Print);
 					UpdateMachines();
 					s--;		
 				}

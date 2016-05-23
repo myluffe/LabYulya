@@ -208,6 +208,17 @@ void Type1Machine::EnterChar(char ch, int pos, int line)
 		strcpy_s(temp, (char*)_potentialwords.get(i));
 		if (temp[_step] != ch)
 		{
+			//test for missed space
+			char stemp[30];
+			strcpy_s(stemp, (char*)_potentialwords.get(i));
+			stemp[strlen(stemp) - 1] = '\0';
+			if (strcmp(stemp, _buffer) == 0 && temp[strlen(temp) - 1] == ' ')
+			{
+				char sstemp[50];
+				sprintf_s(sstemp, "Maybe you misse space? Maybe you mean \"%s\"?", temp);
+				ErrorReporter().WarningReport(stdout, sstemp, _curlexline, _currentLexemePosition + strlen(_buffer) + 1);
+			}
+			//
 			_potentialwords.remove(i);
 			listcount--;
 			i--;
