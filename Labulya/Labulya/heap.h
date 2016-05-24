@@ -42,4 +42,6 @@ private:
 
 };
 
+static Heap heap = *new Heap();
+
 #endif // HEAP_H_INCLUDED

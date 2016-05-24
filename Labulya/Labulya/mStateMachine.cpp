@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "mStateMachine.h"
-#include "ErrorReporter.h"
 
 mStateMachine::mStateMachine(char* name, char* lexname, char* lextype)
 {
@@ -8,6 +7,7 @@ mStateMachine::mStateMachine(char* name, char* lexname, char* lextype)
 	_isError = false;
 	_start = false;
 	_checkError = false;
+	_buffer = (char*)heap.get_mem(sizeof(char) * Chunck);
 	_buffer[0] = '\0';
 	strcpy_s(_machineName, name);
 	strcpy_s(_currentLexemName, lexname);
@@ -15,6 +15,7 @@ mStateMachine::mStateMachine(char* name, char* lexname, char* lextype)
 	_currentLexemePosition = -100;
 	_curlexline = -100;
 	_step = 0;
+	_chunckcount = 1;
 }
 
 mStateMachine::~mStateMachine()
@@ -89,6 +90,11 @@ int mStateMachine::CurrentLexLine()
 	return _curlexline;
 }
 
+int mStateMachine::ChunkCount()
+{
+	return _chunckcount;
+}
+
 void mStateMachine::AddWord(void * word)
 {
 	_words->add(word);
@@ -101,7 +107,9 @@ void mStateMachine::UpdateStatus()
 	_start = false;
 	_checkError = false;
 	_step = 0;
-	strcpy_s(_buffer, "");
+	_chunckcount = 1;
+	_buffer = (char*)heap.get_mem(sizeof(char) * Chunck);
+	_buffer[0] = '\0';
 	_currentLexemePosition = -100;
 	_curlexline = -100;
 	ClearAdditional();
@@ -111,7 +119,7 @@ void mStateMachine::UpdateStatus()
 void Type1Machine::ClearAdditional()
 {
 	_potentialwords.~List();
-	_potentialwords = List(sizeof(char[30]));
+	_potentialwords = List(sizeof(char[Chunck]));
 }
 
 void Type1Machine::PrintAdditionals()
@@ -147,7 +155,7 @@ Type1Machine::~Type1Machine()
 void Type1Machine::CheckStart(char ch)
 {
 	int listcount = _words->count();
-	char temp[20];
+	char temp[Chunck];
 	for (int i = 0; i < listcount; i++)
 	{
 		strcpy_s(temp, (char*)_words->get(i));
@@ -178,7 +186,7 @@ void Type1Machine::EnterChar(char ch, int pos, int line)
 		return;
 	}
 	int listcount = _potentialwords.count();
-	char temp[30];
+	char temp[Chunck];
 	bool f = false;
 	
 	if (listcount == 0)
@@ -193,7 +201,7 @@ void Type1Machine::EnterChar(char ch, int pos, int line)
 		{
 			_isFinished = true;
 			_potentialwords.~List();
-			_potentialwords = List(sizeof(char[30]));
+			_potentialwords = List(sizeof(char[Chunck]));
 			return;
 		}
 		else
@@ -209,12 +217,12 @@ void Type1Machine::EnterChar(char ch, int pos, int line)
 		if (temp[_step] != ch)
 		{
 			//test for missed space
-			char stemp[30];
+			char stemp[Chunck];
 			strcpy_s(stemp, (char*)_potentialwords.get(i));
 			stemp[strlen(stemp) - 1] = '\0';
 			if (strcmp(stemp, _buffer) == 0 && temp[strlen(temp) - 1] == ' ')
 			{
-				char sstemp[50];
+				char sstemp[Chunck];
 				sprintf_s(sstemp, "Maybe you misse space? Maybe you mean \"%s\"?", temp);
 				ErrorReporter().WarningReport(stdout, sstemp, _curlexline, _currentLexemePosition + strlen(_buffer) + 1);
 			}
@@ -225,6 +233,13 @@ void Type1Machine::EnterChar(char ch, int pos, int line)
 		}
 		else if (!f)
 		{
+			if (_step >= Chunck * _chunckcount) //Chunck * кол-во кусков
+			{
+				_chunckcount++;
+				char* _buffer2 = (char*)heap.get_mem(sizeof(char) * Chunck * _chunckcount);
+				strcpy_s(_buffer2, strlen(_buffer), _buffer);
+				_buffer = _buffer2;
+			}
 			_buffer[_step++] = ch;
 			_buffer[_step] = '\0';
 			f = true;
@@ -245,8 +260,8 @@ void Type2Machine::CheckStart(char ch)
 		if (_permissiblestart[i] == ch)
 		{
 			_start = true;
-			strcat_s(_buffer, &ch);
-			_step++;
+			_buffer[_step++] = ch;
+			_buffer[_step] = '\0';
 			return;
 		}
 	}
@@ -273,8 +288,15 @@ void Type2Machine::EnterChar(char ch, int pos, int line)
 		if (strchr((char*)_words->get(i), ch) != nullptr)
 		{
 			_isFinished = false;
-			strcat_s(_buffer, &ch);
-			_step++;
+			if (_step >= Chunck * _chunckcount) //50 * кол-во кусков
+			{
+				_chunckcount++;
+				char* _buffer2 = (char*)heap.get_mem(sizeof(char) * Chunck * _chunckcount);
+				strcpy_s(_buffer2, strlen(_buffer), _buffer);
+				_buffer = _buffer2;
+			}
+			_buffer[_step++] = ch;
+			_buffer[_step] = '\0';
 			break;
 		}
 	}
@@ -322,8 +344,8 @@ void Type3Machine::EnterChar(char ch, int pos, int line)
 		if (strchr((char*)_words->get(i), ch) != nullptr)
 		{
 			_isFinished = false;
-			strcat_s(_buffer, &ch);
-			_step++;
+			_buffer[_step++] = ch;
+			_buffer[_step] = '\0';
 			break;
 		}
 	}
@@ -345,13 +367,13 @@ void Type3Machine::CheckType()
 		strcpy_s(_currentLexemName, "Char");
 		strcpy_s(_currentLexemeType, "char");
 	}
-	char tbuffer[50];
+	char* tbuffer = (char*)heap.get_mem(sizeof(char) * Chunck * _chunckcount);
 	for (int k = 1; k < strlen(_buffer) - 1; k++)
 	{
 		tbuffer[k - 1] = _buffer[k];
 	}
 	tbuffer[strlen(_buffer) - 2] = '\0';
-	strcpy_s(_buffer, tbuffer);
+	strcpy_s(_buffer, Chunck * _chunckcount, tbuffer);
 	if (strcmp(_currentLexemeType, "char") == 0)
 	{
 		int slen = strlen(_buffer);

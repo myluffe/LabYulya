@@ -32,7 +32,7 @@ private:
 
 	void UpdateMachines();
 	void Addmachine(mStateMachine* machine);
-	void NumberCheck(mStateMachine* curr, int line);
+	void NumberCheck(int line);
 	void Hooker(char* buffer);
 	bool HooksCheck(mFileReader* f);
 

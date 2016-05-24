@@ -1,14 +1,16 @@
 #pragma once
 #include "string.h"
 
-using namespace std;
+#define String 100
+#define FileName 50
 
+using namespace std; 
 
 class mFileReader
 {
 private:
-	char _lastreadstring[100];
-	char _filename[50];
+	char _lastreadstring[String];
+	char _filename[FileName];
 	int _currentline;
 	int _currentposiotion;
 	FILE *file;

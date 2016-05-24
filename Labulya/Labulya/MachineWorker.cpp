@@ -7,7 +7,7 @@ MachineWorker::MachineWorker()
 
 	// Special Words
 	sm = new Type1Machine("Special Words", "Special Word", "Special Word");
-	char* ss[] = { "//", "/*", "*/", "return ", "for ", "if ", "else ", "while ", "do ", "input ", "output ", "max ", "min " };
+	char* ss[] = { "//", "/*", "*/", "return ", "for ", "if ", "else ", "while ", "do ", "input ", "output ", "max ", "min ", "sin ", "cos " };
 	for each (char* var in ss)
 	{
 		sm->AddWord(var);
@@ -25,7 +25,7 @@ MachineWorker::MachineWorker()
 
 	// Operations1
 	om = new Type1Machine("Operations1", "Operation", "Operation");
-	char* os[] = { "++", "--", "==", "||", "&&", ">=", "<=" };
+	char* os[] = { "++", "--", "==", "||", "&&", ">=", "<=", "<<", ">>", "::" };
 	for each (char* var in os)
 	{
 		om->AddWord(var);
@@ -34,7 +34,7 @@ MachineWorker::MachineWorker()
 
 	// Operations2
 	om2 = new Type1Machine("Operations2", "Operation", "Operation");
-	char* os2[] = { "+", "-", "=", "/", "*", "|", "&", ">", "<", "%" };
+	char* os2[] = { "+", "-", "=", "/", "*", "|", "&", ">", "<", "%", ":", "!", "?" };
 	for each (char* var in os2)
 	{
 		om2->AddWord(var);
@@ -96,8 +96,8 @@ MachineWorker::~MachineWorker()
 
 int MachineWorker::Work(char* filename, List* lexes)
 {
-	mFileReader fr = mFileReader(filename);
-	char str[100];
+	mFileReader fr = *new mFileReader(filename);
+	char str[String];
 
 	//for comments
 	bool EnterInComment = false;
@@ -140,7 +140,7 @@ int MachineWorker::Work(char* filename, List* lexes)
 					}
 					if (strcmp(_currentaut->MachineName(), "Numbers") == 0)
 					{
-						NumberCheck(_currentaut, fr.CurrentLine());
+						NumberCheck(fr.CurrentLine());
 						if (_error)
 							return -2;
 					}
@@ -228,16 +228,17 @@ void MachineWorker::Addmachine(mStateMachine * machine)
 	_machines[_count++] = machine;
 }
 
-void MachineWorker::NumberCheck(mStateMachine* curr, int line)
+void MachineWorker::NumberCheck(int line)
 {
-	char first[30];
-	first[0] = 0;
+	char* first = (char*)heap.get_mem(sizeof(char) * Chunck * _currentaut->ChunkCount());
+	first[0] = '\0';
 
-	char second[30];
+	char* second = (char*)heap.get_mem(sizeof(char) * Chunck * _currentaut->ChunkCount());
 	second[0] = 0;
 
-	char number[60];
-	strcpy_s(number, curr->Buffer());
+	char* number = (char*)heap.get_mem(sizeof(char) * Chunck * _currentaut->ChunkCount());
+	number[0] = '\0';
+	strcpy_s(number, Chunck * _currentaut->ChunkCount(), _currentaut->Buffer());
 
 	int count = strlen(number);
 	int i = 0;
@@ -247,7 +248,7 @@ void MachineWorker::NumberCheck(mStateMachine* curr, int line)
 		{
 			if (number[i] == 'e')
 			{
-				ErrorReporter().FReport(stdout, "Uncorrect number. \"e\" - не может быть в числителе.", line, curr->CurrentLexPos() + i);
+				ErrorReporter().FReport(stdout, "Uncorrect number. \"e\" - не может быть в числителе.", line, _currentaut->CurrentLexPos() + i);
 				_error = true;
 				return;
 			}
@@ -267,7 +268,7 @@ void MachineWorker::NumberCheck(mStateMachine* curr, int line)
 	{
 		if (number[i] == '.')
 		{
-			ErrorReporter().FReport(stdout, "Uncorrect number. \".\" - не может быть несколько.", line, curr->CurrentLexPos() + i);
+			ErrorReporter().FReport(stdout, "Uncorrect number. \".\" - не может быть несколько.", line, _currentaut->CurrentLexPos() + i);
 			_error = true;
 			return;
 		}
@@ -279,7 +280,7 @@ void MachineWorker::NumberCheck(mStateMachine* curr, int line)
 			}
 			else
 			{
-				ErrorReporter().FReport(stdout, "Uncorrect number. \"e\" - не может быть несколько.", line, curr->CurrentLexPos() + i);
+				ErrorReporter().FReport(stdout, "Uncorrect number. \"e\" - не может быть несколько.", line, _currentaut->CurrentLexPos() + i);
 				_error = true;
 				return;
 			}
@@ -292,9 +293,9 @@ void MachineWorker::NumberCheck(mStateMachine* curr, int line)
 	if (strlen(second) == 0)
 	{
 		if (strlen(first) > 0)
-			curr->ChangeType("double");
+			_currentaut->ChangeType("double");
 		else
-			curr->ChangeType("int");
+			_currentaut->ChangeType("int");
 	}
 	return;
 }
@@ -350,23 +351,21 @@ void MachineWorker::Hooker(char * buffer)
 
 bool MachineWorker::HooksCheck(mFileReader* f)
 {
+	char temp[Chunck];
 	if (_hooks > 0)
 	{
-		char temp[50];
 		sprintf_s(temp, "You need to close %d hook(s)", _hooks);
 		ErrorReporter().FReport(stdout, temp, f->CurrentLine(), 0);
 		return false;
 	}
 	if (_circlehooks > 0)
 	{
-		char temp[50];
 		sprintf_s(temp, "You need to close %d circle hook(s)", _circlehooks);
 		ErrorReporter().FReport(stdout, temp, f->CurrentLine(), 0);
 		return false;
 	}
 	if (_squarehooks > 0)
 	{
-		char temp[50];
 		sprintf_s(temp, "You need to close %d square hook(s)", _squarehooks);
 		ErrorReporter().FReport(stdout, temp, f->CurrentLine(), 0);
 		return false;
