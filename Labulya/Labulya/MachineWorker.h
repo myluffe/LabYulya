@@ -27,16 +27,24 @@ private:
 
 	Type3Machine* ssm;
 
-	ErrorReporter Error = ErrorReporter();
+	//ErrorReporter Error = ErrorReporter();
 	bool _error = false;
 
 	void UpdateMachines();
-	void _addmachine(mStateMachine* machine);
+	void Addmachine(mStateMachine* machine);
 	void NumberCheck(mStateMachine* curr, int line);
+	void Hooker(char* buffer);
+	bool HooksCheck(mFileReader* f);
 
 	mStateMachine* _machines[MACHINES_COUNT];
 	int _count;
 	int _curmachine;
+
+	//for hooks
+	int _hooks = 0;
+	int _circlehooks = 0;
+	int _squarehooks = 0;
+	//
 
 	mStateMachine* _currentaut;
 };
