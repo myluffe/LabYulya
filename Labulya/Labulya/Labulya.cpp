@@ -2,9 +2,16 @@
 #include "MachineWorker.h"
 #include "FileReader.h"
 #include "lec.h"
+#include "hash.h"
 
 int main(char* name)
 {
+	Diction* dtest = new Diction();
+	dtest->auto_create("ine");
+	dtest->auto_create("zwine");
+	dtest->auto_create("dryine");
+
+	/*
 	name = "test.txt";
 	mFileReader* test_reader = new mFileReader(name);
 	printf("File: \"%s\"\n", name);
@@ -24,6 +31,8 @@ int main(char* name)
 		lexeme tl = *(lexeme*)temp_lexes->get(j);
 		tl.Print();
 	}
+	*/
+
 	getc(stdin);
 	return 0;
 }

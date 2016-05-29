@@ -10,13 +10,6 @@ class Hash
 {
 public:
 	Hash(int _n1, int _n2, int _n3, int _n4, int _n5);
-       /* { n1 = abs(_n1) % MAXRANGE + 1;
-          n2 = abs(_n2) % MAXRANGE + 1;
-          n3 = abs(_n3) % MAXRANGE + 1;
-          n4 = abs(_n4) % MAXRANGE + 1;
-          n5 = abs(_n5) % MAXRANGE + 1;
-          //table=(List**)heap.get_mem(n1*n2*n3*n4*n5*sizeof(List*));
-        };*/
    ~Hash(); 
 
 	List* find_list(char* key_word);
@@ -40,7 +33,6 @@ protected:
              
         };
 
-//private:
 	List* table;
 	int    n1,n2,n3,n4,n5;
 };
@@ -67,20 +59,15 @@ public:
 
 class Diction : public Hash
 {
-public: 
-	Diction(int _n1, int _n2, int _n3, int _n4, int _n5);// { Hash::Hash(33, 33, 0, 0, 0); }
-    ~Diction(); 
+public:
+	Diction(int _n1, int _n2, int _n3, int _n4, int _n5) : Hash(_n1, _n2, _n3, _n4, _n5) { ; };
+	~Diction(); 
 	
-	int key1(char* key_word); /* { int f = key_word[0] - 'A';
-				   if (f<33 && f>0) return f;
-			           else             return 0; }*/
-	int key2(char* key_word); /* { return key_word[1] % 33; }*/
+	int key1(char* key_word);
+	int key2(char* key_word);
 
 	Article* find(char* word);
-	/*
-    { Diction_list* list =(Diction_list*)find_list(word);
-      return list ? list->find(*word) : 0; 
-    };*/
+
 	Article* auto_create(char* word); // create Article (and List) if not exist
 	Article* auto_create(char* word,char* description);
 private:

@@ -11,6 +11,7 @@ int Diction::key1(char* key_word)
 	if (f<33 && f>0) return f;
 	else             return 0;
 }
+
 int Diction::key2(char* key_word)
 {
 	int f = key_word[1] - 'a';
@@ -41,7 +42,6 @@ List* Hash::find_list(char* key_word)
 {   
 	int a = combine_keys(key_word);	
 	return (List*)table->get(a);	
-	
 }
 
 void Hash::print_hash()
@@ -61,11 +61,6 @@ void Hash::print_hash()
 	}
 }
 
-
-Diction::Diction(int _n1, int _n2, int _n3, int _n4, int _n5) : Hash(_n1, _n2, _n3, _n4, _n5)
-{
-	;
-};
  Hash::~Hash()
 { 
 	
@@ -203,7 +198,6 @@ Article* Diction::auto_create(char*word, char* description)
 	Article art = { word, description };
 	Article* fin = find(word);
 	if (fin)
-
 	{
 		return fin;
 	}

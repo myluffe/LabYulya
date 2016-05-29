@@ -160,6 +160,7 @@
   <ItemGroup>
     <ClCompile Include="ErrorReporter.cpp" />
     <ClCompile Include="FileReader.cpp" />
+    <ClCompile Include="hash.cpp" />
     <ClCompile Include="heap.cpp" />
     <ClCompile Include="Labulya.cpp" />
     <ClCompile Include="lec.cpp" />
