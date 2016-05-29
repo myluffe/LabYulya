@@ -32,19 +32,25 @@ bool LexemeWorker::Processing(List* lexes)
 						lexeme* tdevider = (lexeme*)lexes->get(i + 1);
 						if (strcmp(tdevider->Data(), "=") != 0)
 						{
-							ErrorReporter().FReport(stdout, "You should define the variable!", temp_lexeme->Line(), temp_lexeme->Start_Position() + strlen(temp_lexeme->Data()) - 1);
+							ErrorReporter().FReport(stdout, "You should define the variable!", temp_lexeme->Line(), temp_lexeme->Start_Position() + strlen(temp_lexeme->Data()));
 							return false;
 						}
 						lexeme* tdata = (lexeme*)lexes->get(i + 2);
-						if (strcmp(temp_lexeme->Name(), "Number") != 0)
+						if (strcmp(tdata->Name(), "Number") != 0 && strcmp(tdata->Name(), "String") != 0 && strcmp(tdata->Name(), "Char") != 0)
 						{
-							ErrorReporter().FReport(stdout, "There should be value!", tdevider->Line(), tdevider->Start_Position() + 1);
+							ErrorReporter().FReport(stdout, "There should be value!", tdevider->Line(), tdevider->Start_Position());
 							return false;
 						}
-						lexeme* newlex = new lexeme(temp_lexeme->Data(), ttype->Type(), tdata->Data(), temp_lexeme->Line(), temp_lexeme->Start_Position(), temp_lexeme->Priority());
+						lexeme* newlex = new lexeme(temp_lexeme->Data(), ttype->Data(), tdata->Data(), temp_lexeme->Line(), temp_lexeme->Start_Position(), temp_lexeme->Priority());
+						if (strcmp(temp_lexeme->Type(), ttype->Data()) != 0)
+							ErrorReporter().WarningReport(stdout, "Diffrent variable and value types!", temp_lexeme->Line(), temp_lexeme->Start_Position());
 						//в дов уже готовую добавляем
 						dob->add(newlex);
+						//добавление в хэш-таблицу
 						LexemeTable.auto_create(newlex);
+						//удаление ненужных и мухлеж с щетчиком :\
+						//....
+						//
 					}
 				}
 				else
@@ -100,6 +106,7 @@ bool LexemeWorker::Processing(List* lexes)
 			}
 		}
 	}
+	LexemeTable.print_lexems();
 	return true;
 }
 

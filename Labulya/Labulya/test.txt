@@ -1,6 +1,9 @@
 int i = 36.e1;
 //dfdfdf
-fora (i; i < 100; i++)
+//int j 0;
+//s = 2;
+for (i; i < 100; i++)
+{
 	/* not like this!
 i want close comment */
 	output ("hi");

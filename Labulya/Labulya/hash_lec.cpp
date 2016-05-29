@@ -36,7 +36,7 @@ Diction_lexem::Diction_lexem(int _n1, int _n2, int _n3, int _n4, int _n5)
 	n5 = abs(_n5) % MAXRANGE + 1;
 	table = new List(sizeof(Lexeme_list));
 	int k = n1*n2*n3*n4*n5;
-	printf("+");
+	//printf("+");
 	for (int i = 0; i < k; i++)
 	{
 		table->add(new Lexeme_list());

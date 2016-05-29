@@ -225,7 +225,7 @@ void Type1Machine::EnterChar(char ch, int pos, int line)
 			{
 				char sstemp[Chunck];
 				sprintf_s(sstemp, "Maybe you misse space? Maybe you mean \"%s\"?", temp);
-				ErrorReporter().WarningReport(stdout, sstemp, _curlexline, _currentLexemePosition + strlen(_buffer) + 1);
+				ErrorReporter().WarningReport(stdout, sstemp, _curlexline, _currentLexemePosition + strlen(_buffer));
 			}
 			//
 			_potentialwords.remove(i);
