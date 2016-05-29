@@ -3,9 +3,6 @@
 #include "list.h"
 #include "hash.h"
 
-
-
-
 int Diction::key1(char* key_word)
 {
 	int f = key_word[0] - 'a';
@@ -136,22 +133,24 @@ int Diction_list::findpos(char* word)
 	}
 	return -1;
 }
+/*
 void Diction_list::put(Article* article)
 { 
-	if (article != nullptr){
-		
+	if (article != nullptr)
+	{
 		Article* art = (Article*)heap.get_mem(sizeof(Article));
 
-		art->word = (char*)heap.get_mem(strlen(article->word)+1);
-		
-		art->description = (char*)heap.get_mem(strlen(article->description)+1);
+		art->word = (char*)heap.get_mem(strlen(article->word) + 1);		
+		art->description = (char*)heap.get_mem(strlen(article->description) + 1);
+
 		memcpy(art->word, article->word, strlen(article->word)+1);
 		memcpy(art->description, article->description, strlen(article->description)+1);
+
 		add(art);		
 		heap.free_mem(art);
 	}
-	
 }
+*/
 
 void Diction_list::del(char* word)
 {
@@ -197,7 +196,7 @@ Article* Diction::auto_create(char*word)
 		{
 			list = (Diction_list*)heap.get_mem(sizeof(Diction_list));
 		}
-		list->put(&art);
+		list->add(&art);
 	}
 	return find(word);
 }
@@ -215,7 +214,7 @@ Article* Diction::auto_create(char*word, char* description)
 	else
 	{
 		Diction_list* list = (Diction_list*)find_list(word);
-		list->put(&art);
+		list->add(&art);
 		return find(word);
 	}
 }

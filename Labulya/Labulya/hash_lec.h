@@ -11,7 +11,7 @@ public:
 	Lexeme_list();  
 	~Lexeme_list(); 
 
-	void     put(lexeme* article); //добавить лексему в список
+	//void     put(lexeme* article); //добавить лексему в список
 	lexeme* find(char* word);      // найти нужную лексему по имени в списке
 	int      findpos(char* word);  //найти позицию лексемы в списке
 	void     del(char* word);      // удалить лексему по имени

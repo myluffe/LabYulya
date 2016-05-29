@@ -4,8 +4,6 @@
 #include "hash.h"
 #include "hash_lec.h"
 
-
-
 int Diction_lexem::key1(char* key_word)
 {
 	int f = key_word[0] - 'a';
@@ -72,7 +70,8 @@ Lexeme_list::~Lexeme_list()
 
 lexeme* Lexeme_list::find(char*word)
 {
-	lexeme * now = new lexeme("","","",0,0,0); // конструктор!
+	//lexeme * now = new lexeme("","","",0,0,0); // конструктор!
+	lexeme* now = (lexeme*)heap.get_mem(sizeof(lexeme));
 
 	for (int i = 0; i < count(); i++)
 	{
@@ -87,7 +86,8 @@ lexeme* Lexeme_list::find(char*word)
 
 int Lexeme_list::findpos(char* word)
 {
-	lexeme * now = new lexeme("","","",0,0,0);
+	//lexeme * now = new lexeme("","","",0,0,0);
+	lexeme* now = (lexeme*)heap.get_mem(sizeof(lexeme));
 
 	for (int i = 0; i < count(); i++)
 	{
@@ -101,6 +101,7 @@ int Lexeme_list::findpos(char* word)
 	return -1;
 }
 
+/*
 void Lexeme_list::put(lexeme* article)
 {
 	if (article != nullptr){
@@ -110,17 +111,18 @@ void Lexeme_list::put(lexeme* article)
 		heap.free_mem(art);
 	}
 }
+*/
 
 void Lexeme_list::del(char* word)
 {
 	int a = findpos(word);
 	if (a != -1)
 	{
-		heap.free_mem((lexeme*)get(a));
-		
+		//heap.free_mem((lexeme*)get(a));
 		remove(a);
 	}
 }
+
 void Lexeme_list::del(lexeme* article)
 {
 	del(article->Name());
@@ -153,13 +155,15 @@ lexeme* Diction_lexem::auto_create(char*word)
 		return fin;
 	else
 	{   
-		fin = new lexeme(word, "", "", 0, 0, 0);
+		//fin = new lexeme(word, "", "", 0, 0, 0);
+		fin = (lexeme*)heap.get_mem(sizeof(lexeme));
 		Lexeme_list* list = (Lexeme_list*)find_list(word);
 		if (!list)
 		{
 			list = (Lexeme_list*)heap.get_mem(sizeof(Lexeme_list));
 		}
-		list->put(fin);
+		//list->put(fin);
+		list->add(fin);
 	}
 	heap.free_mem(fin);
     return find(word);
@@ -179,7 +183,8 @@ int Diction_lexem::auto_create(lexeme* lex)
 		{
 			list = (Lexeme_list*)heap.get_mem(sizeof(Lexeme_list));
 		}
-		list->put(fin);
+		//list->put(fin);
+		list->add(fin);
 	}
 	//heap.free_mem(fin);
 	return combine_keys(lex->Name());

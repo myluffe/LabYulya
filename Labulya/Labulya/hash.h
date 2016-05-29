@@ -21,6 +21,7 @@ public:
 	virtual int key5(char* key_word) { return 0; }
 	
 	void print_hash();
+
 protected:
     int combine_keys(char* key_word)
 		{  
