@@ -368,7 +368,7 @@ void Type3Machine::CheckType()
 	if (_buffer[0] == '\'')
 	{
 		strcpy_s(_currentLexemName, "Char");
-		strcpy_s(_currentLexemeType, "char");
+		strcpy_s(_currentLexemeType, "char ");
 	}
 	char* tbuffer = (char*)heap.get_mem(sizeof(char) * Chunck * _chunckcount);
 	for (int k = 1; k < strlen(_buffer) - 1; k++)
@@ -378,7 +378,7 @@ void Type3Machine::CheckType()
 	tbuffer[strlen(_buffer) - 2] = '\0';
 	strcpy_s(_buffer, Chunck * _chunckcount, tbuffer);
 	heap.free_mem(tbuffer);
-	if (strcmp(_currentLexemeType, "char") == 0)
+	if (strcmp(_currentLexemeType, "char ") == 0)
 	{
 		int slen = strlen(_buffer);
 		if (slen > 1)

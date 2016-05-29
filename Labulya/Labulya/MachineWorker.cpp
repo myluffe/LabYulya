@@ -43,7 +43,7 @@ MachineWorker::MachineWorker()
 	Addmachine(om2);
 
 	// Numbers
-	nm = new Type2Machine("Numbers", "Number", "float");
+	nm = new Type2Machine("Numbers", "Number", "float ");
 	char nm_perstart[] = "0123456789.";
 	char nm_optional[] = "e";
 	nm->AddWord(nm_perstart);
@@ -70,7 +70,7 @@ MachineWorker::MachineWorker()
 	Addmachine(dm);
 
 	// String & Symbols
-	ssm = new Type3Machine("String & Symbols", "String", "string");
+	ssm = new Type3Machine("String & Symbols", "String", "string ");
 	char ssm_perstart[] = "\"\'";
 	char ssm_optional[] = "\\|:,<.>/?;\*]}[{-=!@#$%^&*()+`~";
 	ssm->AddWord(ssm_perstart);
@@ -209,7 +209,8 @@ int MachineWorker::Work(char* filename, List* lexes)
 			}
 		}
 	}
-	LWorker.Processing(lexes);
+	if (!LWorker.Processing(lexes))
+		return -6;
 	return 1;
 }
 
@@ -304,9 +305,9 @@ void MachineWorker::NumberCheck(int line)
 	if (strlen(second) == 0)
 	{
 		if (strlen(first) > 0)
-			_currentaut->ChangeType("double");
+			_currentaut->ChangeType("double ");
 		else
-			_currentaut->ChangeType("int");
+			_currentaut->ChangeType("int ");
 	}
 	heap.free_mem(first);
 	heap.free_mem(second);
