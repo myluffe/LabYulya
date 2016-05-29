@@ -1,8 +1,5 @@
 #pragma once
 
-#ifndef HASH_H_INCLUDED
-#define HASH_H_INCLUDED
-
 #include "List.h"
 
 #define MAXRANGE 20
@@ -81,5 +78,3 @@ public:
 private:
 	
 };
-
-#endif // LIST_H_INCLUDED

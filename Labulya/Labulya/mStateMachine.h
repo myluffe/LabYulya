@@ -1,4 +1,5 @@
 #pragma once
+
 #include "list.h"
 #include "ErrorReporter.h"
 

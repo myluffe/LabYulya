@@ -1,8 +1,6 @@
 // heap.h - TODO: Description
 
 #pragma once
-#ifndef HEAP_H_INCLUDED
-#define HEAP_H_INCLUDED
 
 #include <stdio.h>
 #include "windows.h"
@@ -43,5 +41,3 @@ private:
 };
 
 static Heap heap = *new Heap();
-
-#endif // HEAP_H_INCLUDED
