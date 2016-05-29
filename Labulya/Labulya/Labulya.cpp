@@ -6,11 +6,10 @@
 
 int main(char* name)
 {
-	lexeme* l = new lexeme("a", "int", "1234", 5, 6, 100);
-	l->Print();
-
-	/*
+	//»м€ обрабатываемого файла
 	name = "test.txt";
+
+	//¬ывод обрабатываемого текста из файла:
 	mFileReader* test_reader = new mFileReader(name);
 	printf("File: \"%s\"\n", name);
 	while (!test_reader->EndFile())
@@ -19,17 +18,23 @@ int main(char* name)
 		printf("String Number %d: \"%s\"\n", test_reader->CurrentLine(), temp);	
 	}
 	printf("\n-------------\n");
+	test_reader->~mFileReader();
+	//конец вывода
 
 	List* temp_lexes = new List(sizeof(lexeme));
-	MachineWorker().Work("test.txt", temp_lexes);
 	
+	//обработка текста:
+	MachineWorker().Work(name, temp_lexes);
+
+	
+	//вывод обработанных лексем
 	int lcount = temp_lexes->count();
 	for (int j = 0; j < lcount; j++)
 	{
 		lexeme tl = *(lexeme*)temp_lexes->get(j);
 		tl.Print();
 	}
-	*/
+	//конец вывода
 
 	getc(stdin);
 	return 0;

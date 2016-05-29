@@ -1,6 +1,5 @@
 #include "stdafx.h"
 #include "lec.h"
-#include "heap.h"
 
 lexeme::lexeme(char * name, char * type, char * data, int line, int startposition, int priority)
 {
@@ -23,6 +22,6 @@ lexeme::~lexeme()
 }
 
 void lexeme::Print()
-{
+{   
 	printf("\"%s\" Name: \"%s\" Type: \"%s\" Line: \"%d\" Start Position: \"%d\" Priority: \"%d\"\n", _data, _name, _type, _line, _startposition, _priority);
 }

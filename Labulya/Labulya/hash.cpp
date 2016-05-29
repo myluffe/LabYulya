@@ -5,13 +5,13 @@
 
 
 
+
 int Diction::key1(char* key_word)
 {
 	int f = key_word[0] - 'a';
 	if (f<33 && f>0) return f;
 	else             return 0;
 }
-
 int Diction::key2(char* key_word)
 {
 	int f = key_word[1] - 'a';
@@ -38,14 +38,17 @@ Hash::Hash(int _n1, int _n2, int _n3, int _n4, int _n5)
 	memset(table, 0, n1*n2*n3*n4*n5*sizeof(List*));*/
 };
 
+
 List* Hash::find_list(char* key_word)
 {   
 	int a = combine_keys(key_word);	
 	return (List*)table->get(a);	
+	
 }
 
 void Hash::print_hash()
 {
+	
 	List* list;
 	for (int i = 0; i < table->count(); i++)
 	{
@@ -61,6 +64,11 @@ void Hash::print_hash()
 	}
 }
 
+
+Diction::Diction(int _n1, int _n2, int _n3, int _n4, int _n5) : Hash(_n1, _n2, _n3, _n4, _n5)
+{
+	;
+};
  Hash::~Hash()
 { 
 	
@@ -95,13 +103,15 @@ Diction_list::Diction_list() :List(sizeof(Article))
 
 Diction_list::~Diction_list()
 {
+	List::~List();
 }
 
-Article* Diction_list::find(char* word)
+Article* Diction_list::find(char*word)
 {
 	Article * now= new Article();
 	for (int i = 0; i < count(); i++)
 	{  
+		
 		now = (Article*)get(i);
 		if (!strcmp(now->word , word))
 		{ 
@@ -198,6 +208,7 @@ Article* Diction::auto_create(char*word, char* description)
 	Article art = { word, description };
 	Article* fin = find(word);
 	if (fin)
+
 	{
 		return fin;
 	}

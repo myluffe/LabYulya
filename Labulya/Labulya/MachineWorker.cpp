@@ -250,6 +250,9 @@ void MachineWorker::NumberCheck(int line)
 			{
 				ErrorReporter().FReport(stdout, "Uncorrect number. \"e\" - не может быть в числителе.", line, _currentaut->CurrentLexPos() + i);
 				_error = true;
+				heap.free_mem(first);
+				heap.free_mem(second);
+				heap.free_mem(number);
 				return;
 			}
 			first[i] = number[i];
@@ -270,6 +273,9 @@ void MachineWorker::NumberCheck(int line)
 		{
 			ErrorReporter().FReport(stdout, "Uncorrect number. \".\" - не может быть несколько.", line, _currentaut->CurrentLexPos() + i);
 			_error = true;
+			heap.free_mem(first);
+			heap.free_mem(second);
+			heap.free_mem(number);
 			return;
 		}
 		if (number[i] == 'e')
@@ -282,6 +288,9 @@ void MachineWorker::NumberCheck(int line)
 			{
 				ErrorReporter().FReport(stdout, "Uncorrect number. \"e\" - не может быть несколько.", line, _currentaut->CurrentLexPos() + i);
 				_error = true;
+				heap.free_mem(first);
+				heap.free_mem(second);
+				heap.free_mem(number);
 				return;
 			}
 		}
@@ -297,6 +306,9 @@ void MachineWorker::NumberCheck(int line)
 		else
 			_currentaut->ChangeType("int");
 	}
+	heap.free_mem(first);
+	heap.free_mem(second);
+	heap.free_mem(number);
 	return;
 }
 

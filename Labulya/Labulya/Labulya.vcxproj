@@ -148,8 +148,10 @@
     <ClInclude Include="ErrorReporter.h" />
     <ClInclude Include="FileReader.h" />
     <ClInclude Include="hash.h" />
+    <ClInclude Include="hash_lec.h" />
     <ClInclude Include="heap.h" />
     <ClInclude Include="lec.h" />
+    <ClInclude Include="LexemeWorker.h" />
     <ClInclude Include="list.h" />
     <ClInclude Include="list_adv.h" />
     <ClInclude Include="MachineWorker.h" />
@@ -161,9 +163,11 @@
     <ClCompile Include="ErrorReporter.cpp" />
     <ClCompile Include="FileReader.cpp" />
     <ClCompile Include="hash.cpp" />
+    <ClCompile Include="hash_lec.cpp" />
     <ClCompile Include="heap.cpp" />
     <ClCompile Include="Labulya.cpp" />
     <ClCompile Include="lec.cpp" />
+    <ClCompile Include="LexemeWorker.cpp" />
     <ClCompile Include="list.cpp" />
     <ClCompile Include="MachineWorker.cpp" />
     <ClCompile Include="mStateMachine.cpp" />

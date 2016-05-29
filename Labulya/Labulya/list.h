@@ -3,7 +3,6 @@
 #ifndef LIST_H_INCLUDED
 #define LIST_H_INCLUDED
 
-#include "heap.h"
 #include <stdio.h>
 
 #define LISTSIZE 64

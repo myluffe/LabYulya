@@ -20,6 +20,7 @@ mStateMachine::mStateMachine(char* name, char* lexname, char* lextype)
 
 mStateMachine::~mStateMachine()
 {
+	heap.free_mem(_buffer);
 	_words->~List();
 }
 
@@ -238,6 +239,7 @@ void Type1Machine::EnterChar(char ch, int pos, int line)
 				_chunckcount++;
 				char* _buffer2 = (char*)heap.get_mem(sizeof(char) * Chunck * _chunckcount);
 				strcpy_s(_buffer2, strlen(_buffer), _buffer);
+				heap.free_mem(_buffer);
 				_buffer = _buffer2;
 			}
 			_buffer[_step++] = ch;
@@ -293,6 +295,7 @@ void Type2Machine::EnterChar(char ch, int pos, int line)
 				_chunckcount++;
 				char* _buffer2 = (char*)heap.get_mem(sizeof(char) * Chunck * _chunckcount);
 				strcpy_s(_buffer2, strlen(_buffer), _buffer);
+				heap.free_mem(_buffer);
 				_buffer = _buffer2;
 			}
 			_buffer[_step++] = ch;
@@ -374,6 +377,7 @@ void Type3Machine::CheckType()
 	}
 	tbuffer[strlen(_buffer) - 2] = '\0';
 	strcpy_s(_buffer, Chunck * _chunckcount, tbuffer);
+	heap.free_mem(tbuffer);
 	if (strcmp(_currentLexemeType, "char") == 0)
 	{
 		int slen = strlen(_buffer);

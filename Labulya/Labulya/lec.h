@@ -13,12 +13,16 @@ private:
 public: 
 	lexeme(char* name, char* type, char* data, int line, int startposition, int priority);
 	~lexeme();
-	void Print();
+
 	char* _data;
+
+	char* Data() { return _data; }
 	char* Name() { return _name; }
 	char* Type() { return _type; }
 	int Line() { return _line; }
 	int Start_Position() { return _startposition; }
 	int Priority() { return _priority; }
+
+	void Print();
 };
 

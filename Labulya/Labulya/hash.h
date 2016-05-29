@@ -1,15 +1,18 @@
-#include "Heap.h"
+#pragma once
+
+#ifndef HASH_H_INCLUDED
+#define HASH_H_INCLUDED
+
 #include "List.h"
 
 #define MAXRANGE 20
-
-//Heap heap;
-//static Heap heap;
 
 class Hash
 {
 public:
 	Hash(int _n1, int _n2, int _n3, int _n4, int _n5);
+	Hash(){ ; }
+       
    ~Hash(); 
 
 	List* find_list(char* key_word);
@@ -59,17 +62,24 @@ public:
 
 class Diction : public Hash
 {
-public:
-	Diction(int _n1, int _n2, int _n3, int _n4, int _n5) : Hash(_n1, _n2, _n3, _n4, _n5) { ; };
-	~Diction(); 
+public: 
+	Diction(int _n1, int _n2, int _n3, int _n4, int _n5);// { Hash::Hash(33, 33, 0, 0, 0); }
+    ~Diction(); 
 	
-	int key1(char* key_word);
-	int key2(char* key_word);
+	int key1(char* key_word); /* { int f = key_word[0] - 'A';
+				   if (f<33 && f>0) return f;
+			           else             return 0; }*/
+	int key2(char* key_word); /* { return key_word[1] % 33; }*/
 
 	Article* find(char* word);
-
+	/*
+    { Diction_list* list =(Diction_list*)find_list(word);
+      return list ? list->find(*word) : 0; 
+    };*/
 	Article* auto_create(char* word); // create Article (and List) if not exist
 	Article* auto_create(char* word,char* description);
 private:
 	
 };
+
+#endif // LIST_H_INCLUDED
