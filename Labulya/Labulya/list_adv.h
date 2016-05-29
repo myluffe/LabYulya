@@ -38,12 +38,10 @@ class LexemeStack : List
 	{
 		add(&x);
 	}
-	lexeme pop()
+	void pop(lexeme* store)
 	{
-		lexeme* res = (lexeme*)heap.get_mem(sizeof(lexeme));
-		take_last(res);
+		take_last(store);
 		remove(count() - 1);
-		return *res;
 	}
 };
 
