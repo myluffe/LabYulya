@@ -6,10 +6,8 @@
 
 int main(char* name)
 {
-	Diction* dtest = new Diction();
-	dtest->auto_create("ine");
-	dtest->auto_create("zwine");
-	dtest->auto_create("dryine");
+	lexeme* l = new lexeme("a", "int", "1234", 5, 6, 100);
+	l->Print();
 
 	/*
 	name = "test.txt";
