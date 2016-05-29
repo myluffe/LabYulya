@@ -1,4 +1,5 @@
 #include "list.h"
+#include "lec.h"
 
 class Stack : List
 {
@@ -11,7 +12,7 @@ public:
 	    List::~List();
     }
 
-	void   push(double x)
+	void push(double x)
 	{
 	    add(&x);
     }
@@ -22,6 +23,28 @@ public:
 	    remove(count()-1);
 	    return res;
     }
+};
+
+class LexemeStack : List
+{
+	LexemeStack() : List(sizeof(lexeme))
+	{
+	}
+	~LexemeStack()
+	{
+		List::~List();
+	}
+	void push(lexeme x)
+	{
+		add(&x);
+	}
+	lexeme pop()
+	{
+		lexeme* res = (lexeme*)heap.get_mem(sizeof(lexeme));
+		take_last(res);
+		remove(count() - 1);
+		return *res;
+	}
 };
 
 class Queue : List
