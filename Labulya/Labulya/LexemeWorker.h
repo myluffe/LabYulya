@@ -12,3 +12,5 @@ public:
 	~LexemeWorker();
 };
 
+static LexemeWorker LWorker = *new LexemeWorker();
+

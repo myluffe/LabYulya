@@ -1,5 +1,6 @@
 #include "stdafx.h"
 #include "MachineWorker.h"
+#include "LexemeWorker.h"
 
 MachineWorker::MachineWorker()
 {
@@ -208,6 +209,7 @@ int MachineWorker::Work(char* filename, List* lexes)
 			}
 		}
 	}
+	LWorker.Processing(lexes);
 	return 1;
 }
 
