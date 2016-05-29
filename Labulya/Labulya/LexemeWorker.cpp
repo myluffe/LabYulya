@@ -17,7 +17,7 @@ bool LexemeWorker::Processing(List* lexes)
 		}
 		if (strcmp(temp_lexeme->Type(), "Variable") == 0)
 		{
-			if (dob->find(temp_lexeme->Data()) == nullptr)
+			if (dob->find(temp_lexeme->Data()) == nullptr) //если нет в дов
 			{
 				if (i > 0)
 				{
@@ -42,13 +42,43 @@ bool LexemeWorker::Processing(List* lexes)
 							return false;
 						}
 						lexeme* newlex = new lexeme(temp_lexeme->Data(), ttype->Type(), tdata->Data(), temp_lexeme->Line(), temp_lexeme->Start_Position(), temp_lexeme->Priority());
+						//в дов уже готовую добавляем
 						dob->add(newlex);
+						LexemeTable.auto_create(newlex);
 					}
 				}
 				else
 				{
 					ErrorReporter().FReport(stdout, "You miss the type!", temp_lexeme->Line(), temp_lexeme->Start_Position());
 					return false;
+				}
+			}
+			else
+			{
+				if (i > 0)
+				{
+					lexeme* ttype = (lexeme*)lexes->get(i - 1);
+					if (strcmp(ttype->Type(), "Type") == 0)
+					{
+						ErrorReporter().FReport(stdout, "This variable is alredy defined!", temp_lexeme->Line(), temp_lexeme->Start_Position());
+						return false;
+					}
+				}
+				else
+				{
+					//заменяем на ссылку
+					List* tlist = LexemeTable.find_list(temp_lexeme->Data());
+					for (int k = 0; k < tlist->count(); k++)
+					{
+						if (strcmp(temp_lexeme->Data(), ((lexeme*)tlist->get(k))->Name()) == 0)
+						{
+							*temp_lexeme = *(lexeme*)tlist->get(k);
+							break;
+						}
+					}
+					//отладка
+					printf("1 What's wrong! LexemeWorker.cpp");
+					//
 				}
 			}
 		}
