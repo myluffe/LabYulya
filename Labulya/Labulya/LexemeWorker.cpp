@@ -43,14 +43,19 @@ bool LexemeWorker::Processing(List* lexes)
 						}
 						lexeme* newlex = new lexeme(temp_lexeme->Data(), ttype->Data(), tdata->Data(), temp_lexeme->Line(), temp_lexeme->Start_Position(), temp_lexeme->Priority());
 						if (strcmp(tdata->Type(), ttype->Data()) != 0)
-							ErrorReporter().WarningReport(stdout, "Diffrent variable and value types!", temp_lexeme->Line(), temp_lexeme->Start_Position());
+							ErrorReporter().FReport(stdout, "Diffrent variable and value types!", temp_lexeme->Line(), temp_lexeme->Start_Position());
 						//в дов уже готовую добавляем
 						dob->add(newlex);
 						//добавление в хэш-таблицу
 						LexemeTable.auto_create(newlex);
-						//удаление ненужных и мухлеж с щетчиком :\
-						//....
-						//
+						//удаление ненужных и мухлеж с щетчиком :
+						int ti = i - 1;
+						lexes->remove(i + 2);
+						lexes->remove(i + 1);
+						//lexes[i] = newlex;
+						lexes->set(i, newlex);
+						lexes->remove(i - 1);
+						i = ti;
 					}
 				}
 				else
@@ -106,7 +111,11 @@ bool LexemeWorker::Processing(List* lexes)
 			}
 		}
 	}
+	//отладка
+	printf_s("\n|---------------|\nVariable Table:");
 	LexemeTable.print_lexems();
+	printf_s("\n|---------------|\n");
+	//
 	return true;
 }
 

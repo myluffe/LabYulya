@@ -51,6 +51,17 @@ void List::add(void * data)
 	memcpy(last->data, data, _element_size);
 }
 
+void List::set(int pos, void * data)
+{
+	int n;
+	Segment* s = first;
+	for (n = 0; n != pos; n++)
+	{
+		s = s->next;
+	}
+	memcpy(s->data, data, _element_size);
+}
+
 void List::take_first(void * store)
 {
 	memcpy(store, first->data, _element_size);
