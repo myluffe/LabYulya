@@ -38,4 +38,6 @@ protected:
 	lexeme* auto_create(char* word);
 };
 
+Diction_lexem VariablesTable = *new Diction_lexem(36, 36, 36, 0, 0);
+
 

@@ -27,6 +27,7 @@ public:
 
 class LexemeStack : List
 {
+public:
 	LexemeStack() : List(sizeof(lexeme))
 	{
 	}
@@ -34,9 +35,9 @@ class LexemeStack : List
 	{
 		List::~List();
 	}
-	void push(lexeme x)
+	void push(lexeme* x)
 	{
-		add(&x);
+		add(x);
 	}
 	void pop(lexeme* store)
 	{

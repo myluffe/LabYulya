@@ -73,9 +73,9 @@ Lexeme_list::~Lexeme_list()
 lexeme* Lexeme_list::find(char*word)
 {
 	lexeme * now = new lexeme("","","",0,0,0); // конструктор!
+
 	for (int i = 0; i < count(); i++)
 	{
-
 		now = (lexeme*)get(i);
 		if (!strcmp(now->Name(), word))
 		{
@@ -109,7 +109,6 @@ void Lexeme_list::put(lexeme* article)
 		add(art);
 		heap.free_mem(art);
 	}
-
 }
 
 void Lexeme_list::del(char* word)

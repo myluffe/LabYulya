@@ -3,11 +3,12 @@
 #include "stdafx.h"
 #include "list.h"
 #include "hash_lec.h"
+#include "list_adv.h"
 
 static class LexemeWorker
 {
 public:
-	void Processing(List* lexes);
+	bool Processing(List* lexes);
 	LexemeWorker();
 	~LexemeWorker();
 };

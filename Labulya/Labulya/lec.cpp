@@ -21,6 +21,13 @@ lexeme::~lexeme()
 	heap.free_mem(_data);
 }
 
+void lexeme::DataChange(char* newdata)
+{
+	heap.free_mem(_data);
+	_data = (char*)heap.get_mem(sizeof(char) * strlen(newdata) + 1);
+	strcpy_s(_data, strlen(newdata) + 1, newdata);
+}
+
 void lexeme::Print()
 {   
 	printf("\"%s\" Name: \"%s\" Type: \"%s\" Line: \"%d\" Start Position: \"%d\" Priority: \"%d\"\n", _data, _name, _type, _line, _startposition, _priority);

@@ -6,6 +6,7 @@ struct lexeme
 {
 private:
 	char* _name;
+	char* _data;
 	char* _type;
 	int _line;
 	int _startposition;
@@ -14,8 +15,6 @@ public:
 	lexeme(char* name, char* type, char* data, int line, int startposition, int priority);
 	~lexeme();
 
-	char* _data;
-
 	char* Data() { return _data; }
 	char* Name() { return _name; }
 	char* Type() { return _type; }
@@ -23,6 +22,7 @@ public:
 	int Start_Position() { return _startposition; }
 	int Priority() { return _priority; }
 
+	void DataChange(char* newdata);
 	void Print();
 };
 
