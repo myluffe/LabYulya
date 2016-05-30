@@ -24,6 +24,15 @@ MachineWorker::MachineWorker()
 	}
 	Addmachine(tm);
 
+	//Bool
+	bm = new Type1Machine("Bools", "Bool", "bool ");
+	char* bs[] = { "true ", "false " };
+	for each (char* var in bs)
+	{
+		bm->AddWord(var);
+	}
+	Addmachine(bm);
+
 	// Operations1
 	om = new Type1Machine("Operations1", "Operation", "Operation1");
 	char* os[] = { "++", "--", "==", "!=", "||", "&&", ">=", "<=", "<<", ">>", "::" };

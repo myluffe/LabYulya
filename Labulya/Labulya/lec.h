@@ -21,6 +21,7 @@ public:
 	int Line() { return _line; }
 	int Start_Position() { return _startposition; }
 	int Priority() { return _priority; }
+	//int SetPriority(int pr) { _priority = pr; }
 
 	void DataChange(char* newdata);
 	void Print();
