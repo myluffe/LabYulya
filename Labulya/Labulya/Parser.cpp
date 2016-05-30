@@ -66,7 +66,7 @@ char * Parser::FloatToString(float value)
 	char* res = (char*)heap.get_mem(_CVTBUFSIZE);
 	int buf = _fcvt_s(res, _CVTBUFSIZE, value, 100, &decimal, &sign);
 	if (buf != 0)
-		return nullptr
+		return nullptr;
 	return res;
 }
 
