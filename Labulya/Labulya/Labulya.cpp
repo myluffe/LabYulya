@@ -2,11 +2,11 @@
 #include "MachineWorker.h"
 #include "FileReader.h"
 #include "lec.h"
-#include "hash.h"
-#include "LexemeWorker.h"
 
 int main(char* name)
 {	
+	
+	
 	//Имя обрабатываемого файла
 	name = "test.txt";
 
