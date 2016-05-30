@@ -4,6 +4,7 @@
 
 bool LexemeWorker::Processing(List* lexes)
 {
+	//изменение
 	//LexemeStack* temp_stack = new LexemeStack();
 	Lexeme_list* dob = new Lexeme_list(); //стэк для области видимости
 	for (int i = 0; i < lexes->count(); i++)
