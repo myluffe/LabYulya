@@ -15,12 +15,14 @@ protected:
 
 	lexeme* NExpressionSolver(List* expression);
 
-	bool WhateverCheck(char ** perone, int c1, char ** types, int c2, List * expression);
-
 	bool IsNumberExpression(List* expression);
 	bool IsBoolExpression(List* expression);
 	bool IsStringExpression(List * expression);
 	bool IsCharExpression(List * expression);
+
+private:
+	bool WhateverCheck(char ** perone, int c1, char ** types, int c2, List * expression);
+	lexeme* ExePression(lexeme expression[3]);
 };
 
 static LexemeWorker LWorker = *new LexemeWorker();

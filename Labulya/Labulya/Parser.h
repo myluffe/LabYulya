@@ -7,7 +7,6 @@ static class Parser
 public:
 	Parser();
 	~Parser();
-protected:
 	int ToInt(char* str);
 	double ToDouble(char* str);
 	float ToFloat(char* str);
@@ -15,6 +14,9 @@ protected:
 	char* IntToString(int value);
 	char* DoubleToString(int value);
 	char* FloatToString(int value);
+
+	bool ToBool(char* str);
+	char* BoolToString(bool value);
 };
 
-static Parser = *new Parser();
+static Parser parser = *new Parser();

@@ -61,3 +61,17 @@ char * Parser::FloatToString(int value)
 	//char* str = (char*)heap.get_mem(sizeof(char) * (count) + 1 ); //её возвращать
 	return nullptr;
 }
+
+bool Parser::ToBool(char * str)
+{
+	if (strcmp(str, "true") == 0)
+		return true;
+	return false;
+}
+
+char * Parser::BoolToString(bool value)
+{
+	if (value)
+		return "true";
+	else return "false";
+}

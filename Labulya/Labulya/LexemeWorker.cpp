@@ -161,7 +161,7 @@ int LexemeWorker::GetLexemePositionWithMinimalPriority(List * expression)
 
 lexeme * LexemeWorker::NExpressionSolver(List * expression)
 {
-	if (!IsNumberExpression(expression))
+	if (!IsNumberExpression(expression) && !IsBoolExpression(expression) && !IsStringExpression(expression) && !IsCharExpression(expression))
 		return nullptr;
 	int pos = -1;
 	lexeme* solution = nullptr;
@@ -169,6 +169,7 @@ lexeme * LexemeWorker::NExpressionSolver(List * expression)
 	{
 		pos = GetLexemePositionWithMinimalPriority(expression);
 		lexeme* temp = (lexeme*)expression->get(pos);
+		//TODO: Full Hoock checker!
 		if (strcmp(temp->Data(), "(") == 0)
 		{
 			int count = 1;
@@ -179,10 +180,10 @@ lexeme * LexemeWorker::NExpressionSolver(List * expression)
 				temp = (lexeme*)expression->get(pos + count);
 				temp_lexes->add(temp);
 				count++;
-				if (pos == expression->count() && strcmp(temp->Data(), ")") != 0)
+				if (pos + count == expression->count() && strcmp(temp->Data(), ")") != 0)
 				{
-					//не хватает закрывающей скобки
-					//return nullptr;
+					ErrorReporter().FReport(stdout, "You should close the hoock!", temp->Line(), pos + count);
+					return nullptr;
 				}
 			} while (strcmp(temp->Data(), ")") != 0);
 			expression->set(pos, NExpressionSolver(temp_lexes));
@@ -211,20 +212,21 @@ lexeme * LexemeWorker::NExpressionSolver(List * expression)
 					if (temp->Priority() != 100)
 					{
 						//error!? неверное расположение операции
-						//return nullptr;
+						ErrorReporter().FReport(stdout, "Operation on wrrong place!", temp->Line(), pos);
+						return nullptr;
 					}
 					else
 					{
 						//error!? не хватает операций между переменными/числами
-						//return nullptr;
+						ErrorReporter().FReport(stdout, "You  miss the Operation!", temp->Line(), pos);
+						return nullptr;
 					}
 				}
 			}
 			else
 			{
-				//...
-
-				//
+				lexeme a[] = { *(lexeme*)expression->get(0), *(lexeme*)expression->get(1), *(lexeme*)expression->get(2) };
+				return ExePression(a);
 			}
 		}
 	}
@@ -269,6 +271,12 @@ bool LexemeWorker::WhateverCheck(char ** perone, int c1, char ** types, int c2, 
 			return false;
 	}
 	return true;
+}
+
+lexeme * LexemeWorker::ExePression(lexeme expression[3])
+{
+	//...
+	return nullptr;
 }
 
 bool LexemeWorker::IsNumberExpression(List * expression)
