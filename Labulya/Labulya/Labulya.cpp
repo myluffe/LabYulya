@@ -3,9 +3,11 @@
 #include "FileReader.h"
 #include "lec.h"
 
+#include "Parser.h"
+
 int main(char* name)
 {	
-	
+	parser.FloatToString(-56.e31);
 	
 	//Имя обрабатываемого файла
 	name = "test.txt";
