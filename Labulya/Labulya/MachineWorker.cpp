@@ -268,23 +268,42 @@ void MachineWorker::NumberCheck(int line)
 
 	int count = strlen(number);
 	int i = 0;
+
+	bool dopflag = false;
+
 	while (i < (int)(strlen(number)))
 	{
 		if (number[i] != '.')
 		{
 			if (number[i] == 'e')
 			{
-				ErrorReporter().FReport(stdout, "Uncorrect number. \"e\" - не может быть в числителе.", line, _currentaut->CurrentLexPos() + i);
+				if (dopflag)
+				{
+					ErrorReporter().FReport(stdout, "Uncorrect number. \"e\" - не может повторятся в числителе.", line, _currentaut->CurrentLexPos() + i);
+					_error = true;
+					heap.free_mem(first);
+					heap.free_mem(second);
+					heap.free_mem(number);
+					return;
+				}
+				dopflag = true;
+			}
+			first[i] = number[i];
+			i++;
+		}
+		else
+		{
+			if (dopflag && number[i] == '.')
+			{
+				ErrorReporter().FReport(stdout, "Uncorrect number. \"e\" - если присутствует в числителе, знаменателя не может быть.", line, _currentaut->CurrentLexPos() + i);
 				_error = true;
 				heap.free_mem(first);
 				heap.free_mem(second);
 				heap.free_mem(number);
 				return;
 			}
-			first[i] = number[i];
-			i++;
+			break;
 		}
-		else break;
 	}
 
 	first[i] = '\0';
