@@ -161,7 +161,7 @@ int LexemeWorker::GetLexemePositionWithMinimalPriority(List * expression)
 
 lexeme * LexemeWorker::NExpressionSolver(List * expression)
 {
-	if (!IsNumberExpression(expression) && !IsBoolExpression(expression) && !IsStringExpression(expression) && !IsCharExpression(expression))
+	if (!IsNumberExpression(expression) && !IsBoolExpression(expression) && !IsStringExpression(expression))
 		return nullptr;
 	int pos = -1;
 	lexeme* solution = nullptr;
@@ -200,12 +200,25 @@ lexeme * LexemeWorker::NExpressionSolver(List * expression)
 				if (strcmp(temp->Name(), "Operation") == 0 && pos > 0 && pos < (expression->count() - 1))
 				{
 					List* temp_list = new List(sizeof(lexeme));
-					temp_list->add((lexeme*)expression->get(pos - 1));
-					temp_list->add((lexeme*)expression->get(pos));
-					temp_list->add((lexeme*)expression->get(pos + 1));
-					expression->set(pos - 1, NExpressionSolver(temp_list));
-					expression->remove(pos + 1);
-					expression->remove(pos);
+					/*
+					if (strcmp(temp->Data(), "++") == 0 || strcmp(temp->Data(), "--") == 0)
+					{
+						//проверка на то где операция перед или после переменной
+						temp_list->add((lexeme*)expression->get(pos - 1));
+						temp_list->add((lexeme*)expression->get(pos));
+						expression->set(pos - 1, NExpressionSolver(temp_list));
+						expression->remove(pos);
+					}
+					else
+					*/
+					{
+						temp_list->add((lexeme*)expression->get(pos - 1));
+						temp_list->add((lexeme*)expression->get(pos));
+						temp_list->add((lexeme*)expression->get(pos + 1));
+						expression->set(pos - 1, NExpressionSolver(temp_list));
+						expression->remove(pos + 1);
+						expression->remove(pos);
+					}
 				}
 				else
 				{
@@ -225,8 +238,25 @@ lexeme * LexemeWorker::NExpressionSolver(List * expression)
 			}
 			else
 			{
-				lexeme a[] = { *(lexeme*)expression->get(0), *(lexeme*)expression->get(1), *(lexeme*)expression->get(2) };
-				return ExePression(a);
+				switch (expression->count())
+				{
+				case 1:
+					return (lexeme*)expression->get(0);
+					break;
+				/*
+				case 2:
+					if (strcmp(((lexeme*)expression->get(0))->Type(), "Operation") == 0)
+						return Exe2Pression((lexeme*)expression->get(0), (lexeme*)expression->get(1), false);
+					return Exe2Pression((lexeme*)expression->get(0), (lexeme*)expression->get(1), true);
+					break;
+				*/
+				case 3:
+					return Exe3Pression(expression);
+					break;
+				default:
+					return nullptr;
+					break;
+				}
 			}
 		}
 	}
@@ -273,36 +303,289 @@ bool LexemeWorker::WhateverCheck(char ** perone, int c1, char ** types, int c2, 
 	return true;
 }
 
-lexeme * LexemeWorker::ExePression(lexeme expression[3])
+lexeme * LexemeWorker::Exe3Pression(List* expression)
 {
-	//...
+	lexeme* temp1 = (lexeme*)expression->get(0);
+	lexeme* temp2 = (lexeme*)expression->get(1);
+	lexeme* temp3 = (lexeme*)expression->get(2);
+	if (strcmp(temp1->Type(), "int ") == 0)
+	{
+		// "+", "-", "/", "*", "%", "==", ">=", "<=", "!=", ">", "<"
+		int t1 = parser.ToInt(temp1->Data());
+		int t2 = parser.ToInt(temp3->Data());
+		if (strcmp(temp2->Data(), "+") == 0)
+		{
+			if (t1 + t2 > INT_MAX)
+			{
+				ErrorReporter().FReport(stdout, "Out of value range!", temp2->Line(), temp2->Start_Position());
+				_error = true;
+				return nullptr;
+			}
+			int result = t1 + t2;
+			return new lexeme("Number", "int ", parser.IntToString(result), temp1->Line(), temp1->Start_Position(), temp1->Priority());
+		}
+		if (strcmp(temp2->Data(), "-") == 0)
+		{
+			if (t1 - t2 > INT_MIN)
+			{
+				ErrorReporter().FReport(stdout, "Out of value range!", temp2->Line(), temp2->Start_Position());
+				_error = true;
+				return nullptr;
+			}
+			int result = t1 - t2;
+			return new lexeme("Number", "int ", parser.IntToString(result), temp1->Line(), temp1->Start_Position(), temp1->Priority());
+		}
+		if (strcmp(temp2->Data(), "/") == 0)
+		{
+			if (t1 % t2 == 0)
+			{
+				int result = t1 / t2;
+				return new lexeme("Number", "int ", parser.IntToString(result), temp1->Line(), temp1->Start_Position(), temp1->Priority());
+			}
+			else
+			{
+				double result = t1 / t2;
+				return new lexeme("Number", "double ", parser.DoubleToString(result), temp1->Line(), temp1->Start_Position(), temp1->Priority());
+			}
+		}
+		if (strcmp(temp2->Data(), "*") == 0)
+		{
+			if (t1 * t2 > INT_MAX)
+			{
+				double result = t1 * t2;
+				return new lexeme("Number", "double ", parser.DoubleToString(result), temp1->Line(), temp1->Start_Position(), temp1->Priority());
+			}
+			else
+			{
+				int result = t1 * t2;
+				return new lexeme("Number", "int ", parser.IntToString(result), temp1->Line(), temp1->Start_Position(), temp1->Priority());
+			}
+		}
+		if (strcmp(temp2->Data(), "%") == 0)
+		{
+			int result = t1 % t2;
+			return new lexeme("Number", "int ", parser.IntToString(result), temp1->Line(), temp1->Start_Position(), temp1->Priority());
+		}
+		// "==", ">=", "<=", "!=", ">", "<"
+		bool result = false;
+		if (strcmp(temp2->Data(), "==") == 0)
+			result = (temp1 == temp2);
+		if (strcmp(temp2->Data(), ">=") == 0)
+			result = (temp1 >= temp2);
+		if (strcmp(temp2->Data(), "<=") == 0)
+			result = (temp1 <= temp2);
+		if (strcmp(temp2->Data(), "!=") == 0)
+			result = (temp1 != temp2);
+		if (strcmp(temp2->Data(), ">") == 0)
+			result = (temp1 > temp2);
+		if (strcmp(temp2->Data(), "<") == 0)
+			result = (temp1 < temp2);
+		return new lexeme("Bool", "bool ", parser.BoolToString(result), temp1->Line(), temp1->Start_Position(), temp1->Priority());
+	}
+	if (strcmp(temp1->Type(), "double ") == 0)
+	{
+		// "+", "-", "/", "*", "%" "==", ">=", "<=", "!=", ">", "<"
+		double t1 = parser.ToDouble(temp1->Data());
+		double t2 = parser.ToDouble(temp3->Data());
+		double result;
+		bool f = false;
+		if (strcmp(temp2->Data(), "+") == 0)
+		{
+			f = true;
+			result = t1 + t2;
+		}
+		if (strcmp(temp2->Data(), "-") == 0)
+		{
+			f = true;
+			result = t1 - t2;
+		}
+		if (strcmp(temp2->Data(), "/") == 0)
+		{
+			f = true;
+			result = t1 / t2;
+		}
+		if (strcmp(temp2->Data(), "*") == 0)
+		{
+			f = true;
+			result = t1 * t2;
+		}
+		if (strcmp(temp2->Data(), "%") == 0)
+		{
+			ErrorReporter().FReport(stdout, "Выражение должно относиться к целочисленному типу или типу перечисления без области видимости", temp1->Line(), temp1->Start_Position());
+			_error = true;
+			return nullptr;
+		}
+		if (f)
+			return new lexeme("Number", "double ", parser.DoubleToString(result), temp1->Line(), temp1->Start_Position(), temp1->Priority());
+		// "==", ">=", "<=", "!=", ">", "<"
+		bool result2 = false;
+		if (strcmp(temp2->Data(), "==") == 0)
+			result2 = (temp1 == temp2);
+		if (strcmp(temp2->Data(), ">=") == 0)
+			result2 = (temp1 >= temp2);
+		if (strcmp(temp2->Data(), "<=") == 0)
+			result2 = (temp1 <= temp2);
+		if (strcmp(temp2->Data(), "!=") == 0)
+			result2 = (temp1 != temp2);
+		if (strcmp(temp2->Data(), ">") == 0)
+			result2 = (temp1 > temp2);
+		if (strcmp(temp2->Data(), "<") == 0)
+			result2 = (temp1 < temp2);
+		return new lexeme("Bool", "bool ", parser.BoolToString(result2), temp1->Line(), temp1->Start_Position(), temp1->Priority());
+	}
+	if (strcmp(temp1->Type(), "float ") == 0)
+	{
+		// "+", "-", "/", "*", "%"
+		float t1 = parser.ToFloat(temp1->Data());
+		float t2 = parser.ToFloat(temp3->Data());
+		float result;
+		bool f = false;
+		if (strcmp(temp2->Data(), "+") == 0)
+		{
+			f = true;
+			result = t1 + t2;
+		}
+		if (strcmp(temp2->Data(), "-") == 0)
+		{
+			f = true;
+			result = t1 - t2;
+		}
+		if (strcmp(temp2->Data(), "/") == 0)
+		{
+			f = true;
+			result = t1 / t2;
+		}
+		if (strcmp(temp2->Data(), "*") == 0)
+		{
+			f = true;
+			result = t1 * t2;
+		}
+		if (strcmp(temp2->Data(), "%") == 0)
+		{
+			ErrorReporter().FReport(stdout, "Выражение должно относиться к целочисленному типу или типу перечисления без области видимости", temp1->Line(), temp1->Start_Position());
+			_error = true;
+			return nullptr;
+		}
+		if (f)
+			return new lexeme("Number", "float ", parser.FloatToString(result), temp1->Line(), temp1->Start_Position(), temp1->Priority());
+		// "==", ">=", "<=", "!=", ">", "<"
+		bool result2 = false;
+		if (strcmp(temp2->Data(), "==") == 0)
+			result2 = (temp1 == temp2);
+		if (strcmp(temp2->Data(), ">=") == 0)
+			result2 = (temp1 >= temp2);
+		if (strcmp(temp2->Data(), "<=") == 0)
+			result2 = (temp1 <= temp2);
+		if (strcmp(temp2->Data(), "!=") == 0)
+			result2 = (temp1 != temp2);
+		if (strcmp(temp2->Data(), ">") == 0)
+			result2 = (temp1 > temp2);
+		if (strcmp(temp2->Data(), "<") == 0)
+			result2 = (temp1 < temp2);
+		return new lexeme("Bool", "bool ", parser.BoolToString(result2), temp1->Line(), temp1->Start_Position(), temp1->Priority());
+	}
+	if (strcmp(temp1->Type(), "bool ") == 0)
+	{
+		//"==", "||", "&&", "!="
+		bool t1 = parser.ToBool(temp1->Data());
+		bool t2 = parser.ToBool(temp3->Data());
+		bool result;
+		if (strcmp(temp2->Data(), "==") == 0)
+			result = (t1 == t2);
+		if (strcmp(temp2->Data(), "||") == 0)
+			result = (t1 || t2);
+		if (strcmp(temp2->Data(), "&&") == 0)
+			result = (t1 && t2);
+		if (strcmp(temp2->Data(), "!=") == 0)
+			result = (t1 != t2);
+		return new lexeme("Bool", "bool ", parser.BoolToString(result), temp1->Line(), temp1->Start_Position(), temp1->Priority());
+	}
+	if (strcmp(temp1->Type(), "string ") == 0 || strcmp(temp1->Type(), "char ") == 0)
+	{
+		//"==", "+", "!="
+		char* t1 = temp1->Data();
+		char* t2 = temp3->Data();
+		if (strcmp(temp2->Data(), "==") == 0)
+		{
+			bool result = false;
+			if (strcmp(t1, t2) == 0)
+				result = true;
+			return new lexeme("Bool", "bool ", parser.BoolToString(result), temp1->Line(), temp1->Start_Position(), temp1->Priority());
+		}
+		if (strcmp(temp2->Data(), "!=") == 0)
+		{
+			bool result = false;
+			if (strcmp(t1, t2) != 0)
+				result = true;
+			return new lexeme("Bool", "bool ", parser.BoolToString(result), temp1->Line(), temp1->Start_Position(), temp1->Priority());
+		}
+		if (strcmp(temp2->Data(), "+") == 0)
+		{
+			char* result = (char*)heap.get_mem(sizeof(char) * (strlen(t1) + strlen(t2) + 1));
+			sprintf_s(result, (strlen(t1) + strlen(t2) + 1), "%s%s", t1, t2);
+			return new lexeme("String", "string ", result, temp1->Line(), temp1->Start_Position(), temp1->Priority());
+		}
+	}
 	return nullptr;
 }
 
+/*
+lexeme * LexemeWorker::Exe2Pression(lexeme* temp1, lexeme* temp2, bool after)
+{
+	//{ "++", "--" }
+	if (after)
+	{
+		if (strcmp(temp1->Type(), "int ") == 0)
+		{
+			int t1 = parser.ToInt(temp1->Data());
+			if (strcmp(temp2->Data(), "++") == 0)
+				t1++;
+			if (strcmp(temp2->Data(), "--") == 0)
+				t1--;
+			return new lexeme("Number", "int ", parser.IntToString(t1), temp1->Line(), temp1->Start_Position(), temp1->Priority());
+		}
+		if (strcmp(temp1->Type(), "double ") == 0)
+		{
+			double t1 = parser.ToDouble(temp1->Data());
+			if (strcmp(temp2->Data(), "++") == 0)
+				t1++;
+			if (strcmp(temp2->Data(), "--") == 0)
+				t1--;
+			return new lexeme("Number", "double ", parser.DoubleToString(t1), temp1->Line(), temp1->Start_Position(), temp1->Priority());
+
+		}
+		if (strcmp(temp1->Type(), "float ") == 0)
+		{
+			float t1 = parser.ToFloat(temp1->Data());
+			if (strcmp(temp2->Data(), "++") == 0)
+				t1++;
+			if (strcmp(temp2->Data(), "--") == 0)
+				t1--;
+			return new lexeme("Number", "float ", parser.FloatToString(t1), temp1->Line(), temp1->Start_Position(), temp1->Priority());
+		}
+	}
+	return nullptr;
+}
+*/
+
 bool LexemeWorker::IsNumberExpression(List * expression)
 {
-	char* perone[] = { "++", "--", "+", "-", "(", "/", "*", ")", "%" };
+	//char* perone[] = { "++", "--", "+", "-", "(", "/", "*", ")", "%", "==", ">=", "<=", "!=", ">", "<" };
+	char* perone[] = { "+", "-", "(", "/", "*", ")", "%", "==", ">=", "<=", "!=", ">", "<" };
 	char* types[] = { "int ", "float ", "double " };
-	return WhateverCheck(perone, 9, types, 3, expression);
+	return WhateverCheck(perone, (sizeof(perone) / sizeof(char)), types, (sizeof(types) / sizeof(char)), expression);
 }
 
 bool LexemeWorker::IsBoolExpression(List * expression)
 {
-	char* perone[] = { "==", "||", "&&", ">=", "<=", "<<", ">>", "!=" };
+	char* perone[] = { "==", "||", "&&", "(", ")", "!=" };
 	char* types[] = { "bool " };
-	return WhateverCheck(perone, 8, types, 1, expression);
+	return WhateverCheck(perone, (sizeof(perone) / sizeof(char)), types, (sizeof(types) / sizeof(char)), expression);
 }
 
 bool LexemeWorker::IsStringExpression(List * expression)
 {
-	char* perone[] = { "==", "+", "!=" };
-	char* types[] = { "string " };
-	return WhateverCheck(perone, 9, types, 3, expression);
-}
-
-bool LexemeWorker::IsCharExpression(List * expression)
-{
-	char* perone[] = { "==", "!=" };
-	char* types[] = { "char " };
-	return WhateverCheck(perone, 2, types, 1, expression);
+	char* perone[] = { "==", "+", "!=", "(", ")"};
+	char* types[] = { "string ", "char " };
+	return WhateverCheck(perone, (sizeof(perone) / sizeof(char)), types, (sizeof(types) / sizeof(char)), expression);
 }

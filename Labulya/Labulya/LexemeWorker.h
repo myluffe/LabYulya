@@ -3,6 +3,7 @@
 #include "list.h"
 #include "hash_lec.h"
 #include "list_adv.h"
+#include "Parser.h"
 
 static class LexemeWorker
 {
@@ -18,11 +19,13 @@ protected:
 	bool IsNumberExpression(List* expression);
 	bool IsBoolExpression(List* expression);
 	bool IsStringExpression(List * expression);
-	bool IsCharExpression(List * expression);
+
+	bool _error = false;
 
 private:
 	bool WhateverCheck(char ** perone, int c1, char ** types, int c2, List * expression);
-	lexeme* ExePression(lexeme expression[3]);
+	lexeme* Exe3Pression(List* expression);
+	//lexeme* Exe2Pression(lexeme* temp1, lexeme* temp2, bool after);
 };
 
 static LexemeWorker LWorker = *new LexemeWorker();

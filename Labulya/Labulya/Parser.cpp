@@ -13,7 +13,7 @@ Parser::~Parser()
 
 int Parser::ToInt(char * str)
 {
-	char* number = (char*)heap.get_mem(sizeof(char) * strlen(str) + 1);
+	char* number = (char*)heap.get_mem(sizeof(char) * (strlen(str) + 1));
 	strcpy_s(number, strlen(str) + 1, str);
 	//...
 	return -1;
@@ -21,7 +21,7 @@ int Parser::ToInt(char * str)
 
 double Parser::ToDouble(char * str)
 {
-	char* number = (char*)heap.get_mem(sizeof(char) * strlen(str) + 1);
+	char* number = (char*)heap.get_mem(sizeof(char) * (strlen(str) + 1));
 	strcpy_s(number, strlen(str) + 1, str);
 	//...
 	return -1.0;
@@ -29,7 +29,7 @@ double Parser::ToDouble(char * str)
 
 float Parser::ToFloat(char * str)
 {
-	char* number = (char*)heap.get_mem(sizeof(char) * strlen(str) + 1);
+	char* number = (char*)heap.get_mem(sizeof(char) * (strlen(str) + 1));
 	strcpy_s(number, strlen(str) + 1, str);
 	//...
 	return -1.0f;
