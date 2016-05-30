@@ -16,7 +16,7 @@ public:
 	virtual int compare(void* i, void* j) { return 0; }; //сравнивает два элемента
 	void*      get(int pos); //возвращает данные i-ого элемента
 	void       add(void* data); //добавляет новый элемент
-	void	   set(int pos, void* data);
+	void	   set(int pos, void* data); //заменить значение на позиции pos на значение из data
 	void       take_first(void* store); //получает данные первого элемента
 	void       take_last(void* store); //получает данные последнего элемента
 	void       take(int pos, void* store); //получает данные указанного элемента

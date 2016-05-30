@@ -10,6 +10,10 @@ public:
 	bool Processing(List* lexes);
 	LexemeWorker();
 	~LexemeWorker();
+protected:
+	lexeme* NumberExpressionSolver(List* expression);
+	bool IsNumberExpression(List* expression);
+	bool IsBoolExpression(List* expression);
 };
 
 static LexemeWorker LWorker = *new LexemeWorker();

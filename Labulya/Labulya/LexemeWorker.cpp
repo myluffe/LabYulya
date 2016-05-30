@@ -127,3 +127,79 @@ LexemeWorker::LexemeWorker()
 LexemeWorker::~LexemeWorker()
 {
 }
+
+lexeme * LexemeWorker::NumberExpressionSolver(List * expression)
+{
+	//...
+	return nullptr;
+}
+
+bool LexemeWorker::IsNumberExpression(List * expression)
+{
+	char* perone[] = { "++", "--", "+", "-", "(", "/", "*", ")", "%" };
+	char ttype[30];
+	bool type = false;
+	for (int k = 0; k < expression->count(); k++)
+	{
+		lexeme* tlex = (lexeme*)expression->get(k);
+		bool flag = false;
+		for each (char* var in perone)
+		{
+			if (strcmp(var, tlex->Data()) == 0)
+			{
+				flag = true;
+				break;
+			}
+		}
+		if (!flag && strcmp("Number", tlex->Name()) == 0)
+		{
+			if (type)
+				if (strcmp(ttype, tlex->Type()) != 0)
+					return false;
+			if (!type)
+			{
+				strcpy_s(ttype, tlex->Type());
+				type = true;
+			}
+			flag = true;
+		}
+		if (!flag)
+			return false;
+	}
+	return true;
+}
+
+bool LexemeWorker::IsBoolExpression(List * expression)
+{
+	char* perone[] = { "==", "||", "&&", ">=", "<=", "<<", ">>", "!=" };
+	char ttype[30];
+	bool type = false;
+	for (int k = 0; k < expression->count(); k++)
+	{
+		lexeme* tlex = (lexeme*)expression->get(k);
+		bool flag = false;
+		for each (char* var in perone)
+		{
+			if (strcmp(var, tlex->Data()) == 0)
+			{
+				flag = true;
+				break;
+			}
+		}
+		if (!flag && (strcmp("int ", tlex->Name()) == 0 || strcmp("double ", tlex->Name()) == 0 || strcmp("float ", tlex->Name()) == 0 || strcmp("bool ", tlex->Name()) == 0 || strcmp("char ", tlex->Name()) == 0 || strcmp("string ", tlex->Name()) == 0))
+		{
+			if (type)
+				if (strcmp(ttype, tlex->Type()) != 0)
+					return false;
+			if (!type)
+			{
+				strcpy_s(ttype, tlex->Type());
+				type = true;
+			}
+			flag = true;
+		}
+		if (!flag)
+			return false;
+	}
+	return true;
+}

@@ -25,8 +25,8 @@ MachineWorker::MachineWorker()
 	Addmachine(tm);
 
 	// Operations1
-	om = new Type1Machine("Operations1", "Operation", "Operation");
-	char* os[] = { "++", "--", "==", "||", "&&", ">=", "<=", "<<", ">>", "::" };
+	om = new Type1Machine("Operations1", "Operation", "Operation1");
+	char* os[] = { "++", "--", "==", "!=", "||", "&&", ">=", "<=", "<<", ">>", "::" };
 	for each (char* var in os)
 	{
 		om->AddWord(var);
@@ -34,7 +34,7 @@ MachineWorker::MachineWorker()
 	Addmachine(om);
 
 	// Operations2
-	om2 = new Type1Machine("Operations2", "Operation", "Operation");
+	om2 = new Type1Machine("Operations2", "Operation", "Operation2");
 	char* os2[] = { "+", "-", "=", "/", "*", "|", "&", ">", "<", "%", ":", "!", "?" };
 	for each (char* var in os2)
 	{
@@ -150,6 +150,11 @@ int MachineWorker::Work(char* filename, List* lexes)
 						Hooker(_currentaut->Buffer());
 						if (_error)
 							return -5;
+						_currentaut->Priority = 0;
+					}
+					if (strcmp(_currentaut->CurrentLexName(), "Operation") == 0)
+					{
+						GetOperationPriority(_currentaut);
 					}
 					lexes->add(new lexeme(_currentaut->CurrentLexName(),
 						_currentaut->CurrentLexType(), _currentaut->Buffer(),
@@ -217,6 +222,15 @@ int MachineWorker::Work(char* filename, List* lexes)
 int MachineWorker::Count()
 {
 	return _count;
+}
+
+int MachineWorker::GetOperationPriority(mStateMachine * machine)
+{
+	if (strcmp("*", _currentaut->Buffer()) == 0)
+		return 25;
+	if (strcmp(_currentaut->CurrentLexName(), "Operation") != 0)
+		return 100;
+	return 50;
 }
 
 void MachineWorker::UpdateMachines()

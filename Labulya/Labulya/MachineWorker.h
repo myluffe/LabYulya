@@ -31,6 +31,8 @@ private:
 	//ErrorReporter Error = ErrorReporter();
 	bool _error = false;
 
+	int GetOperationPriority(mStateMachine* machine);
+
 	void UpdateMachines();
 	void Addmachine(mStateMachine* machine);
 	void NumberCheck(int line);
