@@ -49,7 +49,10 @@ bool LexemeWorker::Processing(List* lexes)
 						}
 						lexeme* newlex = new lexeme(temp_lexeme->Data(), ttype->Data(), tdata->Data(), temp_lexeme->Line(), temp_lexeme->Start_Position(), temp_lexeme->Priority());
 						if (strcmp(tdata->Type(), ttype->Data()) != 0)
+						{
 							ErrorReporter().FReport(stdout, "Diffrent variable and value types!", temp_lexeme->Line(), temp_lexeme->Start_Position());
+							return false;
+						}
 						//в дов уже готовую добавляем
 						dob->add(newlex);
 						//добавление в хэш-таблицу

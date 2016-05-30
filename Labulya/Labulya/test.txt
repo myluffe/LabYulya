@@ -1,6 +1,6 @@
-int i = 36.e1;
+float i = 36.e1;
 //dfdfdf
-//int j 0;
+int j = -1;
 //s = 2;
 for (i; i < 100; i++)
 {

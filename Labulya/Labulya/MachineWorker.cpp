@@ -42,6 +42,15 @@ MachineWorker::MachineWorker()
 	}
 	Addmachine(om);
 
+	// Numbers
+	nm = new Type2Machine("Numbers", "Number", "float ");
+	char nm_perstart[] = "-+0123456789.";
+	char nm_optional[] = "e";
+	nm->AddWord(nm_perstart);
+	nm->AddWord(nm_optional);
+	nm->SetPerStartWords(nm_perstart);
+	Addmachine(nm);
+
 	// Operations2
 	om2 = new Type1Machine("Operations2", "Operation", "Operation2");
 	char* os2[] = { "+", "-", "=", "/", "*", "|", "&", ">", "<", "%", ":", "!", "?" };
@@ -50,15 +59,6 @@ MachineWorker::MachineWorker()
 		om2->AddWord(var);
 	}
 	Addmachine(om2);
-
-	// Numbers
-	nm = new Type2Machine("Numbers", "Number", "float ");
-	char nm_perstart[] = "0123456789.";
-	char nm_optional[] = "e";
-	nm->AddWord(nm_perstart);
-	nm->AddWord(nm_optional);
-	nm->SetPerStartWords(nm_perstart);
-	Addmachine(nm);
 
 	// Variables
 	vm = new Type2Machine("Variables", "Variable", "Variable");
@@ -327,7 +327,7 @@ void MachineWorker::NumberCheck(int line)
 	// b = e1
 	if (strlen(second) == 0)
 	{
-		if (strlen(first) > 0)
+		if (strlen(first) > 9)
 			_currentaut->ChangeType("double ");
 		else
 			_currentaut->ChangeType("int ");
