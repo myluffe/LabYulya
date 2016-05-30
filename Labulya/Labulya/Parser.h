@@ -12,8 +12,8 @@ public:
 	float ToFloat(char* str);
 
 	char* IntToString(int value);
-	char* DoubleToString(int value);
-	char* FloatToString(int value);
+	char* DoubleToString(double value);
+	char* FloatToString(float value);
 
 	bool ToBool(char* str);
 	char* BoolToString(bool value);

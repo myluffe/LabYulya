@@ -44,7 +44,7 @@ char * Parser::IntToString(int value)
 	return nullptr;
 }
 
-char * Parser::DoubleToString(int value)
+char * Parser::DoubleToString(double value)
 {
 	//...
 
@@ -53,7 +53,7 @@ char * Parser::DoubleToString(int value)
 	return nullptr;
 }
 
-char * Parser::FloatToString(int value)
+char * Parser::FloatToString(float value)
 {
 	//...
 
