@@ -9,7 +9,7 @@
 class mStateMachine
 {
 public:
-	mStateMachine(char* name, char* lexname, char* lextype);
+	mStateMachine(char* name, char* lexname, int lextype);
 	~mStateMachine();
 
 	char* Buffer();
@@ -22,8 +22,8 @@ public:
 	bool CheckError();
 
 	char* CurrentLexName();
-	char* CurrentLexType();
-	void ChangeType(char* str);
+	int CurrentLexType();
+	void ChangeType(int stype);
 
 	//Test
 	void PrintMachine();
@@ -56,7 +56,7 @@ protected:
 	bool _checkError;
 	
 	char _currentLexemName[Chunck];
-	char _currentLexemeType[Chunck];
+	int _currentLexemeType;
 
 	int _currentLexemePosition;
 	int _curlexline;
@@ -67,7 +67,7 @@ protected:
 class Type1Machine : public mStateMachine
 {
 public:
-	Type1Machine(char* name, char* lexname, char* lextype) : mStateMachine(name, lexname, lextype) 
+	Type1Machine(char* name, char* lexname, int lextype) : mStateMachine(name, lexname, lextype) 
 	{
 		_words = new List(sizeof(char[Chunck]));
 	};
@@ -84,7 +84,7 @@ private:
 class Type2Machine : public mStateMachine
 {
 public:
-	Type2Machine(char* name, char* lexname, char* lextype) : mStateMachine(name, lexname, lextype)
+	Type2Machine(char* name, char* lexname, int lextype) : mStateMachine(name, lexname, lextype)
 	{
 		_words = new List(sizeof(char[Type23Chunck]));
 		_permissiblestart[0] = '\0';
@@ -104,7 +104,7 @@ protected:
 class Type3Machine : public Type2Machine
 {
 public:
-	Type3Machine(char* name, char* lexname, char* lextype) : Type2Machine(name, lexname, lextype)
+	Type3Machine(char* name, char* lexname, int lextype) : Type2Machine(name, lexname, lextype)
 	{ }
 	~Type3Machine();
 	void EnterChar(char ch, int pos, int line);

@@ -1,7 +1,9 @@
+{
 float i = 36.e1;
 //dfdfdf
 int j = -1;
 //s = 2;
+int s2 = d;
 for (i; i < 100; i++)
 {
 	/* not like this!
@@ -9,4 +11,6 @@ i want close comment */
 	output ("hi");
 	char s = 'b';
 	char s1 = '\n';
+}
+int s = 2;
 }

@@ -76,7 +76,7 @@ lexeme* Lexeme_list::find(char*word)
 	for (int i = 0; i < count(); i++)
 	{
 		now = (lexeme*)get(i);
-		if (!strcmp(now->Name(), word))
+		if (strcmp(now->Name(), word) == 0)
 		{
 			return now;
 		}
