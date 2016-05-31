@@ -64,7 +64,7 @@ bool LexemeWorker::Processing(List* lexes)
 						lexes->remove(i + 2);
 						lexes->remove(i + 1);
 						lexes->set(i, newlex); //не добавлять ее в список лексем?
-						//lexes->remove(i); удалять все?
+						lexes->remove(i); //удалять все?
 						lexes->remove(i - 1);
 						i = ti;
 					}
