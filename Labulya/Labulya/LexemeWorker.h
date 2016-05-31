@@ -12,8 +12,6 @@ public:
 	LexemeWorker();
 	~LexemeWorker();
 protected:
-	int GetLexemePositionWithMinimalPriority(List* expression);
-
 	lexeme* NExpressionSolver(List* expression);
 
 	bool IsNumberExpression(List* expression);
@@ -25,7 +23,6 @@ protected:
 private:
 	bool WhateverCheck(char ** perone, int c1, int * types, int c2, List * expression);
 	lexeme* Exe3Pression(List* expression);
-	//lexeme* Exe2Pression(lexeme* temp1, lexeme* temp2, bool after);
 };
 
 static LexemeWorker LWorker = *new LexemeWorker();
