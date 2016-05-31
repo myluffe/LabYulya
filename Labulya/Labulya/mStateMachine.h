@@ -57,6 +57,7 @@ protected:
 	
 	char _currentLexemName[Chunck];
 	int _currentLexemeType;
+	int _originaltype;
 
 	int _currentLexemePosition;
 	int _curlexline;

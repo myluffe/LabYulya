@@ -37,10 +37,24 @@ bool LexemeWorker::Processing(List* lexes)
 							return false;
 						}
 						lexeme* tdata = (lexeme*)lexes->get(i + 2);
-						if (strcmp(tdata->Name(), "Number") != 0 && strcmp(tdata->Name(), "String") != 0 && strcmp(tdata->Name(), "Char") != 0 && strcmp(tdata->Name(), "Bool") != 0)
+						if (!(tdata->Type() == INT || tdata->Type() == DOUBLE || tdata->Type() == FLOAT || tdata->Type() == CHAR || tdata->Type() == STRING || tdata->Type() == BOOL))
 						{
-							ErrorReporter().FReport(stdout, "There should be value!", tdevider->Line(), tdevider->Start_Position());
-							return false;
+							if (tdata->Type() == VARIABLE)
+							{
+								int pos = dob->findpos(tdata->Data());
+								if (pos != -1)
+									*tdata = *(lexeme*)dob->get(pos);
+								else
+								{
+									ErrorReporter().FReport(stdout, "Нельзя непоределенное присвоить значение!", tdata->Line(), tdata->Start_Position());
+									return false;
+								}
+							}
+							else
+							{
+								ErrorReporter().FReport(stdout, "There should be value!", tdevider->Line(), tdevider->Start_Position());
+								return false;
+							}
 						}
 						lexeme* tdevider2 = (lexeme*)lexes->get(i + 3);
 						if (strcmp(tdevider2->Data(), ";") != 0)
@@ -59,11 +73,10 @@ bool LexemeWorker::Processing(List* lexes)
 						//добавление в хэш-таблицу
 						LexemeTable.auto_create(newlex);
 						//удаление ненужных и мухлеж с щетчиком :
-						int ti = i - 1;
+						int ti = i - 2;
 						lexes->remove(i + 3); //удалять ли точку с запятой после переменной?
 						lexes->remove(i + 2);
 						lexes->remove(i + 1);
-						lexes->set(i, newlex); //не добавлять ее в список лексем?
 						lexes->remove(i); //удалять все?
 						lexes->remove(i - 1);
 						i = ti;
@@ -87,6 +100,7 @@ bool LexemeWorker::Processing(List* lexes)
 					lexeme* ttype = (lexeme*)lexes->get(i - 1);
 					if (ttype->Type() == TYPE)
 					{
+						dob->print_list();
 						ErrorReporter().FReport(stdout, "This variable is alredy defined!", temp_lexeme->Line(), temp_lexeme->Start_Position());
 						return false;
 					}
@@ -102,8 +116,6 @@ bool LexemeWorker::Processing(List* lexes)
 								break;
 							}
 						}
-						//отладка
-						printf("1 What's wrong! LexemeWorker.cpp");
 					}
 				}
 				else

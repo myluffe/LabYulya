@@ -44,7 +44,7 @@ MachineWorker::MachineWorker()
 
 	// Numbers
 	nm = new Type2Machine("Numbers", "Number", FLOAT);
-	char nm_perstart[] = "-+0123456789.";
+	char nm_perstart[] = "0123456789.";
 	char nm_optional[] = "e";
 	nm->AddWord(nm_perstart);
 	nm->AddWord(nm_optional);
@@ -173,6 +173,9 @@ int MachineWorker::Work(char* filename, List* lexes)
 					}
 					if (strcmp(_currentaut->CurrentLexName(), "Operation") == 0)
 					{
+						lexeme* tlex = (lexeme*)lexes->get(lexes->count() - 1);
+						if (tlex->Type() == VARIABLE || tlex->Type() == NUMBER || strcmp(tlex->Data(), ")") == 0)
+							_currentaut->ChangeType(BYNARYOPERATION);
 						GetOperationPriority(_currentaut);
 					}
 					lexes->add(new lexeme(_currentaut->CurrentLexName(),
@@ -248,7 +251,11 @@ void MachineWorker::GetOperationPriority(mStateMachine * machine)
 	if (strcmp("(", machine->Buffer()) == 0)
 		machine->Priority = 0;
 	if (strcmp("*", machine->Buffer()) == 0)
-		machine->Priority = 25;
+	{
+		if (machine->CurrentLexType() == BYNARYOPERATION)
+			machine->Priority = 25;
+		//...
+	}
 	if (strcmp(machine->CurrentLexName(), "Operation") == 0)
 		machine->Priority = 50;
 	machine->Priority = 100;

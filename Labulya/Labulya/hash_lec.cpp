@@ -171,7 +171,6 @@ lexeme* Diction_lexem::auto_create(char*word)
 
 int Diction_lexem::auto_create(lexeme* lex)
 {
-
 	lexeme* fin = find(lex->Name());
 	if (fin != nullptr)
 		return combine_keys(lex->Name());

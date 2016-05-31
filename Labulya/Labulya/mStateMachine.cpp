@@ -12,6 +12,7 @@ mStateMachine::mStateMachine(char* name, char* lexname, int lextype)
 	strcpy_s(_machineName, name);
 	strcpy_s(_currentLexemName, lexname);
 	_currentLexemeType = lextype;
+	_originaltype = lextype;
 	_currentLexemePosition = -100;
 	_curlexline = -100;
 	_step = 0;
@@ -103,6 +104,7 @@ void mStateMachine::AddWord(void * word)
 
 void mStateMachine::UpdateStatus()
 {
+	_currentLexemeType = _originaltype;
 	_isError = false;
 	_isFinished = false;
 	_start = false;
@@ -215,7 +217,11 @@ void Type1Machine::EnterChar(char ch, int pos, int line)
 	for (int i = 0; i < listcount; i++)
 	{
 		strcpy_s(temp, (char*)_potentialwords.get(i));
-		if (temp[_step] != ch)
+		bool ftemp;
+		if (!f) ftemp = (temp[_step] != ch);
+		else 
+			ftemp = (temp[_step - 1] != ch);
+		if (ftemp)
 		{
 			//test for missed space
 			char stemp[Chunck];
