@@ -176,6 +176,7 @@ int MachineWorker::Work(char* filename, List* lexes)
 						lexeme* tlex = (lexeme*)lexes->get(lexes->count() - 1);
 						if (tlex->Type() == VARIABLE || tlex->Type() == NUMBER || strcmp(tlex->Data(), ")") == 0)
 							_currentaut->ChangeType(BYNARYOPERATION);
+						else _currentaut->ChangeType(UNARYOPERATION);
 						GetOperationPriority(_currentaut);
 					}
 					lexes->add(new lexeme(_currentaut->CurrentLexName(),
