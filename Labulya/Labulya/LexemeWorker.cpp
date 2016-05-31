@@ -90,22 +90,27 @@ bool LexemeWorker::Processing(List* lexes)
 						ErrorReporter().FReport(stdout, "This variable is alredy defined!", temp_lexeme->Line(), temp_lexeme->Start_Position());
 						return false;
 					}
+					else
+					{
+						//заменяем на ссылку
+						List* tlist = LexemeTable.find_list(temp_lexeme->Data());
+						for (int k = 0; k < tlist->count(); k++)
+						{
+							if (strcmp(temp_lexeme->Data(), ((lexeme*)tlist->get(k))->Name()) == 0)
+							{
+								*temp_lexeme = *(lexeme*)tlist->get(k);
+								break;
+							}
+						}
+						//отладка
+						printf("1 What's wrong! LexemeWorker.cpp");
+					}
 				}
 				else
 				{
-					//заменяем на ссылку
-					List* tlist = LexemeTable.find_list(temp_lexeme->Data());
-					for (int k = 0; k < tlist->count(); k++)
-					{
-						if (strcmp(temp_lexeme->Data(), ((lexeme*)tlist->get(k))->Name()) == 0)
-						{
-							*temp_lexeme = *(lexeme*)tlist->get(k);
-							break;
-						}
-					}
-					//отладка
-					printf("1 What's wrong! LexemeWorker.cpp");
 					//
+					ErrorReporter().FReport(stdout, "No type of undefined variable!", temp_lexeme->Line(), temp_lexeme->Start_Position());
+					return false;
 				}
 			}
 		}
