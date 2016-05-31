@@ -2,13 +2,13 @@
 #include "MachineWorker.h"
 #include "FileReader.h"
 #include "lec.h"
-
+#include <locale.h>
 #include "Parser.h"
 
 int main(char* name)
 {	
-	
-	
+	setlocale(LC_CTYPE, "");
+
 	//Имя обрабатываемого файла
 	name = "test.txt";
 

@@ -23,7 +23,7 @@ protected:
 	bool _error = false;
 
 private:
-	bool WhateverCheck(char ** perone, int c1, char ** types, int c2, List * expression);
+	bool WhateverCheck(char ** perone, int c1, int * types, int c2, List * expression);
 	lexeme* Exe3Pression(List* expression);
 	//lexeme* Exe2Pression(lexeme* temp1, lexeme* temp2, bool after);
 };

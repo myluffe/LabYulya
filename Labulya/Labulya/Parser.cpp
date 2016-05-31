@@ -1,7 +1,5 @@
 #include "stdafx.h"
 #include "Parser.h"
-#include <iostream>
-#include "stdio.h"
 
 
 Parser::Parser()
@@ -32,7 +30,8 @@ float Parser::ToFloat(char * str)
 {
 	char* number = (char*)heap.get_mem(sizeof(char) * (strlen(str) + 1));
 	strcpy_s(number, strlen(str) + 1, str);
-	float res = (float)atof(number);
+	long temp = 0;
+	float res = _Stof(number, nullptr, temp);
 	return res;
 }
 
@@ -79,7 +78,9 @@ bool Parser::ToBool(char * str)
 
 char * Parser::BoolToString(bool value)
 {
+	char* temp = (char*)heap.get_mem(sizeof(char) * (6));
 	if (value)
-		return "true";
-	else return "false";
+		strcpy_s(temp, 6, "true");
+	else strcpy_s(temp, 6, "false");
+	return temp;
 }

@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "mStateMachine.h"
 
-mStateMachine::mStateMachine(char* name, char* lexname, char* lextype)
+mStateMachine::mStateMachine(char* name, char* lexname, int lextype)
 {
 	_isFinished = false;
 	_isError = false;
@@ -11,7 +11,7 @@ mStateMachine::mStateMachine(char* name, char* lexname, char* lextype)
 	_buffer[0] = '\0';
 	strcpy_s(_machineName, name);
 	strcpy_s(_currentLexemName, lexname);
-	strcpy_s(_currentLexemeType, lextype);
+	_currentLexemeType = lextype;
 	_currentLexemePosition = -100;
 	_curlexline = -100;
 	_step = 0;
@@ -59,14 +59,14 @@ char * mStateMachine::CurrentLexName()
 	return _currentLexemName;
 }
 
-char * mStateMachine::CurrentLexType()
+int mStateMachine::CurrentLexType()
 {
 	return _currentLexemeType;
 }
 
-void mStateMachine::ChangeType(char* str)
+void mStateMachine::ChangeType(int stype)
 {
-	strcpy_s(_currentLexemeType, str);
+	_currentLexemeType = stype;
 }
 
 void mStateMachine::PrintMachine()
@@ -368,7 +368,7 @@ void Type3Machine::CheckType()
 	if (_buffer[0] == '\'')
 	{
 		strcpy_s(_currentLexemName, "Char");
-		strcpy_s(_currentLexemeType, "char ");
+		_currentLexemeType = CHAR;
 	}
 	char* tbuffer = (char*)heap.get_mem(sizeof(char) * Chunck * _chunckcount);
 	for (int k = 1; k < strlen(_buffer) - 1; k++)
@@ -378,7 +378,7 @@ void Type3Machine::CheckType()
 	tbuffer[strlen(_buffer) - 2] = '\0';
 	strcpy_s(_buffer, Chunck * _chunckcount, tbuffer);
 	heap.free_mem(tbuffer);
-	if (strcmp(_currentLexemeType, "char ") == 0)
+	if (_currentLexemeType == CHAR)
 	{
 		int slen = strlen(_buffer);
 		if (slen > 1)

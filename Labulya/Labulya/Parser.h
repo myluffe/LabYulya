@@ -1,6 +1,7 @@
 #pragma once
 
-#include "heap.h" 
+#include <iostream>
+#include "stdio.h"
 
 static class Parser
 {
@@ -19,5 +20,3 @@ public:
 	bool ToBool(char* str);
 	char* BoolToString(bool value);
 };
-
-static Parser parser = *new Parser();

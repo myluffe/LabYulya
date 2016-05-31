@@ -10,6 +10,8 @@
 #include <stdio.h>
 #include <tchar.h>
 #include "heap.h"
+#include "Types.h"
+#include "Parser.h"
 
 
 
