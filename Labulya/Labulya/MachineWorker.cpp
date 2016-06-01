@@ -34,6 +34,7 @@ MachineWorker::MachineWorker()
 	Addmachine(bm);
 
 	// Operations1
+	//"?:" как добавить
 	om = new Type1Machine("Operations1", "Operation", OPERATION);
 	char* os[] = { "++", "--", "==", "!=", "||", "&&", ">=", "<=", "<<", ">>", "::" };
 	for each (char* var in os)
@@ -249,18 +250,66 @@ int MachineWorker::Count()
 
 void MachineWorker::GetOperationPriority(mStateMachine * machine)
 {
-	if (strcmp("(", machine->Buffer()) == 0)
+	if (strcmp("(", machine->Buffer()) == 0 || strcmp(")", machine->Buffer()) == 0)
 		machine->Priority = 0;
+	if (strcmp("::", machine->Buffer()) == 0)
+		machine->Priority = 1;
+	if (strcmp("--", machine->Buffer()) == 0 || strcmp("++", machine->Buffer()) == 0)
+		machine->Priority = 2;
+	if (strcmp("!", machine->Buffer()) == 0)
+		machine->Priority = 3;
+	if (strcmp("/", machine->Buffer()) == 0 || strcmp("%", machine->Buffer()) == 0)
+		machine->Priority = 5;
+	if (strcmp("<<", machine->Buffer()) == 0 || strcmp(">>", machine->Buffer()) == 0)
+		machine->Priority = 7;
+	if (strcmp("<", machine->Buffer()) == 0 || strcmp(">", machine->Buffer()) == 0 ||
+		strcmp("<=", machine->Buffer()) == 0 || strcmp(">=", machine->Buffer()) == 0)
+		machine->Priority = 8;
+	if (strcmp("==", machine->Buffer()) == 0 || strcmp("!=", machine->Buffer()) == 0)
+		machine->Priority = 9;
+	if (strcmp("|", machine->Buffer()) == 0)
+		machine->Priority = 12;
+	if (strcmp("&&", machine->Buffer()) == 0)
+		machine->Priority = 13;
+	if (strcmp("||", machine->Buffer()) == 0)
+		machine->Priority = 14;
+	//if (strcmp("?:", machine->Buffer()) == 0)
+	//	machine->Priority = 15;
+	if (strcmp(":", machine->Buffer()) == 0 || strcmp("?", machine->Buffer()))
+		machine->Priority = 15;
+	if (strcmp("=", machine->Buffer()) == 0)
+		machine->Priority = 16;
+
+	if (strcmp("+", machine->Buffer()) == 0 || strcmp("-", machine->Buffer()) == 0)
+	{
+		if (machine->CurrentLexType() == BYNARYOPERATION)
+			machine->Priority = 6;
+		if (machine->CurrentLexType() == UNARYOPERATION)
+			machine->Priority = 3;
+	}
+
 	if (strcmp("*", machine->Buffer()) == 0)
 	{
 		if (machine->CurrentLexType() == BYNARYOPERATION)
-			machine->Priority = 25;
-		//...
+			machine->Priority = 10;
+		if (machine->CurrentLexType() == UNARYOPERATION)
+			machine->Priority = 3;
 	}
+
+	if (strcmp("&", machine->Buffer()) == 0)
+	{
+		if (machine->CurrentLexType() == BYNARYOPERATION)
+			machine->Priority = 5;
+		if (machine->CurrentLexType() == UNARYOPERATION)
+			machine->Priority = 3;
+	}
+
+
 	if (strcmp(machine->CurrentLexName(), "Operation") == 0)
 		machine->Priority = 50;
 	machine->Priority = 100;
 }
+
 
 void MachineWorker::UpdateMachines()
 {
