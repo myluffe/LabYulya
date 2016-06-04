@@ -9,6 +9,8 @@ bool LexemeWorker::Processing(List* lexes)
 	Lexeme_list* dob = new Lexeme_list(); //стэк для области видимости
 	for (int i = 0; i < lexes->count(); i++)
 	{
+		if (_error)
+			false;
 		lexeme* temp_lexeme = (lexeme*)lexes->get(i);
 		if (strcmp(temp_lexeme->Data(), "{") == 0)
 		{
@@ -132,7 +134,7 @@ bool LexemeWorker::Processing(List* lexes)
 		}
 		if (temp_lexeme->Type() == SPECIALWORD)
 		{
-
+			CorrectSpecial(temp_lexeme, i, lexes);
 		}
 		if (strcmp(temp_lexeme->Data(), "}") == 0)
 		{
@@ -184,7 +186,7 @@ static int GetLexemePositionWithMinimalPriority(List * expression)
 	return pos;
 }
 
-bool LexemeWorker::CorrenctSpecial(lexeme* spec, int pos, List* expression)
+bool LexemeWorker::CorrectSpecial(lexeme* spec, int pos, List* expression)
 {
 	if (pos == expression->count())
 	{
@@ -194,23 +196,23 @@ bool LexemeWorker::CorrenctSpecial(lexeme* spec, int pos, List* expression)
 	}
 	if (strcmp(spec->Data(), "for ") == 0)
 	{
-
+		return true;
 	}
 	if (strcmp(spec->Data(), "if ") == 0)
 	{
-
+		return true;
 	}
 	if (strcmp(spec->Data(), "else ") == 0)
 	{
-
+		return true;
 	}
 	if (strcmp(spec->Data(), "while ") == 0)
 	{
-
+		return true;
 	}
 	if (strcmp(spec->Data(), "do ") == 0)
 	{
-
+		return true;
 	}
 	if (strcmp(spec->Data(), "input ") == 0)
 	{
@@ -345,7 +347,7 @@ lexeme * LexemeWorker::NExpressionSolver(List * expression)
 bool LexemeWorker::FuncWithTwoNumberParams(List * expression, int pos, lexeme * spec)
 {
 	lexeme* devider1 = (lexeme*)expression->get(pos + 1);
-	if (strcmp(devider1->Data, "(") != 0)
+	if (strcmp(devider1->Data(), "(") != 0)
 	{
 		ErrorReporter().FReport(stdout, "Ожидается \"(\"", devider1->Line(), devider1->Start_Position());
 		_error = true;
@@ -373,21 +375,22 @@ bool LexemeWorker::FuncWithTwoNumberParams(List * expression, int pos, lexeme * 
 	}
 	if (strcmp(tlex->Data(), ",") != 0)
 	{
-		ErrorReporter().FReport(stdout, "Ожидается \",\"", tlex->Line(), tlex->Start_Position());
+		ErrorReporter().FReport(stdout, "Ожидается \",\"", devider2->Line(), devider2->Start_Position());
 		_error = true;
 		return false;
 	}
 	List* ltemp2 = new List(sizeof(lexeme));
+	lexeme* devider3 = nullptr;
 	int j = 0;
 	for (j = i + 1; j < expression->count(); j++)
 	{
-		tlex = (lexeme*)expression->get(i);
+		tlex = (lexeme*)expression->get(j);
 		if (strcmp(tlex->Data(), ")") == 0)
 		{
-			devider2 = (lexeme*)expression->get(i);
+			devider3 = (lexeme*)expression->get(i);
 			break;
 		}
-		ltemp1->add(tlex);
+		ltemp2->add(tlex);
 	}
 	if (!IsNumberExpression(ltemp2))
 	{
@@ -417,7 +420,7 @@ bool LexemeWorker::FuncWithTwoNumberParams(List * expression, int pos, lexeme * 
 bool LexemeWorker::FuncWithStringParam(List * expression, int pos, lexeme * spec)
 {
 	lexeme* devider1 = (lexeme*)expression->get(pos + 1);
-	if (strcmp(devider1->Data, "(") != 0)
+	if (strcmp(devider1->Data(), "(") != 0)
 	{
 		ErrorReporter().FReport(stdout, "Ожидается \"(\"", devider1->Line(), devider1->Start_Position());
 		_error = true;
@@ -426,12 +429,12 @@ bool LexemeWorker::FuncWithStringParam(List * expression, int pos, lexeme * spec
 	List* ltemp = new List(sizeof(lexeme));
 	lexeme* tlex = nullptr;
 	int i = 0;
-	for (i = pos + 1; i < expression->count(); i++)
+	for (i = pos + 2; i < expression->count(); i++)
 	{
 		tlex = (lexeme*)expression->get(i);
-		ltemp->add(tlex);
 		if (strcmp(tlex->Data(), ")") == 0)
 			break;
+		ltemp->add(tlex);
 	}
 	if (!IsStringExpression(ltemp))
 	{
@@ -460,7 +463,7 @@ bool LexemeWorker::FuncWithStringParam(List * expression, int pos, lexeme * spec
 bool LexemeWorker::FuncWithNumberParam(List * expression, int pos, lexeme * spec)
 {
 	lexeme* devider1 = (lexeme*)expression->get(pos + 1);
-	if (strcmp(devider1->Data, "(") != 0)
+	if (strcmp(devider1->Data(), "(") != 0)
 	{
 		ErrorReporter().FReport(stdout, "Ожидается \"(\"", devider1->Line(), devider1->Start_Position());
 		_error = true;
@@ -469,12 +472,12 @@ bool LexemeWorker::FuncWithNumberParam(List * expression, int pos, lexeme * spec
 	List* ltemp = new List(sizeof(lexeme));
 	lexeme* tlex = nullptr;
 	int i = 0;
-	for (i = pos + 1; i < expression->count(); i++)
+	for (i = pos + 2; i < expression->count(); i++)
 	{
 		tlex = (lexeme*)expression->get(i);
-		ltemp->add(tlex);
 		if (strcmp(tlex->Data(), ")") == 0)
 			break;
+		ltemp->add(tlex);
 	}
 	if (!IsNumberExpression(ltemp))
 	{
@@ -510,9 +513,9 @@ bool LexemeWorker::WhateverCheck(char ** perone, int c1, int * types, int c2, Li
 	{
 		flag = false;
 		lexeme* tlex = (lexeme*)expression->get(k);
-		if (tlex->Type == DEVIDER)
+		if (tlex->Type() == DEVIDER)
 		{
-			if (strcmp(tlex->Data, ")") == 0)
+			if (strcmp(tlex->Data(), ")") == 0)
 			{
 				hook_count--;
 				if (hook_count < 0)
@@ -522,7 +525,7 @@ bool LexemeWorker::WhateverCheck(char ** perone, int c1, int * types, int c2, Li
 					return false;
 				}
 			}
-			if (strcmp(tlex->Data, "(") == 0)
+			if (strcmp(tlex->Data(), "(") == 0)
 				hook_count++;
 			flag = true;
 		}
@@ -553,7 +556,7 @@ bool LexemeWorker::WhateverCheck(char ** perone, int c1, int * types, int c2, Li
 	}
 	if (hook_count > 0)
 	{
-		lexeme* tlex = (lexeme*)expression->get(expression->count - 1);
+		lexeme* tlex = (lexeme*)expression->get(expression->count() - 1);
 		char str[50];
 		str[0] = '\0';
 		sprintf_s(str, "Вы забыли закрыть %d скобку(ок)!", hook_count);

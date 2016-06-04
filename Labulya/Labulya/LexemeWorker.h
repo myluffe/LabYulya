@@ -17,7 +17,7 @@ protected:
 	bool IsNumberExpression(List* expression);
 	bool IsBoolExpression(List* expression);
 	bool IsStringExpression(List * expression);
-	bool CorrenctSpecial(lexeme* spec, int pos, List* expression);
+	bool CorrectSpecial(lexeme* spec, int pos, List* expression);
 
 	bool _error = false;
 

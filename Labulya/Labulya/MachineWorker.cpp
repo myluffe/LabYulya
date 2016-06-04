@@ -54,7 +54,7 @@ MachineWorker::MachineWorker()
 
 	// Operations2
 	om2 = new Type1Machine("Operations2", "Operation", OPERATION);
-	char* os2[] = { "+", "-", "=", "/", "*", "|", "&", ">", "<", "%", ":", "!", "?" };
+	char* os2[] = { "+", "-", "=", "/", "*", "|", "&", ">", "<", "%", ":", "!", "?", "," };
 	for each (char* var in os2)
 	{
 		om2->AddWord(var);
@@ -282,6 +282,8 @@ void MachineWorker::GetOperationPriority(mStateMachine * machine)
 	}
 	if (strcmp("=", machine->Buffer()) == 0)
 		machine->Priority = 16;
+	if (strcmp(",", machine->Buffer()) == 0)
+		machine->Priority = 17;
 
 	if (strcmp("+", machine->Buffer()) == 0 || strcmp("-", machine->Buffer()) == 0)
 	{
