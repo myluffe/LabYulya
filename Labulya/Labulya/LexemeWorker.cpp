@@ -275,10 +275,29 @@ bool LexemeWorker::WhateverCheck(char ** perone, int c1, int * types, int c2, Li
 {
 	int ttype;
 	bool flag = false;
+	int hook_count = 0;
+
 	for (int k = 0; k < expression->count(); k++)
 	{
+		flag = false;
 		lexeme* tlex = (lexeme*)expression->get(k);
-		if (tlex->Type() == OPERATION)
+		if (tlex->Type == DEVIDER)
+		{
+			if (strcmp(tlex->Data, ")") == 0)
+			{
+				hook_count--;
+				if (hook_count < 0)
+				{
+					ErrorReporter().FReport(stdout, "Вы забыли открыть скобку!", tlex->Line(), tlex->Start_Position());
+					_error == true;
+					return false;
+				}
+			}
+			if (strcmp(tlex->Data, "(") == 0)
+				hook_count++;
+			flag = true;
+		}
+		else if (tlex->Type() == OPERATION)
 		{
 			for (int s = 0; s < c1; s++)
 			{
@@ -302,6 +321,16 @@ bool LexemeWorker::WhateverCheck(char ** perone, int c1, int * types, int c2, Li
 		}
 		if (!flag)
 			return false;
+	}
+	if (hook_count > 0)
+	{
+		lexeme* tlex = (lexeme*)expression->get(expression->count - 1);
+		char str[50];
+		str[0] = '\0';
+		sprintf_s(str, "Вы забыли закрыть %d скобку(ок)!", hook_count);
+		ErrorReporter().FReport(stdout, str, tlex->Line(), tlex->Start_Position());
+		_error == true;
+		return false;
 	}
 	return flag;
 }
