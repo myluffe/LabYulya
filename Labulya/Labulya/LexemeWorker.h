@@ -22,7 +22,9 @@ protected:
 	bool _error = false;
 
 private:
-	bool StandartFuncWithNumberExpression(List* expresion, int pos, lexeme* spec);
+	bool FuncWithNumberParam(List* expresion, int pos, lexeme* spec);
+	bool FuncWithTwoNumberParams(List* expresion, int pos, lexeme* spec);
+	bool FuncWithStringParam(List* expresion, int pos, lexeme* spec);
 	bool WhateverCheck(char ** perone, int c1, int * types, int c2, List * expression);
 	//lexeme* Exe3Pression(List* expression);
 };
