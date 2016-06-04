@@ -130,6 +130,10 @@ bool LexemeWorker::Processing(List* lexes)
 		{
 			//обработка для чисел
 		}
+		if (temp_lexeme->Type() == SPECIALWORD)
+		{
+
+		}
 		if (strcmp(temp_lexeme->Data(), "}") == 0)
 		{
 			for (int j = dob->count() - 1; j >= 0; j--)
@@ -178,6 +182,65 @@ static int GetLexemePositionWithMinimalPriority(List * expression)
 		}
 	}
 	return pos;
+}
+
+bool LexemeWorker::CorrenctSpecial(lexeme* spec, int pos, List* expression)
+{
+	if (pos == expression->count())
+	{
+		ErrorReporter().FReport(stdout, "Не законченное выражение!", spec->Line(), spec->Start_Position());
+		_error = true;
+		return false;
+	}
+	if (strcmp(spec->Data(), "for ") == 0)
+	{
+
+	}
+	if (strcmp(spec->Data(), "if ") == 0)
+	{
+
+	}
+	if (strcmp(spec->Data(), "else ") == 0)
+	{
+
+	}
+	if (strcmp(spec->Data(), "while ") == 0)
+	{
+
+	}
+	if (strcmp(spec->Data(), "do ") == 0)
+	{
+
+	}
+	if (strcmp(spec->Data(), "input ") == 0)
+	{
+
+	}
+	if (strcmp(spec->Data(), "output ") == 0)
+	{
+
+	}
+	if (strcmp(spec->Data(), "min ") == 0)
+	{
+
+	}
+	if (strcmp(spec->Data(), "max ") == 0)
+	{
+
+	}
+	if (strcmp(spec->Data(), "sin ") == 0)
+	{
+		if (!StandartFuncWithNumberExpression)
+			return false;
+		else return true;
+	}
+	if (strcmp(spec->Data(), "cos ") == 0)
+	{
+		if (!StandartFuncWithNumberExpression)
+			return false;
+		else return true;
+	}
+	return false;
 }
 
 /*
@@ -270,6 +333,49 @@ lexeme * LexemeWorker::NExpressionSolver(List * expression)
 	return solution;
 }
 */
+
+bool LexemeWorker::StandartFuncWithNumberExpression(List * expression, int pos, lexeme * spec)
+{
+	lexeme* devider1 = (lexeme*)expression->get(pos + 1);
+	if (strcmp(devider1->Data, "(") != 0)
+	{
+		ErrorReporter().FReport(stdout, "Ожидается \"(\"", devider1->Line(), devider1->Start_Position());
+		_error = true;
+		return false;
+	}
+	List* ltemp = new List(sizeof(lexeme));
+	lexeme* tlex = nullptr;
+	int i = 0;
+	for (i = pos + 1; i < expression->count(); i++)
+	{
+		tlex = (lexeme*)expression->get(i);
+		ltemp->add(tlex);
+		if (strcmp(tlex->Data(), ")") == 0)
+			break;
+	}
+	if (!IsNumberExpression(ltemp))
+	{
+		ErrorReporter().FReport(stdout, "Ожидается числовое выражение!", devider1->Line(), devider1->Start_Position());
+		_error = true;
+		return false;
+	}
+	if (strcmp(tlex->Data(), ")") != 0)
+	{
+		ErrorReporter().FReport(stdout, "Ожидается \")\"", tlex->Line(), tlex->Start_Position());
+		_error = true;
+		return false;
+	}
+	tlex = (lexeme*)expression->get(i + 1);
+	if ((i + 1) >= expression->count() || strcmp(tlex->Data(), ";") != 0)
+	{
+		ErrorReporter().FReport(stdout, "Ожидается \";\"", tlex->Line(), tlex->Start_Position());
+		_error = true;
+		return false;
+	}
+	
+	ltemp->~List();
+	return true;
+}
 
 bool LexemeWorker::WhateverCheck(char ** perone, int c1, int * types, int c2, List * expression)
 {
@@ -605,21 +711,21 @@ lexeme * LexemeWorker::Exe3Pression(List* expression)
 bool LexemeWorker::IsNumberExpression(List * expression)
 {
 	//char* perone[] = { "++", "--", "+", "-", "(", "/", "*", ")", "%", "==", ">=", "<=", "!=", ">", "<" };
-	char* perone[] = { "+", "-", "(", "/", "*", ")", "%", "==", ">=", "<=", "!=", ">", "<" };
+	char* perone[] = { "++", "--", "<<", ">>", "+", "-", "/", "*", "%", "==", ">=", "<=", "!=", ">", "<" };
 	int types[] = { INT, FLOAT, DOUBLE };
 	return WhateverCheck(perone, (sizeof(perone) / sizeof(int)), types, (sizeof(types) / sizeof(char)), expression);
 }
 
 bool LexemeWorker::IsBoolExpression(List * expression)
 {
-	char* perone[] = { "==", "||", "&&", "(", ")", "!=" };
+	char* perone[] = { "==", "||", "&&", "!=" };
 	int types[] = { BOOL };
 	return WhateverCheck(perone, (sizeof(perone) / sizeof(int)), types, (sizeof(types) / sizeof(char)), expression);
 }
 
 bool LexemeWorker::IsStringExpression(List * expression)
 {
-	char* perone[] = { "==", "+", "!=", "(", ")"};
+	char* perone[] = { "==", "+", "!="};
 	int types[] = { STRING, CHAR };
 	return WhateverCheck(perone, (sizeof(perone) / sizeof(int)), types, (sizeof(types) / sizeof(char)), expression);
 }

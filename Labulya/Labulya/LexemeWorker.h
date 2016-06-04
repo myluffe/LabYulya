@@ -12,17 +12,19 @@ public:
 	LexemeWorker();
 	~LexemeWorker();
 protected:
-	lexeme* NExpressionSolver(List* expression);
+	//lexeme* NExpressionSolver(List* expression);
 
 	bool IsNumberExpression(List* expression);
 	bool IsBoolExpression(List* expression);
 	bool IsStringExpression(List * expression);
+	bool CorrenctSpecial(lexeme* spec, int pos, List* expression);
 
 	bool _error = false;
 
 private:
+	bool StandartFuncWithNumberExpression(List* expresion, int pos, lexeme* spec);
 	bool WhateverCheck(char ** perone, int c1, int * types, int c2, List * expression);
-	lexeme* Exe3Pression(List* expression);
+	//lexeme* Exe3Pression(List* expression);
 };
 
 static LexemeWorker LWorker = *new LexemeWorker();
