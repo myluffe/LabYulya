@@ -151,7 +151,6 @@ bool LexemeWorker::Processing(List* lexes)
 			}
 		}
 	}
-	dob->~Lexeme_list();
 
 	for (int i = 0; i < lexes->count(); i++)
 	{
@@ -168,6 +167,7 @@ bool LexemeWorker::Processing(List* lexes)
 	LexemeTable.print_lexems();
 	printf_s("\n|---------------|\n");
 	//
+	dob->~Lexeme_list();
 	return true;
 }
 
@@ -845,6 +845,7 @@ int LexemeWorker::CorrectFor(List * expression, int pos, lexeme * spec)
 	}
 
 	List* param2 = new List(sizeof(lexeme));
+	pos++;
 	for (pos; pos < expression->count(); pos++)
 	{
 		tlex = (lexeme*)expression->get(pos);
@@ -870,6 +871,7 @@ int LexemeWorker::CorrectFor(List * expression, int pos, lexeme * spec)
 	}
 
 	List* param3 = new List(sizeof(lexeme));
+	pos++;
 	for (pos; pos < expression->count(); pos++)
 	{
 		tlex = (lexeme*)expression->get(pos);
@@ -905,6 +907,7 @@ int LexemeWorker::CorrectFor(List * expression, int pos, lexeme * spec)
 		return 0;
 	}
 
+	pos++;
 	List* body = new List(sizeof(lexeme));
 	if (pos < expression->count())
 	{
@@ -932,9 +935,7 @@ int LexemeWorker::CorrectFor(List * expression, int pos, lexeme * spec)
 				if (strcmp(tlex->Data(), "}") != 0)
 					body->add(tlex);
 				else
-				{
 					break;
-				}
 			}
 		}
 		if (InnerExpression(body))
