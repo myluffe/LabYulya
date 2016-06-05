@@ -146,6 +146,7 @@ int MachineWorker::Work(char* filename, List* lexes)
 					s = sizeof(strlen(str));
 					_currentaut->EnterChar('\0', s, fr.CurrentLine());
 					SuperFlag = false;
+					s = lenght;
 				}
 				if (_currentaut->IsFinished())
 				{
@@ -204,7 +205,7 @@ int MachineWorker::Work(char* filename, List* lexes)
 						_currentaut->CurrentLexType(), _currentaut->Buffer(),
 						_currentaut->CurrentLexLine(), _currentaut->CurrentLexPos(), _currentaut->Priority));
 					UpdateMachines();
-					s--;		
+					s--;
 				}
 				if (_currentaut->IsError())
 				{
@@ -261,11 +262,13 @@ int MachineWorker::Work(char* filename, List* lexes)
 			}
 		}
 	}
+	
 	if (!LWorker.Processing(lexes))
 	{
 		fr.~mFileReader();
 		return -6;
 	}
+	
 	fr.~mFileReader();
 	return 1;
 }

@@ -151,7 +151,6 @@ bool LexemeWorker::Processing(List* lexes)
 			}
 		}
 	}
-	dob->~Lexeme_list();
 
 	for (int i = 0; i < lexes->count(); i++)
 	{
@@ -168,6 +167,7 @@ bool LexemeWorker::Processing(List* lexes)
 	LexemeTable.print_lexems();
 	printf_s("\n|---------------|\n");
 	//
+	dob->~Lexeme_list();
 	return true;
 }
 
@@ -722,6 +722,7 @@ int LexemeWorker::CorrectDo(List * expression, int pos, lexeme * spec)
 	List* tlist = new List(sizeof(lexeme));
 	if (pos < expression->count())
 	{
+		pos++;
 		lexeme* tlex = (lexeme*)expression->get(pos);
 		if (strcmp(tlex->Data(), "{") != 0)
 		{
@@ -766,7 +767,7 @@ int LexemeWorker::CorrectDo(List * expression, int pos, lexeme * spec)
 						tlist->~List();
 						return 0;
 					}
-					int pos2 = FuncWithBoolParam(expression, pos, spec, true);
+					int pos2 = FuncWithBoolParam(expression, pos, spec, false);
 					if (pos2 == 0)
 					{
 						_error = true;
@@ -845,6 +846,7 @@ int LexemeWorker::CorrectFor(List * expression, int pos, lexeme * spec)
 	}
 
 	List* param2 = new List(sizeof(lexeme));
+	pos++;
 	for (pos; pos < expression->count(); pos++)
 	{
 		tlex = (lexeme*)expression->get(pos);
@@ -870,6 +872,7 @@ int LexemeWorker::CorrectFor(List * expression, int pos, lexeme * spec)
 	}
 
 	List* param3 = new List(sizeof(lexeme));
+	pos++;
 	for (pos; pos < expression->count(); pos++)
 	{
 		tlex = (lexeme*)expression->get(pos);
@@ -905,6 +908,7 @@ int LexemeWorker::CorrectFor(List * expression, int pos, lexeme * spec)
 		return 0;
 	}
 
+	pos++;
 	List* body = new List(sizeof(lexeme));
 	if (pos < expression->count())
 	{
@@ -932,9 +936,7 @@ int LexemeWorker::CorrectFor(List * expression, int pos, lexeme * spec)
 				if (strcmp(tlex->Data(), "}") != 0)
 					body->add(tlex);
 				else
-				{
 					break;
-				}
 			}
 		}
 		if (InnerExpression(body))
@@ -986,9 +988,9 @@ int LexemeWorker::CorrectIf(List * expression, int pos, lexeme * spec)
 	lexeme* tlex = (lexeme*)expression->get(pos);
 	if (strcmp(tlex->Data(), "else ") != 0)
 	{
-		errorReporter.FReport(logfile, "Ожидается \"else \"!", tlex->Line(), tlex->Start_Position());
-		_error = true;
-		return 0;
+		//errorReporter.FReport(logfile, "Ожидается \"else \"!", tlex->Line(), tlex->Start_Position());
+		//_error = true;
+		return pos - 1;
 	}
 	pos = CorrectWhile(expression, pos, spec);
 	if (pos >= expression->count())

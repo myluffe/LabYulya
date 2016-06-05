@@ -3,26 +3,13 @@ float i = 36.e1;
 max (i, 2);
 //dfdfdf
 bool f = true ;
+if (f)
+	output ("oi!");
 int h = 0;
-while (f)
+do 
 {
 	h++;
 }
-sin (11);
-//s = 2;
-int d = 15;
-int s2 = d;
-s2++;
-int j = 5;
-s2 = (d - 2) + j;
-d = -s2;
-for (i; i < 100; i++)
-{
-	/* not like this!
-i want close comment */
-	output ("hi");
-	char s = 'b';
-	string s1 = "a";
-}
+while (f)
 int s1 = 2;
 }
