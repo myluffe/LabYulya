@@ -980,6 +980,7 @@ bool LexemeWorker::IsStringExpression(List * expression)
 
 int LexemeWorker::CorrectWhile(List * expression, int pos, lexeme * spec)
 {
+	//comment
 	int pos2 = FuncWithBoolParam(expression, pos, spec, false);
 	if (pos2 == 0)
 	{
