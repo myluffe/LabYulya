@@ -143,7 +143,7 @@ int MachineWorker::Work(char* filename, List* lexes)
 					_currentaut->EnterChar(str[s], s, fr.CurrentLine());
 				else
 				{
-					s = strlen(str);
+					s = sizeof(strlen(str));
 					_currentaut->EnterChar('\0', s, fr.CurrentLine());
 					SuperFlag = false;
 				}

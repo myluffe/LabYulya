@@ -13,7 +13,7 @@ Heap::~Heap()
 	delete_segments();
 }
 
-void* Heap::get_mem(int size)
+void* Heap::get_mem(size_t size)
 {
     if(size <= SEGMENTSIZE)
 	{Segment*  now_current = current;
@@ -34,11 +34,11 @@ void* Heap::get_mem(int size)
 					{
 						Chunk my_Chunk;
 						my_Chunk.offset = (char*)(now_current->descriptor[i].offset) + size;
-						my_Chunk.size = now_current->descriptor[i].size - size;
+						my_Chunk.size = now_current->descriptor[i].size - sizeof(size);
 						my_Chunk.used = false;
 
                         now_current->descriptor[i].used = true;
-						now_current->descriptor[i].size = size;
+						now_current->descriptor[i].size = sizeof(size);
 						now_current->descriptor_count++;
 
 						for (int h = now_current->descriptor_count; h > i; h--)
@@ -57,12 +57,12 @@ void* Heap::get_mem(int size)
 	if (make_segment() == 0)
 	{
 	    Chunk my_Chunk;
-		my_Chunk.offset = (char*)(current->data) + size;
-		my_Chunk.size = current->descriptor[0].size - size;
+		my_Chunk.offset = (char*)(current->data) + sizeof(size);
+		my_Chunk.size = current->descriptor[0].size - sizeof(size);
 		my_Chunk.used = false;
 
 		current->descriptor[0].used = true;
-		current->descriptor[0].size = size;
+		current->descriptor[0].size = sizeof(size);
 		current->descriptor[1] = my_Chunk;
 		current->descriptor_count++;
 
@@ -154,10 +154,10 @@ void Heap::print()
     Segment*  now_current = current;
     while (now_current != 0)
 	{
-	    printf("new Seg:\n%d\t%d\n",now_current->descriptor_count, now_current->data);
+	    printf("new Seg:\n%d\t%s\n",now_current->descriptor_count, (char *)now_current->data);
 		for (int i = 0; i < now_current->descriptor_count; i++)
 		{
-		    printf("%d\t%d\t%d\n", now_current->descriptor[i].size, now_current->descriptor[i].offset, now_current->descriptor[i].used?1:0);
+		    printf("%d\t%s\t%d\n", now_current->descriptor[i].size, (char *)now_current->descriptor[i].offset, now_current->descriptor[i].used?1:0);
 		}
 		now_current = now_current->prev;
 	}

@@ -53,21 +53,56 @@ class TVariable : TNode
 class TUnaryOperation : TNode
 {
 	public:
-		TUnaryOperation(TNode* operand, lexeme* moperation)
+		TUnaryOperation(TNode* operand, lexeme* moperation, bool left = true)
 		{
 			m_operand = operand;
 			m_operation = moperation;
+			m_left = left;
 		}
 		lexeme* exec()
 		{ 
-			if (m_operation->Data == "-")
+			lexeme* res1 = m_operand->exec();
+			double o = Parser().ToDouble(res1->Data);
+			lexeme* res = new lexeme("Number", NUMBER, "0", res1->Line, res1->Start_Position, 100);
+			if (m_operation->Data == "-" && m_left)
 			{
-				lexeme* res = m_operand->exec();
-				res->DataChange("-" + res->Data);
+				res1->DataChange(Parser().DoubleToString(-o));
+				res->DataChange(res1->Data);
 				return res;
 			}
-			if (m_operation->Data == "+")
+			if (m_operation->Data == "++" && m_left)
 			{
+				res1->DataChange(Parser().DoubleToString(o + 1));
+				res->DataChange(res1->Data);
+				return res;
+			}
+			if (m_operation->Data == "--" && m_left)
+			{
+				res1->DataChange(Parser().DoubleToString(o - 1));
+				res->DataChange(res1->Data);
+				return res;
+			}
+			if (m_operation->Data == "++" && !m_left)
+			{
+				res->DataChange(res1->Data);
+				res1->DataChange(Parser().DoubleToString(o + 1));
+				return res;
+			}
+			if (m_operation->Data == "--" && !m_left)
+			{
+				res->DataChange(res1->Data);
+				res1->DataChange(Parser().DoubleToString(o - 1));
+				return res;
+			}
+			if (m_operation->Data == "+" && m_left)
+			{
+				return m_operand->exec();
+			}
+			if (m_operation->Data == "!" && m_left)
+			{
+				bool b = Parser().ToBool(res1->Data);
+				res1->DataChange(Parser().BoolToString(!b));
+				res->DataChange(res1->Data);
 				return m_operand->exec();
 			}
 		}
@@ -77,6 +112,7 @@ class TUnaryOperation : TNode
 			m_operand->print();
 		}
 	protected:
+		bool    m_left;
 		lexeme* m_operation;
 		TNode*  m_operand;
 };
@@ -126,9 +162,9 @@ class TBinaryOperation : TNode
 			{
 				res->DataChange(Parser().BoolToString(o1 == o2));
 			}
-			if (m_operation->Data == "=!")
+			if (m_operation->Data == "!=")
 			{
-				res->DataChange(Parser().BoolToString(o1 =! o2));
+				res->DataChange(Parser().BoolToString(o1 != o2));
 			}
 			if (m_operation->Data == "<=")
 			{
@@ -137,6 +173,26 @@ class TBinaryOperation : TNode
 			if (m_operation->Data == ">=")
 			{
 				res->DataChange(Parser().BoolToString(o1 >= o2));
+			}
+			if (m_operation->Data == "<")
+			{
+				res->DataChange(Parser().BoolToString(o1 < o2));
+			}
+			if (m_operation->Data == ">")
+			{
+				res->DataChange(Parser().BoolToString(o1 > o2));
+			}
+			if (m_operation->Data == "&&")
+			{
+				bool b1 = Parser().ToBool(res1->Data);
+				bool b2 = Parser().ToBool(res2->Data);
+				res->DataChange(Parser().BoolToString(b1 && b2));
+			}
+			if (m_operation->Data == "||")
+			{
+				bool b1 = Parser().ToBool(res1->Data);
+				bool b2 = Parser().ToBool(res2->Data);
+				res->DataChange(Parser().BoolToString(b1 || b2));
 			}
 			return res;
 		}

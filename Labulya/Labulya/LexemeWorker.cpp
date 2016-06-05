@@ -32,7 +32,7 @@ bool LexemeWorker::Processing(List* lexes)
 						lexeme* tdevider = (lexeme*)lexes->get(i + 1);
 						if (strcmp(tdevider->Data(), "=") != 0)
 						{
-							ErrorReporter().FReport(stdout, "You should define the variable!", temp_lexeme->Line(), temp_lexeme->Start_Position() + strlen(temp_lexeme->Data()));
+							ErrorReporter().FReport(stdout, "You should define the variable!", temp_lexeme->Line(), temp_lexeme->Start_Position() + sizeof(strlen(temp_lexeme->Data())));
 							return false;
 						}
 						lexeme* tdata = (lexeme*)lexes->get(i + 2);
@@ -82,7 +82,7 @@ bool LexemeWorker::Processing(List* lexes)
 					}
 					else
 					{
-						ErrorReporter().FReport(stdout, "You should define the variable!", temp_lexeme->Line(), temp_lexeme->Start_Position() + strlen(temp_lexeme->Data()));
+						ErrorReporter().FReport(stdout, "You should define the variable!", temp_lexeme->Line(), temp_lexeme->Start_Position() + sizeof(strlen(temp_lexeme->Data())));
 						return false;
 					}
 				}
@@ -617,7 +617,7 @@ bool LexemeWorker::InnerExpression(List * expression)
 
 bool LexemeWorker::WhateverCheck(char ** perone, int c1, int * types, int c2, List * expression)
 {
-	int ttype;
+	//int ttype;
 	bool varbefore = false;
 	bool correct = false;
 	int hook_count = 0;
@@ -634,7 +634,7 @@ bool LexemeWorker::WhateverCheck(char ** perone, int c1, int * types, int c2, Li
 				if (hook_count < 0)
 				{
 					ErrorReporter().FReport(stdout, "Вы забыли открыть скобку!", tlex->Line(), tlex->Start_Position());
-					_error == true;
+					_error = true;
 					return false;
 				}
 			}
@@ -683,7 +683,7 @@ bool LexemeWorker::WhateverCheck(char ** perone, int c1, int * types, int c2, Li
 		str[0] = '\0';
 		sprintf_s(str, "Вы забыли закрыть %d скобку(ок)!", hook_count);
 		ErrorReporter().FReport(stdout, str, tlex->Line(), tlex->Start_Position());
-		_error == true;
+		_error = true;
 		return false;
 	}
 	return correct;
