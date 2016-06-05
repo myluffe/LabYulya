@@ -291,6 +291,8 @@ void Type2Machine::EnterChar(char ch, int pos, int line)
 
 	int listcount = _words->count();
 	_isFinished = true;
+	if (ch == '\0')
+		return;
 	for (int i = 0; i < listcount; i++)
 	{
 		if (strchr((char*)_words->get(i), ch) != nullptr)

@@ -722,6 +722,7 @@ int LexemeWorker::CorrectDo(List * expression, int pos, lexeme * spec)
 	List* tlist = new List(sizeof(lexeme));
 	if (pos < expression->count())
 	{
+		pos++;
 		lexeme* tlex = (lexeme*)expression->get(pos);
 		if (strcmp(tlex->Data(), "{") != 0)
 		{
@@ -766,7 +767,7 @@ int LexemeWorker::CorrectDo(List * expression, int pos, lexeme * spec)
 						tlist->~List();
 						return 0;
 					}
-					int pos2 = FuncWithBoolParam(expression, pos, spec, true);
+					int pos2 = FuncWithBoolParam(expression, pos, spec, false);
 					if (pos2 == 0)
 					{
 						_error = true;
@@ -987,9 +988,9 @@ int LexemeWorker::CorrectIf(List * expression, int pos, lexeme * spec)
 	lexeme* tlex = (lexeme*)expression->get(pos);
 	if (strcmp(tlex->Data(), "else ") != 0)
 	{
-		errorReporter.FReport(logfile, "Ожидается \"else \"!", tlex->Line(), tlex->Start_Position());
-		_error = true;
-		return 0;
+		//errorReporter.FReport(logfile, "Ожидается \"else \"!", tlex->Line(), tlex->Start_Position());
+		//_error = true;
+		return pos - 1;
 	}
 	pos = CorrectWhile(expression, pos, spec);
 	if (pos >= expression->count())
