@@ -248,6 +248,16 @@ class TList : TNode
 		{
 			start = NULL;
 		}
+		~TList()
+		{
+			list* cur = start;
+			while (cur)
+			{
+				list* next = cur->next;
+				heap.free_mem(&cur);
+				cur = next;
+			}
+		}
 		lexeme* exec()  
 		{  
 			list* cur = start;
