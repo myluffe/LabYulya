@@ -1,3 +1,4 @@
+#include "stdafx.h"
 #include "tree.h"
 #include "LexemeWorker.h"
 #include "ErrorReporter.h"

@@ -8,7 +8,7 @@ MachineWorker::MachineWorker()
 
 	// Special Words
 	sm = new Type1Machine("Special Words", "Special Word", SPECIALWORD);
-	char* ss[] = { "//", "/*", "*/", "return ", "for ", "if ", "else ", "while ", "do ", "input ", "output ", "max ", "min ", "sin ", "cos " };
+	char* ss[] = { "//", "/*", "*/", "for ", "if ", "else ", "while ", "do ", "input ", "output ", "max ", "min ", "sin ", "cos " };
 	for each (char* var in ss)
 	{
 		sm->AddWord(var);
