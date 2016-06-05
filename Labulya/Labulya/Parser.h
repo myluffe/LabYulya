@@ -19,4 +19,4 @@ public:
 
 	bool ToBool(char* str);
 	char* BoolToString(bool value);
-};
+} parser = *new Parser();

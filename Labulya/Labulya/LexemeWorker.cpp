@@ -24,7 +24,7 @@ bool LexemeWorker::Processing(List* lexes)
 					lexeme* ttype = (lexeme*)lexes->get(i - 1);
 					if (ttype->Type() != TYPE)
 					{
-						ErrorReporter().FReport(logfile, "No type of undefined variable!", temp_lexeme->Line(), temp_lexeme->Start_Position());
+						errorReporter.FReport(logfile, "No type of undefined variable!", temp_lexeme->Line(), temp_lexeme->Start_Position());
 						return false;
 					}
 					if (i + 1 != lexes->count() && i + 2 != lexes->count() && i + 3 != lexes->count())
@@ -32,7 +32,7 @@ bool LexemeWorker::Processing(List* lexes)
 						lexeme* tdevider = (lexeme*)lexes->get(i + 1);
 						if (strcmp(tdevider->Data(), "=") != 0)
 						{
-							ErrorReporter().FReport(logfile, "You should define the variable!", temp_lexeme->Line(), temp_lexeme->Start_Position() + strlen(temp_lexeme->Data()));
+							errorReporter.FReport(logfile, "You should define the variable!", temp_lexeme->Line(), temp_lexeme->Start_Position() + strlen(temp_lexeme->Data()));
 							return false;
 						}
 						lexeme* tdata = (lexeme*)lexes->get(i + 2);
@@ -45,26 +45,26 @@ bool LexemeWorker::Processing(List* lexes)
 									*tdata = *(lexeme*)dob->get(pos);
 								else
 								{
-									ErrorReporter().FReport(logfile, "Нельзя непоределенное присвоить значение!", tdata->Line(), tdata->Start_Position());
+									errorReporter.FReport(logfile, "Нельзя непоределенное присвоить значение!", tdata->Line(), tdata->Start_Position());
 									return false;
 								}
 							}
 							else
 							{
-								ErrorReporter().FReport(logfile, "There should be value!", tdevider->Line(), tdevider->Start_Position());
+								errorReporter.FReport(logfile, "There should be value!", tdevider->Line(), tdevider->Start_Position());
 								return false;
 							}
 						}
 						lexeme* tdevider2 = (lexeme*)lexes->get(i + 3);
 						if (strcmp(tdevider2->Data(), ";") != 0)
 						{
-							ErrorReporter().FReport(logfile, "There should be \";\" after value!", tdata->Line(), tdata->Start_Position());
+							errorReporter.FReport(logfile, "There should be \";\" after value!", tdata->Line(), tdata->Start_Position());
 							return false;
 						}
 						lexeme* newlex = new lexeme(temp_lexeme->Data(), ttype->Data(), tdata->Data(), temp_lexeme->Line(), temp_lexeme->Start_Position(), temp_lexeme->Priority());
 						if (tdata->Type() != GetType(ttype->Data()))
 						{
-							ErrorReporter().FReport(logfile, "Diffrent variable and value types!", temp_lexeme->Line(), temp_lexeme->Start_Position());
+							errorReporter.FReport(logfile, "Diffrent variable and value types!", temp_lexeme->Line(), temp_lexeme->Start_Position());
 							return false;
 						}
 						//в дов уже готовую добавляем
@@ -82,13 +82,13 @@ bool LexemeWorker::Processing(List* lexes)
 					}
 					else
 					{
-						ErrorReporter().FReport(logfile, "You should define the variable!", temp_lexeme->Line(), temp_lexeme->Start_Position() + strlen(temp_lexeme->Data()));
+						errorReporter.FReport(logfile, "You should define the variable!", temp_lexeme->Line(), temp_lexeme->Start_Position() + strlen(temp_lexeme->Data()));
 						return false;
 					}
 				}
 				else
 				{
-					ErrorReporter().FReport(logfile, "You miss the type!", temp_lexeme->Line(), temp_lexeme->Start_Position());
+					errorReporter.FReport(logfile, "You miss the type!", temp_lexeme->Line(), temp_lexeme->Start_Position());
 					return false;
 				}
 			}
@@ -100,7 +100,7 @@ bool LexemeWorker::Processing(List* lexes)
 					if (ttype->Type() == TYPE)
 					{
 						dob->print_list();
-						ErrorReporter().FReport(logfile, "This variable is alredy defined!", temp_lexeme->Line(), temp_lexeme->Start_Position());
+						errorReporter.FReport(logfile, "This variable is alredy defined!", temp_lexeme->Line(), temp_lexeme->Start_Position());
 						return false;
 					}
 					else
@@ -125,7 +125,7 @@ bool LexemeWorker::Processing(List* lexes)
 				else
 				{
 					//
-					ErrorReporter().FReport(logfile, "No type of undefined variable!", temp_lexeme->Line(), temp_lexeme->Start_Position());
+					errorReporter.FReport(logfile, "No type of undefined variable!", temp_lexeme->Line(), temp_lexeme->Start_Position());
 					return false;
 				}
 			}
@@ -200,7 +200,7 @@ int LexemeWorker::CorrectSpecial(lexeme* spec, int pos, List* expression)
 {
 	if (pos == expression->count())
 	{
-		ErrorReporter().FReport(logfile, "Не законченное выражение!", spec->Line(), spec->Start_Position());
+		errorReporter.FReport(logfile, "Не законченное выражение!", spec->Line(), spec->Start_Position());
 		_error = true;
 		return 0;
 	}
@@ -266,7 +266,7 @@ int LexemeWorker::FuncWithTwoNumberParams(List * expression, int pos, lexeme * s
 	lexeme* devider1 = (lexeme*)expression->get(pos + 1);
 	if (strcmp(devider1->Data(), "(") != 0)
 	{
-		ErrorReporter().FReport(logfile, "Ожидается \"(\"", devider1->Line(), devider1->Start_Position());
+		errorReporter.FReport(logfile, "Ожидается \"(\"", devider1->Line(), devider1->Start_Position());
 		_error = true;
 		return 0;
 	}
@@ -286,13 +286,13 @@ int LexemeWorker::FuncWithTwoNumberParams(List * expression, int pos, lexeme * s
 	}
 	if (!IsNumberExpression(ltemp1, false))
 	{
-		ErrorReporter().FReport(logfile, "Ожидается числовое выражение!", devider1->Line(), devider1->Start_Position());
+		errorReporter.FReport(logfile, "Ожидается числовое выражение!", devider1->Line(), devider1->Start_Position());
 		ltemp1->~List();
 		return 0;
 	}
 	if (strcmp(tlex->Data(), ",") != 0)
 	{
-		ErrorReporter().FReport(logfile, "Ожидается \",\"", devider2->Line(), devider2->Start_Position());
+		errorReporter.FReport(logfile, "Ожидается \",\"", devider2->Line(), devider2->Start_Position());
 		ltemp1->~List();
 		return 0;
 	}
@@ -311,14 +311,14 @@ int LexemeWorker::FuncWithTwoNumberParams(List * expression, int pos, lexeme * s
 	}
 	if (!IsNumberExpression(ltemp2, false))
 	{
-		ErrorReporter().FReport(logfile, "Ожидается числовое выражение!", devider1->Line(), devider1->Start_Position());
+		errorReporter.FReport(logfile, "Ожидается числовое выражение!", devider1->Line(), devider1->Start_Position());
 		ltemp1->~List();
 		ltemp2->~List();
 		return 0;
 	}
 	if (strcmp(tlex->Data(), ")") != 0)
 	{
-		ErrorReporter().FReport(logfile, "Ожидается \")\"", tlex->Line(), tlex->Start_Position());
+		errorReporter.FReport(logfile, "Ожидается \")\"", tlex->Line(), tlex->Start_Position());
 		_error = true;
 		ltemp1->~List();
 		ltemp2->~List();
@@ -333,7 +333,7 @@ int LexemeWorker::FuncWithTwoNumberParams(List * expression, int pos, lexeme * s
 	tlex = (lexeme*)expression->get(j + 1);
 	if ((j + 1) >= expression->count() || strcmp(tlex->Data(), ";") != 0)
 	{
-		ErrorReporter().FReport(logfile, "Ожидается \";\"", tlex->Line(), tlex->Start_Position());
+		errorReporter.FReport(logfile, "Ожидается \";\"", tlex->Line(), tlex->Start_Position());
 		_error = true;
 		ltemp1->~List();
 		ltemp2->~List();
@@ -350,7 +350,7 @@ int LexemeWorker::FuncWithStringParam(List * expression, int pos, lexeme * spec,
 	lexeme* devider1 = (lexeme*)expression->get(pos + 1);
 	if (strcmp(devider1->Data(), "(") != 0)
 	{
-		ErrorReporter().FReport(logfile, "Ожидается \"(\"", devider1->Line(), devider1->Start_Position());
+		errorReporter.FReport(logfile, "Ожидается \"(\"", devider1->Line(), devider1->Start_Position());
 		_error = true;
 		return 0;
 	}
@@ -366,13 +366,13 @@ int LexemeWorker::FuncWithStringParam(List * expression, int pos, lexeme * spec,
 	}
 	if (!IsStringExpression(ltemp, false))
 	{
-		ErrorReporter().FReport(logfile, "Ожидается строковое выражение!", devider1->Line(), devider1->Start_Position());
+		errorReporter.FReport(logfile, "Ожидается строковое выражение!", devider1->Line(), devider1->Start_Position());
 		ltemp->~List();
 		return 0;
 	}
 	if (strcmp(tlex->Data(), ")") != 0)
 	{
-		ErrorReporter().FReport(logfile, "Ожидается \")\"", tlex->Line(), tlex->Start_Position());
+		errorReporter.FReport(logfile, "Ожидается \")\"", tlex->Line(), tlex->Start_Position());
 		_error = true;
 		ltemp->~List();
 		return 0;
@@ -385,7 +385,7 @@ int LexemeWorker::FuncWithStringParam(List * expression, int pos, lexeme * spec,
 	tlex = (lexeme*)expression->get(i + 1);
 	if ((i + 1) >= expression->count() || strcmp(tlex->Data(), ";") != 0)
 	{
-		ErrorReporter().FReport(logfile, "Ожидается \";\"", tlex->Line(), tlex->Start_Position());
+		errorReporter.FReport(logfile, "Ожидается \";\"", tlex->Line(), tlex->Start_Position());
 		_error = true;
 		ltemp->~List();
 		return 0;
@@ -400,7 +400,7 @@ int LexemeWorker::FuncWithBoolParam(List * expression, int pos, lexeme * spec, b
 	lexeme* devider1 = (lexeme*)expression->get(pos + 1);
 	if (strcmp(devider1->Data(), "(") != 0)
 	{
-		ErrorReporter().FReport(logfile, "Ожидается \"(\"", devider1->Line(), devider1->Start_Position());
+		errorReporter.FReport(logfile, "Ожидается \"(\"", devider1->Line(), devider1->Start_Position());
 		_error = true;
 		return 0;
 	}
@@ -416,13 +416,13 @@ int LexemeWorker::FuncWithBoolParam(List * expression, int pos, lexeme * spec, b
 	}
 	if (!IsBoolExpression(ltemp, false) && !IsNumberExpressionWithBoolOperations(ltemp) && !IsStringExpressionWithBoolOperations(ltemp))
 	{
-		ErrorReporter().FReport(logfile, "Ожидается выражение типа bool!", devider1->Line(), devider1->Start_Position());
+		errorReporter.FReport(logfile, "Ожидается выражение типа bool!", devider1->Line(), devider1->Start_Position());
 		ltemp->~List();
 		return 0;
 	}
 	if (strcmp(tlex->Data(), ")") != 0)
 	{
-		ErrorReporter().FReport(logfile, "Ожидается \")\"", tlex->Line(), tlex->Start_Position());
+		errorReporter.FReport(logfile, "Ожидается \")\"", tlex->Line(), tlex->Start_Position());
 		_error = true;
 		ltemp->~List();
 		return 0;
@@ -435,7 +435,7 @@ int LexemeWorker::FuncWithBoolParam(List * expression, int pos, lexeme * spec, b
 	tlex = (lexeme*)expression->get(i + 1);
 	if ((i + 1) >= expression->count() || strcmp(tlex->Data(), ";") != 0)
 	{
-		ErrorReporter().FReport(logfile, "Ожидается \";\"", tlex->Line(), tlex->Start_Position());
+		errorReporter.FReport(logfile, "Ожидается \";\"", tlex->Line(), tlex->Start_Position());
 		_error = true;
 		ltemp->~List();
 		return 0;
@@ -450,7 +450,7 @@ int LexemeWorker::FuncWithNumberParam(List * expression, int pos, lexeme * spec,
 	lexeme* devider1 = (lexeme*)expression->get(pos + 1);
 	if (strcmp(devider1->Data(), "(") != 0)
 	{
-		ErrorReporter().FReport(logfile, "Ожидается \"(\"", devider1->Line(), devider1->Start_Position());
+		errorReporter.FReport(logfile, "Ожидается \"(\"", devider1->Line(), devider1->Start_Position());
 		_error = true;
 		return 0;
 	}
@@ -466,13 +466,13 @@ int LexemeWorker::FuncWithNumberParam(List * expression, int pos, lexeme * spec,
 	}
 	if (!IsNumberExpression(ltemp, false))
 	{
-		ErrorReporter().FReport(logfile, "Ожидается числовое выражение!", devider1->Line(), devider1->Start_Position());
+		errorReporter.FReport(logfile, "Ожидается числовое выражение!", devider1->Line(), devider1->Start_Position());
 		ltemp->~List();
 		return 0;
 	}
 	if (strcmp(tlex->Data(), ")") != 0)
 	{
-		ErrorReporter().FReport(logfile, "Ожидается \")\"", tlex->Line(), tlex->Start_Position());
+		errorReporter.FReport(logfile, "Ожидается \")\"", tlex->Line(), tlex->Start_Position());
 		_error = true;
 		ltemp->~List();
 		return 0;
@@ -485,7 +485,7 @@ int LexemeWorker::FuncWithNumberParam(List * expression, int pos, lexeme * spec,
 	tlex = (lexeme*)expression->get(i + 1);
 	if ((i + 1) >= expression->count() || strcmp(tlex->Data(), ";") != 0)
 	{
-		ErrorReporter().FReport(logfile, "Ожидается \";\"", tlex->Line(), tlex->Start_Position());
+		errorReporter.FReport(logfile, "Ожидается \";\"", tlex->Line(), tlex->Start_Position());
 		_error = true;
 		ltemp->~List();
 		return 0;
@@ -530,7 +530,6 @@ bool LexemeWorker::InnerExpression(List * expression)
 
 bool LexemeWorker::WhateverCheck(char ** perone, int c1, int * types, int c2, List * expression, bool qual)
 {
-	int ttype;
 	bool varbefore = false;
 	bool correct = false;
 	int hook_count = 0;
@@ -547,8 +546,8 @@ bool LexemeWorker::WhateverCheck(char ** perone, int c1, int * types, int c2, Li
 				hook_count--;
 				if (hook_count < 0)
 				{
-					ErrorReporter().FReport(logfile, "Вы забыли открыть скобку!", tlex->Line(), tlex->Start_Position());
-					_error == true;
+					errorReporter.FReport(logfile, "Вы забыли открыть скобку!", tlex->Line(), tlex->Start_Position());
+					_error = true;
 					return false;
 				}
 			}
@@ -573,7 +572,7 @@ bool LexemeWorker::WhateverCheck(char ** perone, int c1, int * types, int c2, Li
 				{
 					if (equalitycount > 1)
 					{
-						ErrorReporter().FReport(logfile, "В выражении не может быть несколько присваиваний!", tlex->Line(), tlex->Start_Position());
+						errorReporter.FReport(logfile, "В выражении не может быть несколько присваиваний!", tlex->Line(), tlex->Start_Position());
 						return false;
 					}
 					equalitycount++;
@@ -584,7 +583,7 @@ bool LexemeWorker::WhateverCheck(char ** perone, int c1, int * types, int c2, Li
 		{
 			if (varbefore)
 			{
-				ErrorReporter().FReport(logfile, "Ожидается операция!", tlex->Line(), tlex->Start_Position());
+				errorReporter.FReport(logfile, "Ожидается операция!", tlex->Line(), tlex->Start_Position());
 				//_error == true;
 				return false;
 			}
@@ -607,8 +606,8 @@ bool LexemeWorker::WhateverCheck(char ** perone, int c1, int * types, int c2, Li
 		char str[50];
 		str[0] = '\0';
 		sprintf_s(str, "Вы забыли закрыть %d скобку(ок)!", hook_count);
-		ErrorReporter().FReport(logfile, str, tlex->Line(), tlex->Start_Position());
-		_error == true;
+		errorReporter.FReport(logfile, str, tlex->Line(), tlex->Start_Position());
+		_error = true;
 		return false;
 	}
 	return correct;
@@ -708,7 +707,7 @@ int LexemeWorker::CorrectWhile(List * expression, int pos, lexeme * spec)
 	}
 	else
 	{
-		ErrorReporter().FReport(logfile, "Незаконченное выражение!", spec->Line(), spec->Start_Position());
+		errorReporter.FReport(logfile, "Незаконченное выражение!", spec->Line(), spec->Start_Position());
 		_error = true;
 		tlist->~List();
 		return 0;
@@ -762,7 +761,7 @@ int LexemeWorker::CorrectDo(List * expression, int pos, lexeme * spec)
 					tlex = (lexeme*)expression->get(pos);
 					if (strcmp(tlex->Data(), "while ") != 0)
 					{
-						ErrorReporter().FReport(logfile, "Ожидается \"while \" после тела цикла \"do \"!", tlex->Line(), tlex->Start_Position());
+						errorReporter.FReport(logfile, "Ожидается \"while \" после тела цикла \"do \"!", tlex->Line(), tlex->Start_Position());
 						_error = true;
 						tlist->~List();
 						return 0;
@@ -792,7 +791,7 @@ int LexemeWorker::CorrectDo(List * expression, int pos, lexeme * spec)
 	}
 	else
 	{
-		ErrorReporter().FReport(logfile, "Ожидается тело цикла \"do \"!", spec->Line(), spec->Start_Position());
+		errorReporter.FReport(logfile, "Ожидается тело цикла \"do \"!", spec->Line(), spec->Start_Position());
 		_error = true;
 		tlist->~List();
 		return 0;
@@ -805,14 +804,14 @@ int LexemeWorker::CorrectFor(List * expression, int pos, lexeme * spec)
 	pos++;
 	if (pos >= expression->count())
 	{
-		ErrorReporter().FReport(logfile, "Ожидаются параметры для \"for \"!", spec->Line(), spec->Start_Position());
+		errorReporter.FReport(logfile, "Ожидаются параметры для \"for \"!", spec->Line(), spec->Start_Position());
 		_error = true;
 		return 0;
 	}
 	lexeme* tlex = (lexeme*)expression->get(pos);
 	if (strcmp(tlex->Data(), "(") != 0)
 	{
-		ErrorReporter().FReport(logfile, "Ожидается \"(\"!", tlex->Line(), tlex->Start_Position());
+		errorReporter.FReport(logfile, "Ожидается \"(\"!", tlex->Line(), tlex->Start_Position());
 		_error = true;
 		return 0;
 	}
@@ -827,14 +826,14 @@ int LexemeWorker::CorrectFor(List * expression, int pos, lexeme * spec)
 	}
 	if (pos >= expression->count())
 	{
-		ErrorReporter().FReport(logfile, "Незаконченное выражение \"for \"!", tlex->Line(), tlex->Start_Position());
+		errorReporter.FReport(logfile, "Незаконченное выражение \"for \"!", tlex->Line(), tlex->Start_Position());
 		_error = true;
 		param1->~List();
 		return 0;
 	}
 	if (param1->count() != 1)
 	{
-		ErrorReporter().FReport(logfile, "Ожидается инициализированная переменная в качестве первого параметра!", tlex->Line(), tlex->Start_Position());
+		errorReporter.FReport(logfile, "Ожидается инициализированная переменная в качестве первого параметра!", tlex->Line(), tlex->Start_Position());
 		_error = true;
 		param1->~List();
 		return 0;
@@ -842,7 +841,7 @@ int LexemeWorker::CorrectFor(List * expression, int pos, lexeme * spec)
 	lexeme* first = (lexeme*)param1->get(0);
 	if (!(first->Type() == INT || first->Type() == DOUBLE || first->Type() == FLOAT))
 	{
-		ErrorReporter().WarningReport(logfile, "Возможно неверный тип первого пареметра \"for \"", tlex->Line(), tlex->Start_Position());
+		errorReporter.WarningReport(logfile, "Возможно неверный тип первого пареметра \"for \"", tlex->Line(), tlex->Start_Position());
 	}
 
 	List* param2 = new List(sizeof(lexeme));
@@ -855,7 +854,7 @@ int LexemeWorker::CorrectFor(List * expression, int pos, lexeme * spec)
 	}
 	if (pos >= expression->count())
 	{
-		ErrorReporter().FReport(logfile, "Незаконченное выражение \"for \"!", tlex->Line(), tlex->Start_Position());
+		errorReporter.FReport(logfile, "Незаконченное выражение \"for \"!", tlex->Line(), tlex->Start_Position());
 		_error = true;
 		param1->~List();
 		param2->~List();
@@ -863,7 +862,7 @@ int LexemeWorker::CorrectFor(List * expression, int pos, lexeme * spec)
 	}
 	if (!IsNumberExpressionWithBoolOperations(param2) && !IsBoolExpression(param2, false) && !IsNumberExpressionWithBoolOperations(param2))
 	{
-		ErrorReporter().FReport(logfile, "Неверный второй параметр \"for \"!", tlex->Line(), tlex->Start_Position());
+		errorReporter.FReport(logfile, "Неверный второй параметр \"for \"!", tlex->Line(), tlex->Start_Position());
 		_error = true;
 		param2->~List();
 		param1->~List();
@@ -880,7 +879,7 @@ int LexemeWorker::CorrectFor(List * expression, int pos, lexeme * spec)
 	}
 	if (strcmp(tlex->Data(), ")") != 0)
 	{
-		ErrorReporter().FReport(logfile, "Ожидается \")\"!", tlex->Line(), tlex->Start_Position());
+		errorReporter.FReport(logfile, "Ожидается \")\"!", tlex->Line(), tlex->Start_Position());
 		_error = true;
 		param1->~List();
 		param2->~List();
@@ -889,7 +888,7 @@ int LexemeWorker::CorrectFor(List * expression, int pos, lexeme * spec)
 	}
 	if (pos >= expression->count())
 	{
-		ErrorReporter().FReport(logfile, "Незаконченное выражение \"for \"!", tlex->Line(), tlex->Start_Position());
+		errorReporter.FReport(logfile, "Незаконченное выражение \"for \"!", tlex->Line(), tlex->Start_Position());
 		_error = true;
 		param1->~List();
 		param2->~List();
@@ -898,7 +897,7 @@ int LexemeWorker::CorrectFor(List * expression, int pos, lexeme * spec)
 	}
 	if (!IsNumberExpression(param3, true))
 	{
-		ErrorReporter().FReport(logfile, "Неверный третий параметр \"for \"!", tlex->Line(), tlex->Start_Position());
+		errorReporter.FReport(logfile, "Неверный третий параметр \"for \"!", tlex->Line(), tlex->Start_Position());
 		_error = true;
 		param3->~List();
 		param2->~List();
@@ -958,7 +957,7 @@ int LexemeWorker::CorrectFor(List * expression, int pos, lexeme * spec)
 	}
 	else
 	{
-		ErrorReporter().FReport(logfile, "Ожидается тело \"for \"!", tlex->Line(), tlex->Start_Position());
+		errorReporter.FReport(logfile, "Ожидается тело \"for \"!", tlex->Line(), tlex->Start_Position());
 		_error = true;
 		body->~List();
 		param3->~List();
@@ -980,14 +979,14 @@ int LexemeWorker::CorrectIf(List * expression, int pos, lexeme * spec)
 	pos++;
 	if (pos >= expression->count())
 	{
-		ErrorReporter().FReport(logfile, "Ожедается условие \"if \"!", spec->Line(), spec->Start_Position());
+		errorReporter.FReport(logfile, "Ожедается условие \"if \"!", spec->Line(), spec->Start_Position());
 		_error = true;
 		return 0;
 	}
 	lexeme* tlex = (lexeme*)expression->get(pos);
 	if (strcmp(tlex->Data(), "else ") != 0)
 	{
-		ErrorReporter().FReport(logfile, "Ожидается \"else \"!", tlex->Line(), tlex->Start_Position());
+		errorReporter.FReport(logfile, "Ожидается \"else \"!", tlex->Line(), tlex->Start_Position());
 		_error = true;
 		return 0;
 	}

@@ -275,7 +275,7 @@ class TList : TNode
 class TIf : TNode
 {
 	public:
-		TIf(TBinaryOperation* mcondition, TList* mbranch_then, TList* mbranch_else)
+		TIf(TBinaryOperation* mcondition, TNode* mbranch_then, TNode* mbranch_else)
 		{
 			condition = mcondition;
 			branch_then = mbranch_then;
@@ -300,14 +300,14 @@ class TIf : TNode
 		}
 	protected:
 		TBinaryOperation* condition;
-		TList* branch_then;
-		TList* branch_else;
+		TNode* branch_then;
+		TNode* branch_else;
 };
 
 class TWhile : TNode
 {
 	public:
-		TWhile(TBinaryOperation* mcondition, TList* mbody)
+		TWhile(TBinaryOperation* mcondition, TNode* mbody)
 		{
 			condition = mcondition;
 			body = mbody;
@@ -328,13 +328,13 @@ class TWhile : TNode
 		}
 	protected:
 		TBinaryOperation* condition;
-		TList*            body;
+		TNode*            body;
 };
 
 class TFor : TNode
 {
 public:
-	TFor(TBinaryOperation* minitialization, TBinaryOperation* mcondition, TBinaryOperation* mloop, TList* mbody)
+	TFor(TBinaryOperation* minitialization, TBinaryOperation* mcondition, TBinaryOperation* mloop, TNode* mbody)
 	{
 		initialization = minitialization;
 		condition = mcondition;
@@ -363,5 +363,5 @@ protected:
 	TBinaryOperation* initialization;
 	TBinaryOperation* condition;
 	TBinaryOperation* loop;
-	TList*            body;
+	TNode*            body;
 };

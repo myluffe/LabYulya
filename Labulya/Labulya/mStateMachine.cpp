@@ -231,7 +231,7 @@ void Type1Machine::EnterChar(char ch, int pos, int line)
 			{
 				char sstemp[Chunck];
 				sprintf_s(sstemp, "Maybe you misse space? Maybe you mean \"%s\"?", temp);
-				ErrorReporter().WarningReport(logfile, sstemp, _curlexline, _currentLexemePosition + strlen(_buffer));
+				errorReporter.WarningReport(logfile, sstemp, _curlexline, _currentLexemePosition + strlen(_buffer));
 			}
 			//
 			_potentialwords.remove(i);
@@ -391,7 +391,7 @@ void Type3Machine::CheckType()
 		{
 			if (slen != 2)
 			{
-				ErrorReporter().FReport(logfile, "To many symbols for char!", _curlexline, _currentLexemePosition);
+				errorReporter.FReport(logfile, "To many symbols for char!", _curlexline, _currentLexemePosition);
 				_checkError = true;
 				return;
 			}
@@ -399,7 +399,7 @@ void Type3Machine::CheckType()
 			{
 				if (_buffer[0] != '\\')
 				{
-					ErrorReporter().FReport(logfile, "To many Symbols for char!", _curlexline, _currentLexemePosition);
+					errorReporter.FReport(logfile, "To many Symbols for char!", _curlexline, _currentLexemePosition);
 					_checkError = true;
 					return;
 				}

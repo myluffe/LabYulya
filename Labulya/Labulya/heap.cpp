@@ -155,10 +155,10 @@ void Heap::print()
 	Segment*  now_current = current;
 	while (now_current != 0)
 	{
-		printf("new Seg:\n%d\t%d\n", now_current->descriptor_count, now_current->data);
+		printf("new Seg:\n%d\t%s\n", now_current->descriptor_count, (char*)now_current->data);
 		for (int i = 0; i < now_current->descriptor_count; i++)
 		{
-			printf("%d\t%d\t%d\n", now_current->descriptor[i].size, now_current->descriptor[i].offset, now_current->descriptor[i].used ? 1 : 0);
+			printf("%d\t%s\t%d\n", now_current->descriptor[i].size, (char*)now_current->descriptor[i].offset, now_current->descriptor[i].used ? 1 : 0);
 		}
 		now_current = now_current->prev;
 	}

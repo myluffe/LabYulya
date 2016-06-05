@@ -9,7 +9,7 @@ public:
 	void FReport(FILE*, char* Errortext, int line, int position);
 	void WarningReport(FILE*, char* Errortext, int line, int position);
 	~ErrorReporter();
-};
+}errorReporter = *new ErrorReporter();
 
 static FILE* logfile = (FILE*)stdout;
 

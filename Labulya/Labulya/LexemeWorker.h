@@ -39,7 +39,5 @@ private:
 	bool InnerExpression(List* expression);
 	bool WhateverCheck(char ** perone, int c1, int * types, int c2, List * expression, bool equal);
 	//lexeme* Exe3Pression(List* expression);
-};
-
-static LexemeWorker LWorker = *new LexemeWorker();
+} LWorker = *new LexemeWorker();
 

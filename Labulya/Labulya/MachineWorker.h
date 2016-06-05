@@ -29,7 +29,7 @@ private:
 
 	Type3Machine* ssm;
 
-	//ErrorReporter Error = ErrorReporter();
+	//ErrorReporter Error = errorReporter;
 	bool _error = false;
 
 	void GetOperationPriority(mStateMachine* machine);
