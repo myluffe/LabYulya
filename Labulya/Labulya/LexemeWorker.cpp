@@ -9,12 +9,9 @@ bool LexemeWorker::Processing(List* lexes)
 	Lexeme_list* dob = new Lexeme_list(); //стэк дл€ области видимости
 	for (int i = 0; i < lexes->count(); i++)
 	{
-		if (_error)
-			false;
 		lexeme* temp_lexeme = (lexeme*)lexes->get(i);
 		if (strcmp(temp_lexeme->Data(), "{") == 0)
 		{
-			//temp_stack->push(temp_lexeme);
 			dob->add(temp_lexeme);
 			continue;
 		}
@@ -132,10 +129,6 @@ bool LexemeWorker::Processing(List* lexes)
 		{
 			//обработка дл€ чисел
 		}
-		if (temp_lexeme->Type() == SPECIALWORD)
-		{
-			CorrectSpecial(temp_lexeme, i, lexes);
-		}
 		if (strcmp(temp_lexeme->Data(), "}") == 0)
 		{
 			for (int j = dob->count() - 1; j >= 0; j--)
@@ -153,6 +146,18 @@ bool LexemeWorker::Processing(List* lexes)
 			}
 		}
 	}
+	dob->~Lexeme_list();
+
+	for (int i = 0; i < lexes->count(); i++)
+	{
+		lexeme* temp_lexeme = (lexeme*)lexes->get(i);
+		if (temp_lexeme->Type() == SPECIALWORD)
+		{
+			i = CorrectSpecial(temp_lexeme, i, lexes);
+			if (_error) return false;
+		}
+	}
+
 	//отладка
 	printf_s("\n|---------------|\nVariable Table:\n");
 	LexemeTable.print_lexems();
@@ -186,71 +191,59 @@ static int GetLexemePositionWithMinimalPriority(List * expression)
 	return pos;
 }
 
-bool LexemeWorker::CorrectSpecial(lexeme* spec, int pos, List* expression)
+int LexemeWorker::CorrectSpecial(lexeme* spec, int pos, List* expression)
 {
 	if (pos == expression->count())
 	{
 		ErrorReporter().FReport(stdout, "Ќе законченное выражение!", spec->Line(), spec->Start_Position());
 		_error = true;
-		return false;
+		return 0;
 	}
 	if (strcmp(spec->Data(), "for ") == 0)
 	{
-		return true;
+		return 1; //заглушка
 	}
 	if (strcmp(spec->Data(), "if ") == 0)
 	{
-		return true;
+		return 1; //заглушка
 	}
 	if (strcmp(spec->Data(), "else ") == 0)
 	{
-		return true;
+		return 1; //заглушка
 	}
 	if (strcmp(spec->Data(), "while ") == 0)
 	{
-		return true;
+		return 1; //заглушка
 	}
 	if (strcmp(spec->Data(), "do ") == 0)
 	{
-		return true;
+		return 1; //заглушка
 	}
 	if (strcmp(spec->Data(), "input ") == 0)
 	{
-		if (!FuncWithStringParam(expression, pos, spec))
-			return false;
-		else return true;
+		return FuncWithStringParam(expression, pos, spec);
 	}
 	if (strcmp(spec->Data(), "output ") == 0)
 	{
-		if (!FuncWithStringParam(expression, pos, spec))
-			return false;
-		else return true;
+		return FuncWithStringParam(expression, pos, spec);
 	}
 	if (strcmp(spec->Data(), "min ") == 0)
 	{
-		if (!FuncWithTwoNumberParams(expression, pos, spec))
-			return false;
-		else return true;
+		return FuncWithTwoNumberParams(expression, pos, spec);
 	}
 	if (strcmp(spec->Data(), "max ") == 0)
 	{
-		if (!FuncWithTwoNumberParams(expression, pos, spec))
-			return false;
-		else return true;
+		return FuncWithTwoNumberParams(expression, pos, spec);
 	}
 	if (strcmp(spec->Data(), "sin ") == 0)
 	{
-		if (!FuncWithNumberParam(expression, pos, spec))
-			return false;
-		else return true;
+		return FuncWithNumberParam(expression, pos, spec);
 	}
 	if (strcmp(spec->Data(), "cos ") == 0)
 	{
-		if (!FuncWithNumberParam(expression, pos, spec))
-			return false;
-		else return true;
+		return FuncWithNumberParam(expression, pos, spec);
 	}
-	return false;
+	return 0;
 }
 
 /*
@@ -344,14 +337,14 @@ lexeme * LexemeWorker::NExpressionSolver(List * expression)
 }
 */
 
-bool LexemeWorker::FuncWithTwoNumberParams(List * expression, int pos, lexeme * spec)
+int LexemeWorker::FuncWithTwoNumberParams(List * expression, int pos, lexeme * spec)
 {
 	lexeme* devider1 = (lexeme*)expression->get(pos + 1);
 	if (strcmp(devider1->Data(), "(") != 0)
 	{
 		ErrorReporter().FReport(stdout, "ќжидаетс€ \"(\"", devider1->Line(), devider1->Start_Position());
 		_error = true;
-		return false;
+		return 0;
 	}
 	List* ltemp1 = new List(sizeof(lexeme));
 	lexeme* tlex = nullptr;
@@ -371,13 +364,15 @@ bool LexemeWorker::FuncWithTwoNumberParams(List * expression, int pos, lexeme * 
 	{
 		ErrorReporter().FReport(stdout, "ќжидаетс€ числовое выражение!", devider1->Line(), devider1->Start_Position());
 		_error = true;
-		return false;
+		ltemp1->~List();
+		return 0;
 	}
 	if (strcmp(tlex->Data(), ",") != 0)
 	{
 		ErrorReporter().FReport(stdout, "ќжидаетс€ \",\"", devider2->Line(), devider2->Start_Position());
+		ltemp1->~List();
 		_error = true;
-		return false;
+		return 0;
 	}
 	List* ltemp2 = new List(sizeof(lexeme));
 	lexeme* devider3 = nullptr;
@@ -396,35 +391,41 @@ bool LexemeWorker::FuncWithTwoNumberParams(List * expression, int pos, lexeme * 
 	{
 		ErrorReporter().FReport(stdout, "ќжидаетс€ числовое выражение!", devider1->Line(), devider1->Start_Position());
 		_error = true;
-		return false;
+		ltemp1->~List();
+		ltemp2->~List();
+		return 0;
 	}
 	if (strcmp(tlex->Data(), ")") != 0)
 	{
 		ErrorReporter().FReport(stdout, "ќжидаетс€ \")\"", tlex->Line(), tlex->Start_Position());
 		_error = true;
-		return false;
+		ltemp1->~List();
+		ltemp2->~List();
+		return 0;
 	}
 	tlex = (lexeme*)expression->get(j + 1);
 	if ((j + 1) >= expression->count() || strcmp(tlex->Data(), ";") != 0)
 	{
 		ErrorReporter().FReport(stdout, "ќжидаетс€ \";\"", tlex->Line(), tlex->Start_Position());
 		_error = true;
-		return false;
+		ltemp1->~List();
+		ltemp2->~List();
+		return 0;
 	}
 
 	ltemp1->~List();
 	ltemp2->~List();
-	return true;
+	return j + 1;
 }
 
-bool LexemeWorker::FuncWithStringParam(List * expression, int pos, lexeme * spec)
+int LexemeWorker::FuncWithStringParam(List * expression, int pos, lexeme * spec)
 {
 	lexeme* devider1 = (lexeme*)expression->get(pos + 1);
 	if (strcmp(devider1->Data(), "(") != 0)
 	{
 		ErrorReporter().FReport(stdout, "ќжидаетс€ \"(\"", devider1->Line(), devider1->Start_Position());
 		_error = true;
-		return false;
+		return 0;
 	}
 	List* ltemp = new List(sizeof(lexeme));
 	lexeme* tlex = nullptr;
@@ -440,34 +441,37 @@ bool LexemeWorker::FuncWithStringParam(List * expression, int pos, lexeme * spec
 	{
 		ErrorReporter().FReport(stdout, "ќжидаетс€ строковое выражение!", devider1->Line(), devider1->Start_Position());
 		_error = true;
-		return false;
+		ltemp->~List();
+		return 0;
 	}
 	if (strcmp(tlex->Data(), ")") != 0)
 	{
 		ErrorReporter().FReport(stdout, "ќжидаетс€ \")\"", tlex->Line(), tlex->Start_Position());
 		_error = true;
-		return false;
+		ltemp->~List();
+		return 0;
 	}
 	tlex = (lexeme*)expression->get(i + 1);
 	if ((i + 1) >= expression->count() || strcmp(tlex->Data(), ";") != 0)
 	{
 		ErrorReporter().FReport(stdout, "ќжидаетс€ \";\"", tlex->Line(), tlex->Start_Position());
 		_error = true;
-		return false;
+		ltemp->~List();
+		return 0;
 	}
 
 	ltemp->~List();
-	return true;
+	return i + 1;
 }
 
-bool LexemeWorker::FuncWithNumberParam(List * expression, int pos, lexeme * spec)
+int LexemeWorker::FuncWithNumberParam(List * expression, int pos, lexeme * spec)
 {
 	lexeme* devider1 = (lexeme*)expression->get(pos + 1);
 	if (strcmp(devider1->Data(), "(") != 0)
 	{
 		ErrorReporter().FReport(stdout, "ќжидаетс€ \"(\"", devider1->Line(), devider1->Start_Position());
 		_error = true;
-		return false;
+		return 0;
 	}
 	List* ltemp = new List(sizeof(lexeme));
 	lexeme* tlex = nullptr;
@@ -483,24 +487,27 @@ bool LexemeWorker::FuncWithNumberParam(List * expression, int pos, lexeme * spec
 	{
 		ErrorReporter().FReport(stdout, "ќжидаетс€ числовое выражение!", devider1->Line(), devider1->Start_Position());
 		_error = true;
-		return false;
+		ltemp->~List();
+		return 0;
 	}
 	if (strcmp(tlex->Data(), ")") != 0)
 	{
 		ErrorReporter().FReport(stdout, "ќжидаетс€ \")\"", tlex->Line(), tlex->Start_Position());
 		_error = true;
-		return false;
+		ltemp->~List();
+		return 0;
 	}
 	tlex = (lexeme*)expression->get(i + 1);
 	if ((i + 1) >= expression->count() || strcmp(tlex->Data(), ";") != 0)
 	{
 		ErrorReporter().FReport(stdout, "ќжидаетс€ \";\"", tlex->Line(), tlex->Start_Position());
 		_error = true;
-		return false;
+		ltemp->~List();
+		return 0;
 	}
 	
 	ltemp->~List();
-	return true;
+	return i + 1;
 }
 
 bool LexemeWorker::WhateverCheck(char ** perone, int c1, int * types, int c2, List * expression)

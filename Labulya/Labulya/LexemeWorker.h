@@ -17,14 +17,14 @@ protected:
 	bool IsNumberExpression(List* expression);
 	bool IsBoolExpression(List* expression);
 	bool IsStringExpression(List * expression);
-	bool CorrectSpecial(lexeme* spec, int pos, List* expression);
+	int CorrectSpecial(lexeme* spec, int pos, List* expression);
 
 	bool _error = false;
 
 private:
-	bool FuncWithNumberParam(List* expresion, int pos, lexeme* spec);
-	bool FuncWithTwoNumberParams(List* expresion, int pos, lexeme* spec);
-	bool FuncWithStringParam(List* expresion, int pos, lexeme* spec);
+	int FuncWithNumberParam(List* expresion, int pos, lexeme* spec);
+	int FuncWithTwoNumberParams(List* expresion, int pos, lexeme* spec);
+	int FuncWithStringParam(List* expresion, int pos, lexeme* spec);
 	bool WhateverCheck(char ** perone, int c1, int * types, int c2, List * expression);
 	//lexeme* Exe3Pression(List* expression);
 };

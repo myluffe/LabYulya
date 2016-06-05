@@ -41,7 +41,7 @@ public:
 protected:
 	List* _words = new List(sizeof(char[Chunck]));
 
-	virtual void ClearAdditional() = 0;
+	virtual void ClearAdditionals() = 0;
 	//
 	virtual void PrintAdditionals() = 0;
 	//
@@ -76,7 +76,7 @@ public:
 
 	void CheckStart(char ch);
 	void EnterChar(char ch, int pos, int line);
-	void ClearAdditional();
+	void ClearAdditionals();
 private:
 	List _potentialwords = *new List(sizeof(char[Chunck]));
 	void PrintAdditionals();
@@ -96,7 +96,7 @@ public:
 	virtual void EnterChar(char ch, int pos, int line);
 	void AddPerStartWord(char word);
 	void SetPerStartWords(char* words);
-	void ClearAdditional();
+	void ClearAdditionals();
 protected:
 	char _permissiblestart[Type23Chunck];
 	void PrintAdditionals();

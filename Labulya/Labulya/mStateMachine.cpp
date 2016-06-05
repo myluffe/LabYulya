@@ -115,11 +115,11 @@ void mStateMachine::UpdateStatus()
 	_buffer[0] = '\0';
 	_currentLexemePosition = -100;
 	_curlexline = -100;
-	ClearAdditional();
+	ClearAdditionals();
 	Priority = 100;
 }
 
-void Type1Machine::ClearAdditional()
+void Type1Machine::ClearAdditionals()
 {
 	_potentialwords.~List();
 	_potentialwords = List(sizeof(char[Chunck]));
@@ -135,7 +135,7 @@ void Type1Machine::PrintAdditionals()
 	printf("\n");
 }
 
-void Type2Machine::ClearAdditional()
+void Type2Machine::ClearAdditionals()
 {
 }
 

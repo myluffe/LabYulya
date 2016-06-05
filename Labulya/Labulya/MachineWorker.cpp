@@ -103,6 +103,17 @@ MachineWorker::MachineWorker()
 
 MachineWorker::~MachineWorker()
 {
+	sm->~Type1Machine();
+	om->~Type1Machine();
+	om2->~Type1Machine();
+	dm->~Type1Machine();
+	tm->~Type1Machine();
+	bm->~Type1Machine();
+
+	nm->~Type2Machine();
+	vm->~Type2Machine();
+
+	ssm->~Type3Machine();
 }
 
 int MachineWorker::Work(char* filename, List* lexes)
@@ -139,7 +150,10 @@ int MachineWorker::Work(char* filename, List* lexes)
 				if (_currentaut->IsFinished())
 				{
 					if (_currentaut->CheckError())
+					{
+						fr.~mFileReader();
 						return -3;
+					}
 					if (strcmp(_currentaut->MachineName(), "Special Words") == 0)
 					{
 						if (strcmp(_currentaut->Buffer(), "//") == 0)
@@ -163,13 +177,19 @@ int MachineWorker::Work(char* filename, List* lexes)
 					{
 						NumberCheck(fr.CurrentLine());
 						if (_error)
+						{
+							fr.~mFileReader();
 							return -2;
+						}
 					}
 					if (strcmp(_currentaut->MachineName(), "Deviders") == 0)
 					{
 						Hooker(_currentaut->Buffer());
 						if (_error)
+						{
+							fr.~mFileReader();
 							return -5;
+						}
 						GetOperationPriority(_currentaut);
 					}
 					if (strcmp(_currentaut->CurrentLexName(), "Operation") == 0)
@@ -200,6 +220,7 @@ int MachineWorker::Work(char* filename, List* lexes)
 							if (str[s] == EOF)
 								ErrorReporter().FReport(stdout, "Unprocessed word!", fr.CurrentLine(), _currentaut->CurrentLexPos());
 							UpdateMachines();
+							fr.~mFileReader();
 							return -100;
 						}
 					}
@@ -217,14 +238,16 @@ int MachineWorker::Work(char* filename, List* lexes)
 				if (fr.EndFile() && s >= strlen(str) - 1 && EnterInComment)
 				{
 					ErrorReporter().FReport(stdout, "Maybe you forget to close the comment", commentline, commentpos);
-					_error = false;
+					//_error = false;
+					fr.~mFileReader();
 					return -1;
 				}
 				if (fr.EndFile())
 				{
 					if (!HooksCheck(&fr))
 					{
-						_error = true;
+						//_error = true;
+						fr.~mFileReader();
 						return -386;
 					}
 				}
@@ -239,7 +262,11 @@ int MachineWorker::Work(char* filename, List* lexes)
 		}
 	}
 	if (!LWorker.Processing(lexes))
+	{
+		fr.~mFileReader();
 		return -6;
+	}
+	fr.~mFileReader();
 	return 1;
 }
 
