@@ -106,6 +106,10 @@ bool LexemeWorker::Processing(List* lexes)
 					else
 					{
 						//заменяем на ссылку
+						int pos = dob->findpos(temp_lexeme->Data());
+						if (pos != -1)
+							*temp_lexeme = *(lexeme*)dob->get(pos);
+						/*
 						List* tlist = LexemeTable.find_list(temp_lexeme->Data());
 						for (int k = 0; k < tlist->count(); k++)
 						{
@@ -115,6 +119,7 @@ bool LexemeWorker::Processing(List* lexes)
 								break;
 							}
 						}
+						*/
 					}
 				}
 				else
@@ -148,12 +153,6 @@ bool LexemeWorker::Processing(List* lexes)
 	}
 	dob->~Lexeme_list();
 
-	//отладка
-	printf_s("\n|---------------|\nVariable Table:\n");
-	LexemeTable.print_lexems();
-	printf_s("\n|---------------|\n");
-	//
-
 	for (int i = 0; i < lexes->count(); i++)
 	{
 		lexeme* temp_lexeme = (lexeme*)lexes->get(i);
@@ -165,7 +164,7 @@ bool LexemeWorker::Processing(List* lexes)
 	}
 
 	//отладка
-	printf_s("\n|---------------|\nVariable Table:\n");
+	printf_s("\n|---------------|\#2 nVariable Table:\n");
 	LexemeTable.print_lexems();
 	printf_s("\n|---------------|\n");
 	//
@@ -207,23 +206,23 @@ int LexemeWorker::CorrectSpecial(lexeme* spec, int pos, List* expression)
 	}
 	if (strcmp(spec->Data(), "for ") == 0)
 	{
-		return 1; //заглушка
+		return pos + 1; //заглушка
 	}
 	if (strcmp(spec->Data(), "if ") == 0)
 	{
-		return 1; //заглушка
+		return pos + 1; //заглушка
 	}
 	if (strcmp(spec->Data(), "else ") == 0)
 	{
-		return 1; //заглушка
+		return pos + 1; //заглушка
 	}
 	if (strcmp(spec->Data(), "while ") == 0)
 	{
-		return 1; //заглушка
+		return pos + 1; //заглушка
 	}
 	if (strcmp(spec->Data(), "do ") == 0)
 	{
-		return 1; //заглушка
+		return pos + 1; //заглушка
 	}
 	if (strcmp(spec->Data(), "input ") == 0)
 	{
