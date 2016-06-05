@@ -8,8 +8,8 @@ class TNode
 {
 	public:
 		TNode()  {};
-		virtual lexeme* exec();
-		virtual void print();
+		virtual lexeme* exec() = 0;
+		virtual void print() = 0;
 };
 
 class TConst : TNode
@@ -25,7 +25,7 @@ class TConst : TNode
 		}
 		void print()
 		{
-			printf("%s", m_const->Data);
+			printf("%s", m_const->Data());
 		}
 	protected:
 		lexeme* m_const;
@@ -44,7 +44,7 @@ class TVariable : TNode
 		}
 		void print()
 		{
-			printf("%s", m_variable->Name);
+			printf("%s", m_variable->Name());
 		}
 	protected:
 		lexeme* m_variable;
@@ -62,53 +62,54 @@ class TUnaryOperation : TNode
 		lexeme* exec()
 		{ 
 			lexeme* res1 = m_operand->exec();
-			double o = Parser().ToDouble(res1->Data);
-			lexeme* res = new lexeme("Number", NUMBER, "0", res1->Line, res1->Start_Position, 100);
-			if (m_operation->Data == "-" && m_left)
+			double o = Parser().ToDouble(res1->Data());
+			lexeme* res = new lexeme("Number", NUMBER, "0", res1->Line(), res1->Start_Position(), 100);
+			if (m_operation->Data() == "-" && m_left)
 			{
 				res1->DataChange(Parser().DoubleToString(-o));
-				res->DataChange(res1->Data);
+				res->DataChange(res1->Data());
 				return res;
 			}
-			if (m_operation->Data == "++" && m_left)
+			if (m_operation->Data() == "++" && m_left)
 			{
 				res1->DataChange(Parser().DoubleToString(o + 1));
-				res->DataChange(res1->Data);
+				res->DataChange(res1->Data());
 				return res;
 			}
-			if (m_operation->Data == "--" && m_left)
+			if (m_operation->Data() == "--" && m_left)
 			{
 				res1->DataChange(Parser().DoubleToString(o - 1));
-				res->DataChange(res1->Data);
+				res->DataChange(res1->Data());
 				return res;
 			}
-			if (m_operation->Data == "++" && !m_left)
+			if (m_operation->Data() == "++" && !m_left)
 			{
-				res->DataChange(res1->Data);
+				res->DataChange(res1->Data());
 				res1->DataChange(Parser().DoubleToString(o + 1));
 				return res;
 			}
-			if (m_operation->Data == "--" && !m_left)
+			if (m_operation->Data() == "--" && !m_left)
 			{
-				res->DataChange(res1->Data);
+				res->DataChange(res1->Data());
 				res1->DataChange(Parser().DoubleToString(o - 1));
 				return res;
 			}
-			if (m_operation->Data == "+" && m_left)
+			if (m_operation->Data() == "+" && m_left)
 			{
 				return m_operand->exec();
 			}
-			if (m_operation->Data == "!" && m_left)
+			if (m_operation->Data() == "!" && m_left)
 			{
-				bool b = Parser().ToBool(res1->Data);
+				bool b = Parser().ToBool(res1->Data());
 				res1->DataChange(Parser().BoolToString(!b));
-				res->DataChange(res1->Data);
+				res->DataChange(res1->Data());
 				return m_operand->exec();
 			}
+			return NULL;
 		}
 		void print()
 		{
-			printf(m_operation->Data);
+			printf(m_operation->Data());
 			m_operand->print();
 		}
 	protected:
@@ -131,75 +132,77 @@ class TBinaryOperation : TNode
 		{
 			lexeme* res1 = m_operand1->exec();
 			lexeme* res2 = m_operand2->exec();
-			double o1 = Parser().ToDouble(res1->Data);
-			double o2 = Parser().ToDouble(res2->Data);
-			lexeme* res = new lexeme("Number", NUMBER, "0", res1->Line, res1->Start_Position, 100);
-			if (m_operation->Data == "+")
+			double o1 = Parser().ToDouble(res1->Data());
+			double o2 = Parser().ToDouble(res2->Data());
+			lexeme* res = new lexeme("Number", NUMBER, "0", res1->Line(), res1->Start_Position(), 100);
+			if (m_operation->Data() == "+")
 			{
 				res->DataChange(Parser().DoubleToString(o1 + o2));
 			}
-			if (m_operation->Data == "-")
+			if (m_operation->Data() == "-")
 			{
 				res->DataChange(Parser().DoubleToString(o1 - o2));
 			}
-			if (m_operation->Data == "*")
+			if (m_operation->Data() == "*")
 			{
 				res->DataChange(Parser().DoubleToString(o1 * o2));
 			}
-			if (m_operation->Data == "/")
+			if (m_operation->Data() == "/")
 			{
 				res->DataChange(Parser().DoubleToString(o1 / o2));
 			}
-			if (m_operation->Data == "=")
+			if (m_operation->Data() == "=")
 			{
-				if(IsCastable(res1->Type, res2->Type))
+				if(IsCastable(res1->Type(), res2->Type()))
 				{
-					res1->DataChange(res2->Data);
+					res1->DataChange(res2->Data());
 					res = res1;
 				}
 			}
-			if (m_operation->Data == "==")
+			if (m_operation->Data() == "==")
 			{
 				res->DataChange(Parser().BoolToString(o1 == o2));
 			}
-			if (m_operation->Data == "!=")
+			if (m_operation->Data() == "!=")
 			{
 				res->DataChange(Parser().BoolToString(o1 != o2));
 			}
-			if (m_operation->Data == "<=")
+			if (m_operation->Data() == "<=")
 			{
 				res->DataChange(Parser().BoolToString(o1 <= o2));
 			}
-			if (m_operation->Data == ">=")
+			if (m_operation->Data() == ">=")
 			{
 				res->DataChange(Parser().BoolToString(o1 >= o2));
 			}
-			if (m_operation->Data == "<")
+			if (m_operation->Data() == "<")
 			{
 				res->DataChange(Parser().BoolToString(o1 < o2));
 			}
-			if (m_operation->Data == ">")
+			if (m_operation->Data() == ">")
 			{
 				res->DataChange(Parser().BoolToString(o1 > o2));
 			}
-			if (m_operation->Data == "&&")
+			if (m_operation->Data() == "&&")
 			{
-				bool b1 = Parser().ToBool(res1->Data);
-				bool b2 = Parser().ToBool(res2->Data);
+				bool b1 = Parser().ToBool(res1->Data());
+				bool b2 = Parser().ToBool(res2->Data());
 				res->DataChange(Parser().BoolToString(b1 && b2));
 			}
-			if (m_operation->Data == "||")
+			if (m_operation->Data() == "||")
 			{
-				bool b1 = Parser().ToBool(res1->Data);
-				bool b2 = Parser().ToBool(res2->Data);
+				bool b1 = Parser().ToBool(res1->Data());
+				bool b2 = Parser().ToBool(res2->Data());
 				res->DataChange(Parser().BoolToString(b1 || b2));
 			}
 			return res;
 		}
 		void print()
 		{
-			m_operand1->print(); 
-            printf(" " + m_operation->Data + " ");
+			m_operand1->print();
+			printf(" ");
+			printf(m_operation->Data());
+			printf(" ");
             m_operand2->print();
 			printf("\n");
 		}
@@ -219,7 +222,7 @@ class TTernaryOperator : TNode
 	}
 	virtual lexeme* exec()
 	{
-		if (Parser().ToBool(m_operand1->exec()->Data))
+		if (Parser().ToBool(m_operand1->exec()->Data()))
 			return m_operand2->exec();
 		else
 			return m_operand3->exec();
@@ -296,7 +299,7 @@ class TIf : TNode
 		}
 		lexeme* exec()
 		{ 
-			if(Parser().ToBool(condition->exec()->Data))
+			if(Parser().ToBool(condition->exec()->Data()))
 				return branch_then->exec();
 			else
 				return branch_else->exec();
@@ -327,7 +330,7 @@ class TWhile : TNode
 		}
 		lexeme* exec() 
 		{
-			while(Parser().ToBool(condition->exec()->Data)) 
+			while(Parser().ToBool(condition->exec()->Data())) 
 				body->exec();
 			return condition->exec();
 		}
@@ -356,7 +359,7 @@ public:
 	}
 	lexeme* exec()
 	{
-		for (initialization->exec(); Parser().ToBool(condition->exec()->Data); loop->exec())
+		for (initialization->exec(); Parser().ToBool(condition->exec()->Data()); loop->exec())
 			body->exec();
 		return condition->exec();
 	}
