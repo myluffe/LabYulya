@@ -18,7 +18,11 @@ protected:
 	bool IsBoolExpression(List* expression);
 	bool IsStringExpression(List * expression);
 
+	bool IsNumberExpressionWithBoolOperations(List * expression);
+	bool IsStringExpressionWithBoolOperations(List * expression);
+
 	int CorrectWhile(List* expression, int pos, lexeme* spec);
+	int CorrectDo(List* expression, int pos, lexeme* spec);
 
 	int CorrectSpecial(lexeme* spec, int pos, List* expression);
 
