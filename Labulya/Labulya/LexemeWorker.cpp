@@ -506,12 +506,13 @@ bool LexemeWorker::FuncWithNumberParam(List * expression, int pos, lexeme * spec
 bool LexemeWorker::WhateverCheck(char ** perone, int c1, int * types, int c2, List * expression)
 {
 	int ttype;
-	bool flag = false;
+	bool varbefore = false;
+	bool correct = false;
 	int hook_count = 0;
 
 	for (int k = 0; k < expression->count(); k++)
 	{
-		flag = false;
+		correct = false;
 		lexeme* tlex = (lexeme*)expression->get(k);
 		if (tlex->Type() == DEVIDER)
 		{
@@ -527,7 +528,8 @@ bool LexemeWorker::WhateverCheck(char ** perone, int c1, int * types, int c2, Li
 			}
 			if (strcmp(tlex->Data(), "(") == 0)
 				hook_count++;
-			flag = true;
+			varbefore = false;
+			correct = true;
 		}
 		else if (tlex->Type() == OPERATION)
 		{
@@ -535,23 +537,31 @@ bool LexemeWorker::WhateverCheck(char ** perone, int c1, int * types, int c2, Li
 			{
 				if (strcmp(perone[s], tlex->Data()) == 0)
 				{
-					flag = true;
+					correct = true;
 					break;
 				}
 			}
+			varbefore = false;
 		}
 		else
 		{
+			if (varbefore)
+			{
+				ErrorReporter().FReport(stdout, "Ожидается операция!", tlex->Line(), tlex->Start_Position());
+				_error == true;
+				return false;
+			}
 			for (int f = 0; f < c2; f++)
 			{
 				if (tlex->Type() == types[f])
 				{
-					flag = true;
+					correct = true;
+					varbefore = true;
 					break;
 				}
 			}
 		}
-		if (!flag)
+		if (!correct)
 			return false;
 	}
 	if (hook_count > 0)
@@ -564,7 +574,7 @@ bool LexemeWorker::WhateverCheck(char ** perone, int c1, int * types, int c2, Li
 		_error == true;
 		return false;
 	}
-	return flag;
+	return correct;
 }
 
 /*
