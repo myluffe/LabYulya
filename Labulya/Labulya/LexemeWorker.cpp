@@ -1018,7 +1018,7 @@ int LexemeWorker::CorrectWhile(List * expression, int pos, lexeme * spec)
 		lexeme* tlex = (lexeme*)expression->get(pos2);
 		if (strcmp(tlex->Data(), "{") != 0)
 		{
-			for (pos2; pos2 < expression->count(); pos2)
+			for (pos2; pos2 < expression->count(); pos2++)
 			{
 				tlex = (lexeme*)expression->get(pos2);
 				if (strcmp(tlex->Data(), ";") != 0)
@@ -1064,5 +1064,86 @@ int LexemeWorker::CorrectWhile(List * expression, int pos, lexeme * spec)
 	}
 
 	tlist->~List();
+	return 0;
+}
+
+int LexemeWorker::CorrectDo(List * expression, int pos, lexeme * spec)
+{
+	
+	List* tlist = new List(sizeof(lexeme));
+	if (pos < expression->count())
+	{
+		lexeme* tlex = (lexeme*)expression->get(pos);
+		if (strcmp(tlex->Data(), "{") != 0)
+		{
+			for (pos; pos < expression->count(); pos++)
+			{
+				tlex = (lexeme*)expression->get(pos);
+				if (strcmp(tlex->Data(), ";") != 0)
+					tlist->add(tlex);
+				else
+				{
+					tlist->add(tlex);
+					break;
+				}
+			}
+		}
+		else
+		{
+			pos++;
+			for (pos; pos < expression->count(); pos++)
+			{
+				tlex = (lexeme*)expression->get(pos);
+				if (strcmp(tlex->Data(), "}") != 0)
+					tlist->add(tlex);
+				else
+				{
+					break;
+				}
+			}
+		}
+		if (InnerExpression(tlist))
+		{
+			tlist->~List();
+			{
+				pos++;
+				if (pos <= expression->count())
+				{
+					tlex = (lexeme*)expression->get(pos);
+					if (strcmp(tlex->Data(), "while ") != 0)
+					{
+						_error = true;
+						tlist->~List();
+						return 0;
+					}
+					int pos2 = FuncWithBoolParam(expression, pos, spec, true);
+					if (pos2 == 0)
+					{
+						_error = true;
+						return 0;
+					}
+					return pos2;
+				}
+				else
+				{
+					_error = true;
+					tlist->~List();
+					return 0;
+				}
+			}
+		}
+		else
+		{
+			_error = true;
+			tlist->~List();
+			return 0;
+		}
+	}
+	else
+	{
+		_error = true;
+		tlist->~List();
+		return 0;
+	}
 	return 0;
 }

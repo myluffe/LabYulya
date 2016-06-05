@@ -22,6 +22,7 @@ protected:
 	bool IsStringExpressionWithBoolOperations(List * expression);
 
 	int CorrectWhile(List* expression, int pos, lexeme* spec);
+	int CorrectDo(List* expression, int pos, lexeme* spec);
 
 	int CorrectSpecial(lexeme* spec, int pos, List* expression);
 
