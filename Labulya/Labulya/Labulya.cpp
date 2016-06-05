@@ -35,6 +35,7 @@ int main(char* name)
 	for (int j = 0; j < lcount; j++)
 	{
 		lexeme tl = *(lexeme*)temp_lexes->get(j);
+		printf("%d. ", j);
 		tl.Print();
 	}
 	//конец вывода

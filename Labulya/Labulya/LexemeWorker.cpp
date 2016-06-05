@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "LexemeWorker.h"
 #include "ErrorReporter.h"
+#include "TreeWorker.h"
 
 bool LexemeWorker::Processing(List* lexes)
 {
@@ -167,6 +168,8 @@ bool LexemeWorker::Processing(List* lexes)
 	LexemeTable.print_lexems();
 	printf_s("\n|---------------|\n");
 	//
+	treeWorker.DoTree(lexes);
+
 	dob->~Lexeme_list();
 	return true;
 }
