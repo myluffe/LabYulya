@@ -211,18 +211,31 @@ class TBinaryOperation : TNode
 
 class TTernaryOperator : TNode
 {
-	TTernaryOperator() {};
+	TTernaryOperator(TNode* operand1, TNode* operand2, TNode* operand3)
+	{
+		m_operand1 = operand1;
+		m_operand2 = operand2;
+		m_operand3 = operand3;
+	}
 	virtual lexeme* exec()
 	{
-		return m_operand2->exec();
+		if (Parser().ToBool(m_operand1->exec()->Data))
+			return m_operand2->exec();
+		else
+			return m_operand3->exec();
+		
 	}
 	virtual void print()
 	{
-
+		m_operand1->print();
+		printf("?");
+		m_operand2->print();
+		printf(":");
+		m_operand3->print();
 	}
 	TNode*  m_operand1;
 	TNode*  m_operand2;
-	TNode*  m_operand2;
+	TNode*  m_operand3;
 };
 
 class TList : TNode
