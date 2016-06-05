@@ -12,7 +12,7 @@ class Heap
 public:
 	Heap(int _segment_size = SEGMENTSIZE);
 	~Heap();
-	void*      get_mem(size_t size);
+	void*      get_mem(int size);
 	void       free_mem(void*);
 	void print();
 private:

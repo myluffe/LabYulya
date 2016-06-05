@@ -13,65 +13,66 @@ Heap::~Heap()
 	delete_segments();
 }
 
-void* Heap::get_mem(size_t size)
+void* Heap::get_mem(int size)
 {
-    if(size <= SEGMENTSIZE)
-	{Segment*  now_current = current;
-	while (now_current != 0)
+	if (size <= SEGMENTSIZE)
 	{
-		for (int i = 0; i < now_current->descriptor_count; i++)
+		Segment*  now_current = current;
+		while (now_current != 0)
 		{
-			if (size <= now_current->descriptor[i].size && !now_current->descriptor[i].used)
+			for (int i = 0; i < now_current->descriptor_count; i++)
 			{
-				if (size == now_current->descriptor[i].size)
+				if (size <= now_current->descriptor[i].size && !now_current->descriptor[i].used)
 				{
-					now_current->descriptor[i].used = true;
-					return now_current->descriptor[i].offset;
-				}
-				else
-				{
-					if (now_current->descriptor_count + 1 <= SEGMENTCOUNT)
+					if (size == now_current->descriptor[i].size)
 					{
-						Chunk my_Chunk;
-						my_Chunk.offset = (char*)(now_current->descriptor[i].offset) + size;
-						my_Chunk.size = now_current->descriptor[i].size - sizeof(size);
-						my_Chunk.used = false;
-
-                        now_current->descriptor[i].used = true;
-						now_current->descriptor[i].size = sizeof(size);
-						now_current->descriptor_count++;
-
-						for (int h = now_current->descriptor_count; h > i; h--)
-						{
-							now_current->descriptor[h] = now_current->descriptor[h - 1];
-						}
-						now_current->descriptor[i+1] = my_Chunk;
+						now_current->descriptor[i].used = true;
 						return now_current->descriptor[i].offset;
+					}
+					else
+					{
+						if (now_current->descriptor_count + 1 <= SEGMENTCOUNT)
+						{
+							Chunk my_Chunk;
+							my_Chunk.offset = (char*)(now_current->descriptor[i].offset) + size;
+							my_Chunk.size = now_current->descriptor[i].size - size;
+							my_Chunk.used = false;
+
+							now_current->descriptor[i].used = true;
+							now_current->descriptor[i].size = size;
+							now_current->descriptor_count++;
+
+							for (int h = now_current->descriptor_count; h > i; h--)
+							{
+								now_current->descriptor[h] = now_current->descriptor[h - 1];
+							}
+							now_current->descriptor[i + 1] = my_Chunk;
+							return now_current->descriptor[i].offset;
+						}
 					}
 				}
 			}
+			now_current = now_current->prev;
 		}
-		now_current = now_current->prev;
-	}
 
-	if (make_segment() == 0)
-	{
-	    Chunk my_Chunk;
-		my_Chunk.offset = (char*)(current->data) + sizeof(size);
-		my_Chunk.size = current->descriptor[0].size - sizeof(size);
-		my_Chunk.used = false;
+		if (make_segment() == 0)
+		{
+			Chunk my_Chunk;
+			my_Chunk.offset = (char*)(current->data) + size;
+			my_Chunk.size = current->descriptor[0].size - size;
+			my_Chunk.used = false;
 
-		current->descriptor[0].used = true;
-		current->descriptor[0].size = sizeof(size);
-		current->descriptor[1] = my_Chunk;
-		current->descriptor_count++;
+			current->descriptor[0].used = true;
+			current->descriptor[0].size = size;
+			current->descriptor[1] = my_Chunk;
+			current->descriptor_count++;
 
-		return current->descriptor[0].offset;
-	}
+			return current->descriptor[0].offset;
+		}
 	}
 	else
-        //error "a lot of memory"
-        ;
+		//error "a lot of memory"
+		;
 
 	return 0;
 }
@@ -107,7 +108,7 @@ void Heap::free_mem(void* free_m)
 						if (next)
 							now_current->descriptor[i].size += now_current->descriptor[i + 1].size;
 					}
-					for (int i2 = i; i2 < now_current->descriptor_count-count; i2++)
+					for (int i2 = i; i2 < now_current->descriptor_count - count; i2++)
 					{
 						now_current->descriptor[i].size += now_current->descriptor[i + count].size;
 					}
@@ -133,12 +134,12 @@ void Heap::delete_segments()
 int Heap::make_segment()
 {
 	Segment *my_Segment = (Segment*)malloc(sizeof(Segment));
-	my_Segment->data =  malloc(segment_size);
+	my_Segment->data = malloc(segment_size);
 	if (my_Segment->data != NULL)
 	{
 		my_Segment->prev = current;
 		my_Segment->descriptor_count = 1;
-        current = my_Segment;
+		current = my_Segment;
 		Chunk *my_Chunk = (Chunk*)malloc(sizeof(Chunk));
 		my_Chunk->offset = my_Segment->data;
 		my_Chunk->size = segment_size;
@@ -151,13 +152,13 @@ int Heap::make_segment()
 
 void Heap::print()
 {
-    Segment*  now_current = current;
-    while (now_current != 0)
+	Segment*  now_current = current;
+	while (now_current != 0)
 	{
-	    printf("new Seg:\n%d\t%s\n",now_current->descriptor_count, (char *)now_current->data);
+		printf("new Seg:\n%d\t%d\n", now_current->descriptor_count, now_current->data);
 		for (int i = 0; i < now_current->descriptor_count; i++)
 		{
-		    printf("%d\t%s\t%d\n", now_current->descriptor[i].size, (char *)now_current->descriptor[i].offset, now_current->descriptor[i].used?1:0);
+			printf("%d\t%d\t%d\n", now_current->descriptor[i].size, now_current->descriptor[i].offset, now_current->descriptor[i].used ? 1 : 0);
 		}
 		now_current = now_current->prev;
 	}

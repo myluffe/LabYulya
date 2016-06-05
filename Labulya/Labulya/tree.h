@@ -209,6 +209,22 @@ class TBinaryOperation : TNode
 		TNode*  m_operand2;
 };
 
+class TTernaryOperator : TNode
+{
+	TTernaryOperator() {};
+	virtual lexeme* exec()
+	{
+		return m_operand2->exec();
+	}
+	virtual void print()
+	{
+
+	}
+	TNode*  m_operand1;
+	TNode*  m_operand2;
+	TNode*  m_operand2;
+};
+
 class TList : TNode
 {
 	public:
@@ -313,4 +329,39 @@ class TWhile : TNode
 	protected:
 		TBinaryOperation* condition;
 		TList*            body;
+};
+
+class TFor : TNode
+{
+public:
+	TFor(TBinaryOperation* minitialization, TBinaryOperation* mcondition, TBinaryOperation* mloop, TList* mbody)
+	{
+		initialization = minitialization;
+		condition = mcondition;
+		loop = mloop;
+		body = mbody;
+	}
+	lexeme* exec()
+	{
+		for (initialization->exec(); Parser().ToBool(condition->exec()->Data); loop->exec())
+			body->exec();
+		return condition->exec();
+	}
+	void print()
+	{
+		printf("for(");
+		initialization->print();
+		printf("; ");
+		condition->print();
+		printf("; ");
+		loop->print();
+		printf(")\n{");
+		body->print();
+		printf("}\n");
+	}
+protected:
+	TBinaryOperation* initialization;
+	TBinaryOperation* condition;
+	TBinaryOperation* loop;
+	TList*            body;
 };
