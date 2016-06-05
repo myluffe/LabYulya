@@ -14,6 +14,8 @@ bool TreeWorker::DoTree(List* lexes)
 			start = i + 1;
 		}
 	}
+	prog->print();
+	heap.free_mem(prog);
 	return true;
 }
 
