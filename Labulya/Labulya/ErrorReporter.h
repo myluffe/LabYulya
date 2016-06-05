@@ -11,3 +11,5 @@ public:
 	~ErrorReporter();
 };
 
+static FILE* logfile = (FILE*)stdout;
+

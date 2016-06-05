@@ -36,7 +36,7 @@ MachineWorker::MachineWorker()
 	// Operations1
 	//"?:" как добавить
 	om = new Type1Machine("Operations1", "Operation", OPERATION);
-	char* os[] = { "++", "--", "==", "!=", "||", "&&", ">=", "<=", "<<", ">>", "::" };
+	char* os[] = { "++", "--", "==", "!=", "||", "&&", ">=", "<=", "<<", ">>" };
 	for each (char* var in os)
 	{
 		om->AddWord(var);
@@ -218,7 +218,7 @@ int MachineWorker::Work(char* filename, List* lexes)
 						else
 						{
 							if (str[s] == EOF)
-								ErrorReporter().FReport(stdout, "Unprocessed word!", fr.CurrentLine(), _currentaut->CurrentLexPos());
+								ErrorReporter().FReport(logfile, "Unprocessed word!", fr.CurrentLine(), _currentaut->CurrentLexPos());
 							UpdateMachines();
 							fr.~mFileReader();
 							return -100;
@@ -237,7 +237,7 @@ int MachineWorker::Work(char* filename, List* lexes)
 			{
 				if (fr.EndFile() && s >= strlen(str) - 1 && EnterInComment)
 				{
-					ErrorReporter().FReport(stdout, "Maybe you forget to close the comment", commentline, commentpos);
+					ErrorReporter().FReport(logfile, "Maybe you forget to close the comment", commentline, commentpos);
 					//_error = false;
 					fr.~mFileReader();
 					return -1;
@@ -279,8 +279,6 @@ void MachineWorker::GetOperationPriority(mStateMachine * machine)
 {
 	if (strcmp("(", machine->Buffer()) == 0 || strcmp(")", machine->Buffer()) == 0)
 		machine->Priority = 0;
-	if (strcmp("::", machine->Buffer()) == 0)
-		machine->Priority = 1;
 	if (strcmp("--", machine->Buffer()) == 0 || strcmp("++", machine->Buffer()) == 0)
 		machine->Priority = 2;
 	if (strcmp("!", machine->Buffer()) == 0)
@@ -379,7 +377,7 @@ void MachineWorker::NumberCheck(int line)
 			{
 				if (flagE)
 				{
-					ErrorReporter().FReport(stdout, "Uncorrect number. \"e\" - уже встретилось.", line, _currentaut->CurrentLexPos() + i);
+					ErrorReporter().FReport(logfile, "Uncorrect number. \"e\" - уже встретилось.", line, _currentaut->CurrentLexPos() + i);
 					_error = true;
 					heap.free_mem(first);
 					heap.free_mem(second);
@@ -395,7 +393,7 @@ void MachineWorker::NumberCheck(int line)
 		{
 			if (flagE)
 			{
-				ErrorReporter().FReport(stdout, "Uncorrect number. \"e\" - если присутствует в числителе, знаменателя не может быть.", line, _currentaut->CurrentLexPos() + i);
+				ErrorReporter().FReport(logfile, "Uncorrect number. \"e\" - если присутствует в числителе, знаменателя не может быть.", line, _currentaut->CurrentLexPos() + i);
 				_error = true;
 				heap.free_mem(first);
 				heap.free_mem(second);
@@ -416,7 +414,7 @@ void MachineWorker::NumberCheck(int line)
 	{
 		if (number[i] == '.')
 		{
-			ErrorReporter().FReport(stdout, "Uncorrect number. \".\" - не может быть несколько.", line, _currentaut->CurrentLexPos() + i);
+			ErrorReporter().FReport(logfile, "Uncorrect number. \".\" - не может быть несколько.", line, _currentaut->CurrentLexPos() + i);
 			_error = true;
 			heap.free_mem(first);
 			heap.free_mem(second);
@@ -431,7 +429,7 @@ void MachineWorker::NumberCheck(int line)
 			}
 			else
 			{
-				ErrorReporter().FReport(stdout, "Uncorrect number. \"e\" - не может быть несколько.", line, _currentaut->CurrentLexPos() + i);
+				ErrorReporter().FReport(logfile, "Uncorrect number. \"e\" - не может быть несколько.", line, _currentaut->CurrentLexPos() + i);
 				_error = true;
 				heap.free_mem(first);
 				heap.free_mem(second);
@@ -469,7 +467,7 @@ void MachineWorker::Hooker(char * buffer)
 		_circlehooks--;
 		if (_circlehooks < 0)
 		{
-			ErrorReporter().FReport(stdout, "You have lost \"(\"", _currentaut->CurrentLexLine(), _currentaut->CurrentLexPos());
+			ErrorReporter().FReport(logfile, "You have lost \"(\"", _currentaut->CurrentLexLine(), _currentaut->CurrentLexPos());
 			_error = true;
 		}
 		return;
@@ -484,7 +482,7 @@ void MachineWorker::Hooker(char * buffer)
 		_squarehooks--;
 		if (_squarehooks < 0)
 		{
-			ErrorReporter().FReport(stdout, "You have lost \"[\"", _currentaut->CurrentLexLine(), _currentaut->CurrentLexPos());
+			ErrorReporter().FReport(logfile, "You have lost \"[\"", _currentaut->CurrentLexLine(), _currentaut->CurrentLexPos());
 			_error = true;
 		}
 		return;
@@ -499,7 +497,7 @@ void MachineWorker::Hooker(char * buffer)
 		_hooks--;
 		if (_hooks < 0)
 		{
-			ErrorReporter().FReport(stdout, "You have lost \"{\"", _currentaut->CurrentLexLine(), _currentaut->CurrentLexPos());
+			ErrorReporter().FReport(logfile, "You have lost \"{\"", _currentaut->CurrentLexLine(), _currentaut->CurrentLexPos());
 			_error = true;
 		}
 		return;
@@ -512,19 +510,19 @@ bool MachineWorker::HooksCheck(mFileReader* f)
 	if (_hooks > 0)
 	{
 		sprintf_s(temp, "You need to close %d hook(s)", _hooks);
-		ErrorReporter().FReport(stdout, temp, f->CurrentLine(), 0);
+		ErrorReporter().FReport(logfile, temp, f->CurrentLine(), 0);
 		return false;
 	}
 	if (_circlehooks > 0)
 	{
 		sprintf_s(temp, "You need to close %d circle hook(s)", _circlehooks);
-		ErrorReporter().FReport(stdout, temp, f->CurrentLine(), 0);
+		ErrorReporter().FReport(logfile, temp, f->CurrentLine(), 0);
 		return false;
 	}
 	if (_squarehooks > 0)
 	{
 		sprintf_s(temp, "You need to close %d square hook(s)", _squarehooks);
-		ErrorReporter().FReport(stdout, temp, f->CurrentLine(), 0);
+		ErrorReporter().FReport(logfile, temp, f->CurrentLine(), 0);
 		return false;
 	}
 	return true;
