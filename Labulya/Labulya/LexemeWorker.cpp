@@ -164,7 +164,7 @@ bool LexemeWorker::Processing(List* lexes)
 	}
 
 	//отладка
-	printf_s("\n|---------------|\#2 nVariable Table:\n");
+	printf_s("\n|---------------|\nVariable Table:\n");
 	LexemeTable.print_lexems();
 	printf_s("\n|---------------|\n");
 	//
