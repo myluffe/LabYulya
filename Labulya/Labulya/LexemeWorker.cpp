@@ -206,23 +206,23 @@ int LexemeWorker::CorrectSpecial(lexeme* spec, int pos, List* expression)
 	}
 	if (strcmp(spec->Data(), "for ") == 0)
 	{
-		return pos + 1; //заглушка
+		return pos; //заглушка
 	}
 	if (strcmp(spec->Data(), "if ") == 0)
 	{
-		return pos + 1; //заглушка
+		return pos; //заглушка
 	}
 	if (strcmp(spec->Data(), "else ") == 0)
 	{
-		return pos + 1; //заглушка
+		return pos; //заглушка
 	}
 	if (strcmp(spec->Data(), "while ") == 0)
 	{
-		return pos + 1; //заглушка
+		return pos; //заглушка
 	}
 	if (strcmp(spec->Data(), "do ") == 0)
 	{
-		return pos + 1; //заглушка
+		return pos; //заглушка
 	}
 	if (strcmp(spec->Data(), "input ") == 0)
 	{
