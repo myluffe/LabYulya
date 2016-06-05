@@ -148,6 +148,12 @@ bool LexemeWorker::Processing(List* lexes)
 	}
 	dob->~Lexeme_list();
 
+	//отладка
+	printf_s("\n|---------------|\nVariable Table:\n");
+	LexemeTable.print_lexems();
+	printf_s("\n|---------------|\n");
+	//
+
 	for (int i = 0; i < lexes->count(); i++)
 	{
 		lexeme* temp_lexeme = (lexeme*)lexes->get(i);
