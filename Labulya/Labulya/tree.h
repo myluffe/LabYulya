@@ -1,13 +1,13 @@
 #pragma once
 #include "lec.h"
 #include "heap.h"
+#include "Types.h"
+#include "Parser.h"
 
 class TNode
 {
 	public:
 		TNode()  {};
-		~TNode() {};
-
 		virtual lexeme* exec();
 		virtual void print();
 };
@@ -19,8 +19,6 @@ class TConst : TNode
 		{
 			m_const = mconst;
 		}
-		~TConst() {}
-
 		lexeme* exec()
 		{
 			return m_const;
@@ -39,9 +37,7 @@ class TVariable : TNode
 		TVariable(lexeme* mvariable)
 		{
 			m_variable = m_variable;
-		}
-		~TVariable() {}
-			
+		}			
 		lexeme* exec()
 		{
 			return m_variable;
@@ -57,59 +53,102 @@ class TVariable : TNode
 class TUnaryOperation : TNode
 {
 	public:
-		TUnaryOperation(TNode* operand)
+		TUnaryOperation(TNode* operand, lexeme* moperation)
 		{
 			m_operand = operand;
+			m_operation = moperation;
 		}
-		~TUnaryOperation();
-			
-		lexeme exec()
+		lexeme* exec()
 		{ 
-			lexeme res= m_operand->exec();
-            res.DataChange("-" + res.Data);
-            return res;
+			if (m_operation->Data == "-")
+			{
+				lexeme* res = m_operand->exec();
+				res->DataChange("-" + res->Data);
+				return res;
+			}
+			if (m_operation->Data == "+")
+			{
+				return m_operand->exec();
+			}
 		}
 		void print()
 		{
-			printf("-");
+			printf(m_operation->Data);
 			m_operand->print();
 		}
 	protected:
-		int    m_type;
-		TNode* m_operand;
+		lexeme* m_operation;
+		TNode*  m_operand;
 };
 
 class TBinaryOperation : TNode
 {
 	//бинарный "+"
 	public:
-		TBinaryOperation(TNode*  operand1, TNode*  operand2)
+		TBinaryOperation(TNode*  operand1, TNode*  operand2, lexeme* operation)
 		{
 			m_operand1 = operand1;
 			m_operand2 = operand2;
+			m_operation = operation;
 		}
-		~TBinaryOperation();
-
-		lexeme exec()
+		lexeme* exec()
 		{
-			lexeme res1= m_operand1->exec();
-            lexeme res2= m_operand2->exec();
-            lexeme res;
-			//перевод res1.Data() и res2.Data() в числа value1 и value2!
-            res.DataChange(value1 + value2);
-            return res; 
+			lexeme* res1 = m_operand1->exec();
+			lexeme* res2 = m_operand2->exec();
+			double o1 = Parser().ToDouble(res1->Data);
+			double o2 = Parser().ToDouble(res2->Data);
+			lexeme* res = new lexeme("Number", NUMBER, "0", res1->Line, res1->Start_Position, 100);
+			if (m_operation->Data == "+")
+			{
+				res->DataChange(Parser().DoubleToString(o1 + o2));
+			}
+			if (m_operation->Data == "-")
+			{
+				res->DataChange(Parser().DoubleToString(o1 - o2));
+			}
+			if (m_operation->Data == "*")
+			{
+				res->DataChange(Parser().DoubleToString(o1 * o2));
+			}
+			if (m_operation->Data == "/")
+			{
+				res->DataChange(Parser().DoubleToString(o1 / o2));
+			}
+			if (m_operation->Data == "=")
+			{
+				if(IsCastable(res1->Type, res2->Type))
+				{
+					res1->DataChange(res2->Data);
+					res = res1;
+				}
+			}
+			if (m_operation->Data == "==")
+			{
+				res->DataChange(Parser().BoolToString(o1 == o2));
+			}
+			if (m_operation->Data == "=!")
+			{
+				res->DataChange(Parser().BoolToString(o1 =! o2));
+			}
+			if (m_operation->Data == "<=")
+			{
+				res->DataChange(Parser().BoolToString(o1 <= o2));
+			}
+			if (m_operation->Data == ">=")
+			{
+				res->DataChange(Parser().BoolToString(o1 >= o2));
+			}
+			return res;
 		}
-                  // alt:
-                  // { return m_operand1->exec() + m_operand2->exec(); }
 		void print()
 		{
 			m_operand1->print(); 
-            printf(" + ");
+            printf(" " + m_operation->Data + " ");
             m_operand2->print();
 			printf("\n");
 		}
 	protected:
-		int     m_type;
+		lexeme* m_operation;
 		TNode*  m_operand1;
 		TNode*  m_operand2;
 };
@@ -119,10 +158,9 @@ class TList : TNode
 	public:
 		TList()
 		{
-
+			start = NULL;
 		}
-		~TList();
-		lexeme exec()  
+		lexeme* exec()  
 		{  
 			list* cur = start;
             while(cur)
@@ -130,7 +168,7 @@ class TList : TNode
 				cur->sentence->exec();
                 cur=cur->next;
             }
-            lexeme res;
+            lexeme* res;
             return res;
 		}
 		void print() 
@@ -144,7 +182,14 @@ class TList : TNode
 		}
 		void  addNode(TNode* node)
 		{
-			
+			list *a = (list*)heap.get_mem(sizeof(list));
+			a->sentence = node;
+			a->next = NULL;
+			if (start != NULL)
+			{
+				start->next = a;
+			}
+			start = a;
 		}
 	protected:
 		struct list
@@ -158,46 +203,58 @@ class TList : TNode
 class TIf : TNode
 {
 	public:
-		TIf();
-		~TIf();
-
-		lexeme exec()
+		TIf(TBinaryOperation* mcondition, TList* mbranch_then, TList* mbranch_else)
+		{
+			condition = mcondition;
+			branch_then = mbranch_then;
+			branch_else = mbranch_else;
+		}
+		lexeme* exec()
 		{ 
-			if(condition.exec().Data)
-				return branch_then.exec();
+			if(Parser().ToBool(condition->exec()->Data))
+				return branch_then->exec();
 			else
-				return branch_else.exec();
+				return branch_else->exec();
 		}
 		void print()
 		{
 			printf("if(");
-			condition.print();
+			condition->print();
 			printf(")\n{");
-			branch_then.print();
+			branch_then->print();
 			printf("\n}\nelse\n{");
-			branch_else.print();
+			branch_else->print();
 			printf("}\n");
 		}
 	protected:
-		TBinaryOperation condition;
-		TList branch_then;
-		TList branch_else;
+		TBinaryOperation* condition;
+		TList* branch_then;
+		TList* branch_else;
 };
 
-class TWhile
+class TWhile : TNode
 {
 	public:
-		TWhile();
-		~TWhile();
-
-		lexeme exec() 
+		TWhile(TBinaryOperation* mcondition, TList* mbody)
 		{
-			while(condition.exec().value()) 
-				body.exec();
-			return condition.exec();
+			condition = mcondition;
+			body = mbody;
 		}
-		void print();
+		lexeme* exec() 
+		{
+			while(Parser().ToBool(condition->exec()->Data)) 
+				body->exec();
+			return condition->exec();
+		}
+		void print()
+		{
+			printf("while(");
+			condition->print();
+			printf(")\n{");
+			body->print();
+			printf("}\n");
+		}
 	protected:
-		TBinaryOperation condition;
-		TList            body;
+		TBinaryOperation* condition;
+		TList*            body;
 };
