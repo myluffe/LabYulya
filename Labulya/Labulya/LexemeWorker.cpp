@@ -353,7 +353,7 @@ int LexemeWorker::CorrectSpecial(lexeme* spec, int pos, List* expression, TList*
 	}
 	if (strcmp(spec->Data(), "input ") == 0)
 	{
-		List* param;
+		List* param = new List(sizeof(lexeme));
 		int	res = FuncWithStringParam(expression, pos, spec, true, param);
 		if (res > pos)
 		{
@@ -376,7 +376,7 @@ int LexemeWorker::CorrectSpecial(lexeme* spec, int pos, List* expression, TList*
 	}
 	if (strcmp(spec->Data(), "output ") == 0)
 	{
-		List* param;
+		List* param = new List(sizeof(lexeme));
 		int res = FuncWithStringParam(expression, pos, spec, true, param);
 		if (res > pos)
 		{
@@ -399,8 +399,8 @@ int LexemeWorker::CorrectSpecial(lexeme* spec, int pos, List* expression, TList*
 	}
 	if (strcmp(spec->Data(), "min ") == 0)
 	{
-		List* param1;
-		List* param2;
+		List* param1 = new List(sizeof(lexeme));
+		List* param2 = new List(sizeof(lexeme));
 		int res = FuncWithTwoNumberParams(expression, pos, spec, true, param1, param2);
 		if (res != pos)
 			//storage->addNode();
@@ -408,8 +408,8 @@ int LexemeWorker::CorrectSpecial(lexeme* spec, int pos, List* expression, TList*
 	}
 	if (strcmp(spec->Data(), "max ") == 0)
 	{
-		List* param1;
-		List* param2;
+		List* param1 = new List(sizeof(lexeme));
+		List* param2 = new List(sizeof(lexeme));
 		int res = FuncWithTwoNumberParams(expression, pos, spec, true, param1, param2);
 		if (res > pos)
 			//storage->addNode();
@@ -417,7 +417,7 @@ int LexemeWorker::CorrectSpecial(lexeme* spec, int pos, List* expression, TList*
 	}
 	if (strcmp(spec->Data(), "sin ") == 0)
 	{
-		List* param;
+		List* param = new List(sizeof(lexeme));
 		int res = FuncWithNumberParam(expression, pos, spec, true, param);
 		if (res > pos)
 		{
@@ -427,7 +427,7 @@ int LexemeWorker::CorrectSpecial(lexeme* spec, int pos, List* expression, TList*
 	}
 	if (strcmp(spec->Data(), "cos ") == 0)
 	{
-		List* param;
+		List* param = new List(sizeof(lexeme));
 		int res = FuncWithNumberParam(expression, pos, spec, true, param);
 		if (res > pos)
 		{
@@ -441,10 +441,6 @@ int LexemeWorker::CorrectSpecial(lexeme* spec, int pos, List* expression, TList*
 int LexemeWorker::FuncWithTwoNumberParams(List * expression, int pos, lexeme * spec, bool finaldevider, List* param1, List* param2)
 {
 	lexeme* devider1 = (lexeme*)expression->get(pos + 1);
-	param1->~List();
-	param1 = new List(sizeof(lexeme));
-	param2->~List();
-	param2 = new List(sizeof(lexeme));
 	if (strcmp(devider1->Data(), "(") != 0)
 	{
 		errorReporter.FReport(logfile, "Ожидается \"(\"", devider1->Line(), devider1->Start_Position());
@@ -534,8 +530,6 @@ int LexemeWorker::FuncWithStringParam(List * expression, int pos, lexeme * spec,
 		_error = true;
 		return pos;
 	}
-	param->~List();
-	List* param = new List(sizeof(lexeme));
 	lexeme* tlex = nullptr;
 	int i = 0;
 	for (i = pos + 2; i < expression->count(); i++)
@@ -582,8 +576,6 @@ int LexemeWorker::FuncWithBoolParam(List * expression, int pos, lexeme * spec, b
 		_error = true;
 		return pos;
 	}
-	param->~List();
-	List* param = new List(sizeof(lexeme));
 	lexeme* tlex = nullptr;
 	int i = 0;
 	for (i = pos + 2; i < expression->count(); i++)
@@ -630,8 +622,6 @@ int LexemeWorker::FuncWithNumberParam(List * expression, int pos, lexeme * spec,
 		_error = true;
 		return pos;
 	}
-	param->~List();
-	List* param = new List(sizeof(lexeme));
 	lexeme* tlex = nullptr;
 	int i = 0;
 	for (i = pos + 2; i < expression->count(); i++)
@@ -831,7 +821,7 @@ bool LexemeWorker::IsStringExpression(List * expression, bool equal)
 
 int LexemeWorker::CorrectWhile(List * expression, int pos, lexeme * spec, TList* storage)
 {
-	List* hl;
+	List* hl = new List(sizeof(lexeme));
 	int pos2 = FuncWithBoolParam(expression, pos, spec, false, hl);
 	if (pos2 <= pos)
 	{
@@ -1168,7 +1158,7 @@ int LexemeWorker::CorrectFor(List * expression, int pos, lexeme * spec, TList* s
 
 int LexemeWorker::CorrectIf(List * expression, int pos, lexeme * spec, TList* storage)
 {
-	List* hl;
+	List* hl = new List(sizeof(lexeme));
 	int pos3 = FuncWithBoolParam(expression, pos, spec, false, hl);
 	if (pos3 <= pos)
 	{
