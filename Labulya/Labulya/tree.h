@@ -214,6 +214,7 @@ class TBinaryOperation : TNode
 
 class TTernaryOperator : TNode
 {
+public: 
 	TTernaryOperator(TNode* operand1, TNode* operand2, TNode* operand3)
 	{
 		m_operand1 = operand1;
@@ -236,6 +237,7 @@ class TTernaryOperator : TNode
 		printf(":");
 		m_operand3->print();
 	}
+protected:
 	TNode*  m_operand1;
 	TNode*  m_operand2;
 	TNode*  m_operand3;
@@ -266,7 +268,7 @@ class TList : TNode
 				cur->sentence->exec();
                 cur=cur->next;
             }
-            lexeme* res;
+            lexeme* res = nullptr;
             return res;
 		}
 		void print() 
@@ -301,7 +303,7 @@ class TList : TNode
 class TIf : TNode
 {
 	public:
-		TIf(TBinaryOperation* mcondition, TNode* mbranch_then, TNode* mbranch_else)
+		TIf(TNode* mcondition, TList* mbranch_then, TList* mbranch_else)
 		{
 			condition = mcondition;
 			branch_then = mbranch_then;
@@ -325,15 +327,15 @@ class TIf : TNode
 			printf("}\n");
 		}
 	protected:
-		TBinaryOperation* condition;
-		TNode* branch_then;
-		TNode* branch_else;
+		TNode* condition;
+		TList* branch_then;
+		TList* branch_else;
 };
 
 class TWhile : TNode
 {
 	public:
-		TWhile(TBinaryOperation* mcondition, TNode* mbody)
+		TWhile(TNode* mcondition, TList* mbody)
 		{
 			condition = mcondition;
 			body = mbody;
@@ -353,14 +355,43 @@ class TWhile : TNode
 			printf("}\n");
 		}
 	protected:
-		TBinaryOperation* condition;
-		TNode*            body;
+		TNode* condition;
+		TList* body;
+};
+
+class TDoWhile : TNode
+{
+public:
+	TDoWhile(TList* mbody, TNode* mcondition)
+	{
+		condition = mcondition;
+		body = mbody;
+	}
+	lexeme* exec()
+	{
+		do
+			body->exec();
+		while (Parser().ToBool(condition->exec()->Data()));
+			
+		return condition->exec();
+	}
+	void print()
+	{
+		printf("do\n{");
+		body->print();
+		printf("}while(");
+		condition->print();
+		printf(");\n");
+	}
+protected:
+	TNode* condition;
+	TList* body;
 };
 
 class TFor : TNode
 {
 public:
-	TFor(TBinaryOperation* minitialization, TBinaryOperation* mcondition, TBinaryOperation* mloop, TNode* mbody)
+	TFor(TVariable* minitialization, TNode* mcondition, TNode* mloop, TList* mbody)
 	{
 		initialization = minitialization;
 		condition = mcondition;
@@ -386,8 +417,8 @@ public:
 		printf("}\n");
 	}
 protected:
-	TBinaryOperation* initialization;
-	TBinaryOperation* condition;
-	TBinaryOperation* loop;
-	TNode*            body;
+	TVariable* initialization;
+	TNode* condition;
+	TNode* loop;
+	TList* body;
 };

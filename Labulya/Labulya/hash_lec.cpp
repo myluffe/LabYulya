@@ -43,18 +43,11 @@ Diction_lexem::Diction_lexem(int _n1, int _n2, int _n3, int _n4, int _n5)
 
 Diction_lexem::~Diction_lexem()
 {
-	List* list;
+	Lexeme_list* list;
 	for (int i = 0; i < table->count(); i++)
 	{
-		list = (List*)table->get(i);
-		if (list->count() > 0)
-		{
-			for (int j = 0; j < list->count(); j++)
-			{
-				lexeme* a = (lexeme*)list->get(j);
-				((Lexeme_list*)list)->del(a);
-			}
-		}
+		list = (Lexeme_list*)table->get(i);
+		list->~Lexeme_list();
 	}
 };
 
@@ -70,8 +63,7 @@ Lexeme_list::~Lexeme_list()
 
 lexeme* Lexeme_list::find(char*word)
 {
-	//lexeme * now = new lexeme("","","",0,0,0); // конструктор!
-	lexeme* now = (lexeme*)heap.get_mem(sizeof(lexeme));
+	lexeme* now = nullptr;
 
 	for (int i = 0; i < count(); i++)
 	{
@@ -86,8 +78,7 @@ lexeme* Lexeme_list::find(char*word)
 
 int Lexeme_list::findpos(char* word)
 {
-	//lexeme * now = new lexeme("","","",0,0,0);
-	lexeme* now = (lexeme*)heap.get_mem(sizeof(lexeme));
+	lexeme* now = nullptr;
 
 	for (int i = 0; i < count(); i++)
 	{
@@ -96,29 +87,15 @@ int Lexeme_list::findpos(char* word)
 		{
 			return i;
 		}
-
 	}
 	return -1;
 }
-
-/*
-void Lexeme_list::put(lexeme* article)
-{
-	if (article != nullptr){
-
-		lexeme* art = new lexeme(article->Name(), article->Type(), article->Data(), article->Line(), article->Start_Position(), article->Priority());
-		add(art);
-		heap.free_mem(art);
-	}
-}
-*/
 
 void Lexeme_list::del(char* word)
 {
 	int a = findpos(word);
 	if (a != -1)
 	{
-		//heap.free_mem((lexeme*)get(a));
 		remove(a);
 	}
 }
@@ -148,27 +125,6 @@ lexeme* Diction_lexem::find(char* word)
 
 }
 
-lexeme* Diction_lexem::auto_create(char*word)
-{
-	lexeme* fin = find(word);
-	if (fin != nullptr)
-		return fin;
-	else
-	{   
-		//fin = new lexeme(word, "", "", 0, 0, 0);
-		fin = (lexeme*)heap.get_mem(sizeof(lexeme));
-		Lexeme_list* list = (Lexeme_list*)find_list(word);
-		if (!list)
-		{
-			list = (Lexeme_list*)heap.get_mem(sizeof(Lexeme_list));
-		}
-		//list->put(fin);
-		list->add(fin);
-	}
-	heap.free_mem(fin);
-    return find(word);
-}
-
 int Diction_lexem::auto_create(lexeme* lex)
 {
 	lexeme* fin = find(lex->Name());
@@ -176,16 +132,13 @@ int Diction_lexem::auto_create(lexeme* lex)
 		return combine_keys(lex->Name());
 	else
 	{
-		fin = new lexeme(lex->Name(), lex->Type(), lex->Data(), lex->Line(), lex->Start_Position(), lex->Priority());
 		Lexeme_list* list = (Lexeme_list*)find_list(lex->Name());
 		if (!list)
 		{
 			list = (Lexeme_list*)heap.get_mem(sizeof(Lexeme_list));
 		}
-		//list->put(fin);
-		list->add(fin);
+		list->add(lex);
 	}
-	//heap.free_mem(fin);
 	return combine_keys(lex->Name());
 }
 

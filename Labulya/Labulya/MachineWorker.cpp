@@ -301,8 +301,6 @@ void MachineWorker::GetOperationPriority(mStateMachine * machine)
 		machine->Priority = 13;
 	if (strcmp("||", machine->Buffer()) == 0)
 		machine->Priority = 14;
-	//if (strcmp("?:", machine->Buffer()) == 0)
-	//	machine->Priority = 15;
 	if (strcmp(":", machine->Buffer()) == 0 || strcmp("?", machine->Buffer()))
 	{
 		machine->Priority = 15;

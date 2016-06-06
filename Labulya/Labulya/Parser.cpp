@@ -15,6 +15,7 @@ int Parser::ToInt(char * str)
 	char* number = (char*)heap.get_mem(sizeof(char) * (strlen(str) + 1));
 	strcpy_s(number, strlen(str) + 1, str);
 	int res = atoi(number);
+	heap.free_mem(number);
 	return res;
 }
 
@@ -23,6 +24,7 @@ double Parser::ToDouble(char * str)
 	char* number = (char*)heap.get_mem(sizeof(char) * (strlen(str) + 1));
 	strcpy_s(number, strlen(str) + 1, str);
 	double res = atof(number);
+	heap.free_mem(number);
 	return res;
 }
 
@@ -32,6 +34,7 @@ float Parser::ToFloat(char * str)
 	strcpy_s(number, strlen(str) + 1, str);
 	long temp = 0;
 	float res = _Stof(number, nullptr, temp);
+	heap.free_mem(number);
 	return res;
 }
 
@@ -46,6 +49,7 @@ char * Parser::IntToString(int value)
 	}
 	char* str = (char*)heap.get_mem(sizeof(char) * (count + 1) );
 	char* res = (char*)_itoa_s(value, str, count, 10);
+	heap.free_mem(str);
 	return res;
 }
 

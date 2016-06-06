@@ -4,6 +4,8 @@
 #include "hash_lec.h"
 #include "list_adv.h"
 #include "Parser.h"
+#include "ErrorReporter.h"
+#include "TreeWorker.h"
 
 static class LexemeWorker
 {
@@ -21,12 +23,14 @@ protected:
 	bool IsNumberExpressionWithBoolOperations(List * expression);
 	bool IsStringExpressionWithBoolOperations(List * expression);
 
-	int CorrectWhile(List* expression, int pos, lexeme* spec);
-	int CorrectDo(List* expression, int pos, lexeme* spec);
-	int CorrectFor(List* expression, int pos, lexeme* spec);
-	int CorrectIf(List* expression, int pos, lexeme* spec);
+	int CorrectWhile(List* expression, int pos, lexeme* spec, TList* storage);
+	int CorrectDo(List* expression, int pos, lexeme* spec, TList* storage);
+	int CorrectFor(List* expression, int pos, lexeme* spec, TList* storage);
+	int CorrectIf(List* expression, int pos, lexeme* spec, TList* storage);
 
-	int CorrectSpecial(lexeme* spec, int pos, List* expression);
+	int CorrectShortIfOperation(List* expression, int i, TList* storage);
+	int CorrectSpecial(lexeme* spec, int pos, List* expression, TList* storage);
+	int CorrectExpression(List* expression, int pos, TList* storage);
 
 	bool _error = false;
 
@@ -36,7 +40,7 @@ private:
 	int FuncWithStringParam(List* expression, int pos, lexeme* spec, bool finaldevider);
 	int FuncWithBoolParam(List* expression, int pos, lexeme* spec, bool finaldevider);
 
-	bool InnerExpression(List* expression);
+	bool InnerExpression(List* expression, TList* storage);
 	bool WhateverCheck(char ** perone, int c1, int * types, int c2, List * expression, bool equal);
 	//lexeme* Exe3Pression(List* expression);
 } LWorker = *new LexemeWorker();

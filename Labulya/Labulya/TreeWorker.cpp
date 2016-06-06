@@ -1,6 +1,22 @@
 #include "stdafx.h"
 #include "TreeWorker.h"
 
+int TreeWorker::GetLexemePositionWithMinimalPriority(List * lexes, int start, int finish)
+{
+	int min_prior = ((lexeme*)lexes->get(start))->Priority();
+	int pos_min = start;
+	for (int i = start; i < finish; i++)
+	{
+		lexeme* temp_lexeme = (lexeme*)lexes->get(i);
+		if (temp_lexeme->Priority() < min_prior)
+		{
+			min_prior = temp_lexeme->Priority();
+			pos_min = i;
+		}
+	}
+	return pos_min;
+}
+
 bool TreeWorker::DoTree(List* lexes)
 {
 	int start = 0;
@@ -23,17 +39,7 @@ TNode* TreeWorker::GetTNode(List* lexes, int start, int finish)
 {
 	if (start != finish)
 	{
-		int min_prior = ((lexeme*)lexes->get(start))->Priority();
-		int pos_min = start;
-		for (int i = start; i < finish; i++)
-		{
-			lexeme* temp_lexeme = (lexeme*)lexes->get(i);
-			if (temp_lexeme->Priority() < min_prior)
-			{
-				min_prior = temp_lexeme->Priority();
-				pos_min = i;
-			}
-		}
+		int pos_min = GetLexemePositionWithMinimalPriority(lexes, start, finish);
 		if (((lexeme*)lexes->get(pos_min))->Type() == BYNARYOPERATION)
 			return (TNode*)new TBinaryOperation(GetTNode(lexes, start, pos_min - 1), GetTNode(lexes, pos_min + 1, finish), (lexeme*)lexes->get(pos_min));
 		if (((lexeme*)lexes->get(pos_min))->Type() == UNARYOPERATION)

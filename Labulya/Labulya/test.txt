@@ -5,11 +5,11 @@ max (i, 2);
 bool f = true ;
 if (f)
 	output ("oi!");
-int h = 0;
+int h = 666;
 do 
 {
 	h++;
 }
 while (f)
-int s1 = 2;
+int s1 = h;
 }

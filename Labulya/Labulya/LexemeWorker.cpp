@@ -1,7 +1,5 @@
 #include "stdafx.h"
 #include "LexemeWorker.h"
-#include "ErrorReporter.h"
-#include "TreeWorker.h"
 
 bool LexemeWorker::Processing(List* lexes)
 {
@@ -153,13 +151,25 @@ bool LexemeWorker::Processing(List* lexes)
 		}
 	}
 
+	TList* storage = new TList();
+
 	for (int i = 0; i < lexes->count(); i++)
 	{
 		lexeme* temp_lexeme = (lexeme*)lexes->get(i);
+		if (strcmp(temp_lexeme->Data(), "{") == 0 || strcmp(temp_lexeme->Data(), "{") == 0)
+		{
+			lexes->remove(i);
+			i--;
+			break;
+		}
 		if (temp_lexeme->Type() == SPECIALWORD)
 		{
-			i = CorrectSpecial(temp_lexeme, i, lexes);
+			i = CorrectSpecial(temp_lexeme, i, lexes, storage);
 			if (_error) return false;
+		}
+		else
+		{
+			i = CorrectExpression(lexes, i, storage);
 		}
 	}
 
@@ -167,10 +177,10 @@ bool LexemeWorker::Processing(List* lexes)
 	printf_s("\n|---------------|\nVariable Table:\n");
 	LexemeTable.print_lexems();
 	printf_s("\n|---------------|\n");
+	storage->print();
 	//
-	treeWorker.DoTree(lexes);
-
 	dob->~Lexeme_list();
+	storage->~TList();
 	return true;
 }
 
@@ -183,23 +193,141 @@ LexemeWorker::~LexemeWorker()
 {
 }
 
-static int GetLexemePositionWithMinimalPriority(List * expression)
+int LexemeWorker::CorrectExpression(List* expression, int pos, TList* storage)
 {
-	int min = 101;
-	int pos = -1;
-	for (int s = 0; s < expression->count(); s++)
+	int start = 0;
+	int i;
+	List* tlist = new List(sizeof(sizeof(lexeme)));
+
+	for (i = 0; i < expression->count(); i++)
 	{
-		lexeme* temp = (lexeme*)expression->get(s);
-		if (temp->Priority() < min)
+		lexeme* temp_lexeme = (lexeme*)expression->get(i);
+		tlist->add(temp_lexeme);
+		if (strcmp(temp_lexeme->Data(), "?") == 0)
 		{
-			pos = s;
-			min = temp->Priority();
+			i = CorrectShortIfOperation(expression, i, storage);
+		}
+		if (strcmp(temp_lexeme->Data(), ";") == 0)
+		{
+			start = i + 1;
+			break;
 		}
 	}
+	if (IsNumberExpression(tlist, true) || IsBoolExpression(tlist, true) || IsStringExpression(tlist, true) || IsNumberExpressionWithBoolOperations(tlist) || IsStringExpressionWithBoolOperations(tlist))
+	{
+		storage->addNode(treeWorker.GetTNode(tlist, 0, tlist->count() - 2));
+		tlist->~List();
+		return i;
+	}
+	
+	tlist->~List();
 	return pos;
 }
 
-int LexemeWorker::CorrectSpecial(lexeme* spec, int pos, List* expression)
+int LexemeWorker::CorrectShortIfOperation(List * expression, int i, TList* storage)
+{	
+	List* shrtiflist = new List(sizeof(sizeof(lexeme)));
+	TNode* param1;
+	TNode* param2;
+	TNode* param3;
+	int hookcount;
+	bool flag = false;
+	int j;
+	for (j = i - 1; j >= 0; j--)
+	{
+		if (strcmp(((lexeme*)expression->get(i))->Data(), ")") == 0)
+			hookcount++;
+		if (strcmp(((lexeme*)expression->get(i))->Data(), "(") == 0)
+			hookcount--;
+		if (hookcount < 0)
+			break;
+	}
+	if (j < 0)
+	{
+		for (int k = 0; k < i; k++)
+			shrtiflist->add((lexeme*)expression->get(i));
+		if (IsBoolExpression(shrtiflist, false) || IsNumberExpressionWithBoolOperations(shrtiflist) || IsStringExpressionWithBoolOperations(shrtiflist))
+		{
+			param1 = treeWorker.GetTNode(shrtiflist, 0, i - 1);
+		}
+		else
+		{
+			lexeme* t = (lexeme*) expression->get(i);
+			ErrorReporter().FReport(logfile, "Невозможно определить условие \"?\"!", t->Line(), t->Start_Position());
+			return i;
+		}
+	}
+	else
+	{
+		flag = true;
+		for (int k = j + 1; k < i; k++)
+			shrtiflist->add((lexeme*)expression->get(i));
+		if (IsBoolExpression(shrtiflist, false) || IsNumberExpressionWithBoolOperations(shrtiflist) || IsStringExpressionWithBoolOperations(shrtiflist))
+		{
+			param1 = treeWorker.GetTNode(shrtiflist, 0, i - 1);
+		}
+		else
+		{
+			lexeme* t = (lexeme*)expression->get(i);
+			ErrorReporter().FReport(logfile, "Невозможно определить условие \"?\"!", t->Line(), t->Start_Position());
+			return i;
+		}
+	}
+
+	List* body1 = new List(sizeof(sizeof(lexeme)));
+	int h = i + 1;
+	for (h; h < expression->count(); h++)
+	{
+		lexeme* tl = (lexeme*)expression->get(h);
+		if (strcmp(tl->Data(), ":") == 0)
+			break;
+		body1->add(tl);
+	}
+	if (h = expression->count())
+	{
+		lexeme* t = (lexeme*)expression->get(i);
+		ErrorReporter().FReport(logfile, "Ожидается \":\" для \"?\"!", t->Line(), t->Start_Position());
+		return i;
+	}
+	if (IsBoolExpression(body1, true) || IsNumberExpressionWithBoolOperations(body1) || IsStringExpressionWithBoolOperations(body1) || IsNumberExpression(body1, true) || IsStringExpression(body1, true))
+	{
+		param2 = treeWorker.GetTNode(body1, 0, body1->count() - 1);
+	}
+	else
+	{
+		return i;
+	}
+
+	//
+	List* body2 = new List(sizeof(sizeof(lexeme)));
+	int y = h + 1;
+	for (y; y < expression->count(); y++)
+	{
+		lexeme* tl = (lexeme*)expression->get(y);
+		if (flag && strcmp(tl->Data(), ")") == 0)
+			break;
+		if (strcmp(tl->Data(), ";") == 0)
+			break;
+		body1->add(tl);
+	}
+	if (y = expression->count())
+	{
+		lexeme* t = (lexeme*)expression->get(i);
+		ErrorReporter().FReport(logfile, "Невозможность определить конец \"?\"!", t->Line(), t->Start_Position());
+		return i;
+	}
+	if (IsBoolExpression(body1, true) || IsNumberExpressionWithBoolOperations(body1) || IsStringExpressionWithBoolOperations(body1) || IsNumberExpression(body1, true) || IsStringExpression(body1, true))
+	{
+		param3 = treeWorker.GetTNode(body2, 0, body1->count() - 1);
+		storage->addNode((TNode*)new TTernaryOperator(param1, param2, param3));
+	}
+	else
+	{
+		return i;
+	}
+}
+
+int LexemeWorker::CorrectSpecial(lexeme* spec, int pos, List* expression, TList* storage)
 {
 	if (pos == expression->count())
 	{
@@ -209,19 +337,19 @@ int LexemeWorker::CorrectSpecial(lexeme* spec, int pos, List* expression)
 	}
 	if (strcmp(spec->Data(), "for ") == 0)
 	{
-		return CorrectFor(expression, pos, spec);
+		return CorrectFor(expression, pos, spec, storage);
 	}
 	if (strcmp(spec->Data(), "if ") == 0)
 	{
-		return CorrectIf(expression, pos, spec);
+		return CorrectIf(expression, pos, spec, storage);
 	}
 	if (strcmp(spec->Data(), "while ") == 0)
 	{
-		return CorrectWhile(expression, pos, spec);
+		return CorrectWhile(expression, pos, spec, storage);
 	}
 	if (strcmp(spec->Data(), "do ") == 0)
 	{
-		return CorrectDo(expression, pos, spec);
+		return CorrectDo(expression, pos, spec, storage);
 	}
 	if (strcmp(spec->Data(), "input ") == 0)
 	{
@@ -498,7 +626,7 @@ int LexemeWorker::FuncWithNumberParam(List * expression, int pos, lexeme * spec,
 	return i + 1;
 }
 
-bool LexemeWorker::InnerExpression(List * expression)
+bool LexemeWorker::InnerExpression(List * expression, TList* storage)
 {
 	lexeme* tlex;
 	bool startstring = false;
@@ -508,7 +636,7 @@ bool LexemeWorker::InnerExpression(List * expression)
 		tlex = (lexeme*)expression->get(i);
 		if (!startstring && tlex->Type() == SPECIALWORD)
 		{
-			i = CorrectSpecial(tlex, i, expression);
+			i = CorrectSpecial(tlex, i, expression, storage);
 			startstring = true;
 		}
 		else
@@ -517,11 +645,12 @@ bool LexemeWorker::InnerExpression(List * expression)
 				tlist->add(tlex);
 			else
 			{
-				if (!(IsNumberExpression(tlist, true) || IsBoolExpression(tlist, true) || IsStringExpression(tlist, true)))
+				if (!(IsNumberExpression(tlist, true) || IsBoolExpression(tlist, true) || IsStringExpression(tlist, true) || IsNumberExpressionWithBoolOperations(tlist) || IsStringExpressionWithBoolOperations(tlist)))
 				{
 					tlist->~List();
 					return false;
 				}
+				storage->addNode(treeWorker.GetTNode(tlist, 0, i - 1));
 				tlist->~List();
 				tlist = new List(sizeof(lexeme));
 				startstring = false;
@@ -619,7 +748,7 @@ bool LexemeWorker::WhateverCheck(char ** perone, int c1, int * types, int c2, Li
 bool LexemeWorker::IsNumberExpression(List * expression, bool equal)
 {
 	//char* perone[] = { "++", "--", "+", "-", "(", "/", "*", ")", "%", "==", ">=", "<=", "!=", ">", "<" };
-	char* perone[] = { "++", "--", "<<", ">>", "+", "-", "/", "*", "%", "==", ">=", "<=", "!=", ">", "<" };
+	char* perone[] = { "++", "--", "<<", ">>", "+", "-", "/", "*", "%"};
 	int types[] = { INT, FLOAT, DOUBLE };
 	return WhateverCheck(perone, (sizeof(perone) / sizeof(int)), types, (sizeof(types) / sizeof(char)), expression, equal);
 }
@@ -648,20 +777,20 @@ bool LexemeWorker::IsBoolExpression(List * expression, bool equal)
 
 bool LexemeWorker::IsStringExpression(List * expression, bool equal)
 {
-	char* perone[] = { "==", "+", "!="};
+	char* perone[] = { "+" };
 	int types[] = { STRING, CHAR };
 	return WhateverCheck(perone, (sizeof(perone) / sizeof(int)), types, (sizeof(types) / sizeof(char)), expression, equal);
 }
 
-int LexemeWorker::CorrectWhile(List * expression, int pos, lexeme * spec)
+int LexemeWorker::CorrectWhile(List * expression, int pos, lexeme * spec, TList* storage)
 {
-	//comment
 	int pos2 = FuncWithBoolParam(expression, pos, spec, false);
 	if (pos2 == 0)
 	{
 		_error = true;
 		return 0;
 	}
+	TNode* h = treeWorker.GetTNode(expression, pos + 2, pos2 - 2);
 	pos2++;
 	
 	List* tlist = new List(sizeof(lexeme));
@@ -696,8 +825,10 @@ int LexemeWorker::CorrectWhile(List * expression, int pos, lexeme * spec)
 				}
 			}
 		}
-		if (InnerExpression(tlist))
+		TList* body = new TList();
+		if (InnerExpression(tlist, body))
 		{
+			storage->addNode((TNode*)(new TWhile(h, body)));
 			tlist->~List();
 			return pos2;
 		}
@@ -720,7 +851,7 @@ int LexemeWorker::CorrectWhile(List * expression, int pos, lexeme * spec)
 	return 0;
 }
 
-int LexemeWorker::CorrectDo(List * expression, int pos, lexeme * spec)
+int LexemeWorker::CorrectDo(List * expression, int pos, lexeme * spec, TList* storage)
 {
 	List* tlist = new List(sizeof(lexeme));
 	if (pos < expression->count())
@@ -755,7 +886,8 @@ int LexemeWorker::CorrectDo(List * expression, int pos, lexeme * spec)
 				}
 			}
 		}
-		if (InnerExpression(tlist))
+		TList* body = new TList();
+		if (InnerExpression(tlist, body))
 		{
 			tlist->~List();
 			{
@@ -770,12 +902,14 @@ int LexemeWorker::CorrectDo(List * expression, int pos, lexeme * spec)
 						tlist->~List();
 						return 0;
 					}
-					int pos2 = FuncWithBoolParam(expression, pos, spec, false);
+					int pos2 = FuncWithBoolParam(expression, pos, spec, true);
 					if (pos2 == 0)
 					{
 						_error = true;
 						return 0;
 					}
+					TNode* h = treeWorker.GetTNode(expression, pos + 2, pos2 - 3);
+					storage->addNode((TNode*)new TDoWhile(body, h));
 					return pos2;
 				}
 				else
@@ -803,7 +937,7 @@ int LexemeWorker::CorrectDo(List * expression, int pos, lexeme * spec)
 	return 0;
 }
 
-int LexemeWorker::CorrectFor(List * expression, int pos, lexeme * spec)
+int LexemeWorker::CorrectFor(List * expression, int pos, lexeme * spec, TList* storage)
 {
 	pos++;
 	if (pos >= expression->count())
@@ -942,8 +1076,13 @@ int LexemeWorker::CorrectFor(List * expression, int pos, lexeme * spec)
 					break;
 			}
 		}
-		if (InnerExpression(body))
+		TList* sbody = new TList();
+		if (InnerExpression(body, sbody))
 		{
+			TVariable* tparam1 = new TVariable((lexeme*)param1->get(0));
+			TNode* tparam2 = treeWorker.GetTNode(param2, 0,  param2->count() - 1);
+			TNode* tparam3 = treeWorker.GetTNode(param3, 0, param3->count() - 1);
+			storage->addNode((TNode*)new TFor(tparam1, tparam2, tparam3, sbody));
 			body->~List();
 			param3->~List();
 			param2->~List();
@@ -978,28 +1117,140 @@ int LexemeWorker::CorrectFor(List * expression, int pos, lexeme * spec)
 	return 0;
 }
 
-int LexemeWorker::CorrectIf(List * expression, int pos, lexeme * spec)
+int LexemeWorker::CorrectIf(List * expression, int pos, lexeme * spec, TList* storage)
 {
-	pos = CorrectWhile(expression, pos, spec);
-	pos++;
-	if (pos >= expression->count())
+	int pos3 = FuncWithBoolParam(expression, pos, spec, false);
+	if (pos3 == 0)
 	{
-		errorReporter.FReport(logfile, "Ожедается условие \"if \"!", spec->Line(), spec->Start_Position());
 		_error = true;
 		return 0;
 	}
+	TNode* h = treeWorker.GetTNode(expression, pos + 2, pos3 - 2);
+	TList* body;
+	pos3++;
+
+	List* tlist1 = new List(sizeof(lexeme));
+	if (pos3 < expression->count())
+	{
+		lexeme* tlex = (lexeme*)expression->get(pos3);
+		if (strcmp(tlex->Data(), "{") != 0)
+		{
+			for (pos3; pos3 < expression->count(); pos3++)
+			{
+				tlex = (lexeme*)expression->get(pos3);
+				if (strcmp(tlex->Data(), ";") != 0)
+					tlist1->add(tlex);
+				else
+				{
+					tlist1->add(tlex);
+					break;
+				}
+			}
+		}
+		else
+		{
+			pos3++;
+			for (pos3; pos3 < expression->count(); pos3++)
+			{
+				tlex = (lexeme*)expression->get(pos3);
+				if (strcmp(tlex->Data(), "}") != 0)
+					tlist1->add(tlex);
+				else
+				{
+					break;
+				}
+			}
+		}
+		body = new TList();
+		if (InnerExpression(tlist1, body))
+		{
+			pos = pos3;
+			tlist1->~List();
+			//return pos3;
+		}
+		else
+		{
+			_error = true;
+			tlist1->~List();
+			return 0;
+		}
+	}
+	else
+	{
+		errorReporter.FReport(logfile, "Незаконченное выражение!", spec->Line(), spec->Start_Position());
+		_error = true;
+		tlist1->~List();
+		return 0;
+	}
+	
+	if (pos >= expression->count())
+	{
+		storage->addNode((TNode*)new TIf(h, body, nullptr));
+		return pos;
+	}
+	pos++;
 	lexeme* tlex = (lexeme*)expression->get(pos);
 	if (strcmp(tlex->Data(), "else ") != 0)
 	{
-		//errorReporter.FReport(logfile, "Ожидается \"else \"!", tlex->Line(), tlex->Start_Position());
-		//_error = true;
+		storage->addNode((TNode*)new TIf(h, body, nullptr));
 		return pos - 1;
 	}
-	pos = CorrectWhile(expression, pos, spec);
-	if (pos >= expression->count())
+	pos++;
+	pos3 = pos;
+	List* tlist2 = new List(sizeof(lexeme));
+	if (pos3 < expression->count())
 	{
+		lexeme* tlex = (lexeme*)expression->get(pos3);
+		if (strcmp(tlex->Data(), "{") != 0)
+		{
+			for (pos3; pos3 < expression->count(); pos3++)
+			{
+				tlex = (lexeme*)expression->get(pos3);
+				if (strcmp(tlex->Data(), ";") != 0)
+					tlist2->add(tlex);
+				else
+				{
+					tlist2->add(tlex);
+					break;
+				}
+			}
+		}
+		else
+		{
+			pos3++;
+			for (pos3; pos3 < expression->count(); pos3++)
+			{
+				tlex = (lexeme*)expression->get(pos3);
+				if (strcmp(tlex->Data(), "}") != 0)
+					tlist2->add(tlex);
+				else
+				{
+					break;
+				}
+			}
+		}
+		TList* body2 = new TList();
+		if (InnerExpression(tlist1, body2))
+		{
+			storage->addNode((TNode*)new TIf(h, body, body2));
+			pos = pos3;
+			tlist2->~List();
+			//return pos3;
+		}
+		else
+		{
+			_error = true;
+			tlist2->~List();
+			return 0;
+		}
+	}
+	else
+	{
+		errorReporter.FReport(logfile, "Незаконченное выражение!", spec->Line(), spec->Start_Position());
 		_error = true;
+		tlist2->~List();
 		return 0;
 	}
+
 	return pos;
 }
