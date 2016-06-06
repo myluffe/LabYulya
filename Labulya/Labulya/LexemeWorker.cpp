@@ -693,10 +693,6 @@ bool LexemeWorker::InnerExpression(List * expression, TList* storage)
 					tlist->~List();
 					return false;
 				}
-				//
-				for (int huh = 0; huh < tlist->count(); huh++)
-					printf("%s", ((lexeme*)tlist->get(huh))->Data());
-				//
 				storage->addNode(treeWorker.GetTNode(tlist, 0, tlist->count() - 1));
 				//tlist->~List();
 				tlist = new List(sizeof(lexeme));
@@ -839,6 +835,10 @@ int LexemeWorker::CorrectWhile(List * expression, int pos, lexeme * spec, TList*
 		_error = true;
 		return pos;
 	}
+	//
+	for (int jj = 0; jj < hl->count(); jj++)
+		printf("%s", ((lexeme*)hl->get(jj))->Data());
+	//
 	TNode* h = treeWorker.GetTNode(hl, 0, hl->count());
 	pos2++;
 	
@@ -877,6 +877,8 @@ int LexemeWorker::CorrectWhile(List * expression, int pos, lexeme * spec, TList*
 		TList* body = new TList();
 		if (InnerExpression(tlist, body))
 		{
+			h->print();
+			body->print();
 			storage->addNode((TNode*)(new TWhile(h, body)));
 			//tlist->~List();
 			return pos2;
