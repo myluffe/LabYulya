@@ -634,6 +634,10 @@ bool LexemeWorker::InnerExpression(List * expression, TList* storage)
 	for (int i = 0; i < expression->count(); i++)
 	{
 		tlex = (lexeme*)expression->get(i);
+		if (strcmp(tlex->Data(), "?") == 0)
+		{
+			i = CorrectShortIfOperation(expression, i, storage);
+		}
 		if (!startstring && tlex->Type() == SPECIALWORD)
 		{
 			i = CorrectSpecial(tlex, i, expression, storage);
