@@ -5,7 +5,7 @@ int TreeWorker::GetLexemePositionWithMinimalPriority(List * lexes, int start, in
 {
 	int min_prior = ((lexeme*)lexes->get(start))->Priority();
 	int pos_min = start;
-	for (int i = start; i < finish; i++)
+	for (int i = start; i <= finish; i++)
 	{
 		lexeme* temp_lexeme = (lexeme*)lexes->get(i);
 		if (temp_lexeme->Priority() < min_prior)
