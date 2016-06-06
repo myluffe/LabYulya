@@ -36,7 +36,7 @@ class TVariable : TNode
 	public:
 		TVariable(lexeme* mvariable)
 		{
-			m_variable = m_variable;
+			m_variable = mvariable;
 		}			
 		lexeme* exec()
 		{
@@ -274,7 +274,7 @@ class TList : TNode
 		void print() 
 		{  
 			list* cur = start;
-			while (cur)
+			while (cur != nullptr)
 			{
 				cur->sentence->print();
 				cur=cur->next;

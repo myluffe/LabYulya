@@ -20,7 +20,7 @@ int main(char* name)
 		char* temp = test_reader->ReadNextLine();
 		printf("String Number %d: \"%s\"\n", test_reader->CurrentLine(), temp);	
 	}
-	printf("\n-------------\n");
+	//printf_s("\n|---------------|\n");
 	test_reader->~mFileReader();
 	//конец вывода
 

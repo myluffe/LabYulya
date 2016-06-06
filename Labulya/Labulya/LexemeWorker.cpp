@@ -155,7 +155,7 @@ bool LexemeWorker::Processing(List* lexes)
 	for (int i = 0; i < lexes->count(); i++)
 	{
 		lexeme* temp_lexeme = (lexeme*)lexes->get(i);
-		if (strcmp(temp_lexeme->Data(), "{") == 0 || strcmp(temp_lexeme->Data(), "{") == 0)
+		if (strcmp(temp_lexeme->Data(), "{") == 0 || strcmp(temp_lexeme->Data(), "}") == 0)
 		{
 			lexes->remove(i);
 			i--;
@@ -834,7 +834,7 @@ int LexemeWorker::CorrectWhile(List * expression, int pos, lexeme * spec, TList*
 		return pos;
 	}
 	TNode* h = treeWorker.GetTNode(hl, 0, hl->count() - 1);
-	h->print();
+	//h->print();
 	pos2++;
 	
 	List* tlist = new List(sizeof(lexeme));
@@ -872,8 +872,6 @@ int LexemeWorker::CorrectWhile(List * expression, int pos, lexeme * spec, TList*
 		TList* body = new TList();
 		if (InnerExpression(tlist, body))
 		{
-			h->print();
-			body->print();
 			storage->addNode((TNode*)(new TWhile(h, body)));
 			//tlist->~List();
 			return pos2;

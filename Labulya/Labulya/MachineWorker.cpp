@@ -90,12 +90,13 @@ MachineWorker::MachineWorker()
 	ssm->SetPerStartWords(ssm_perstart);
 	Addmachine(ssm);
 	
+	/*
 	for (int klick = 0; klick < _count; klick++)
 	{
 		_machines[klick]->PrintMachine();
 		printf("\n-------------\n");
 	}
-	
+	*/
 	_currentaut = _machines[0];
 	_curmachine = 0;
 }
@@ -281,42 +282,79 @@ int MachineWorker::Count()
 void MachineWorker::GetOperationPriority(mStateMachine * machine)
 {
 	if (strcmp("(", machine->Buffer()) == 0 || strcmp(")", machine->Buffer()) == 0)
+	{
 		machine->Priority = 0;
+		return;
+	}
 	if (strcmp("--", machine->Buffer()) == 0 || strcmp("++", machine->Buffer()) == 0)
+	{
 		machine->Priority = 2;
+		return;
+	}
 	if (strcmp("!", machine->Buffer()) == 0)
+	{
 		machine->Priority = 3;
+		return;
+	}
 	if (strcmp("/", machine->Buffer()) == 0 || strcmp("%", machine->Buffer()) == 0)
+	{
 		machine->Priority = 5;
+		return;
+	}
 	if (strcmp("<<", machine->Buffer()) == 0 || strcmp(">>", machine->Buffer()) == 0)
+	{
 		machine->Priority = 7;
+		return;
+	}	
 	if (strcmp("<", machine->Buffer()) == 0 || strcmp(">", machine->Buffer()) == 0 ||
 		strcmp("<=", machine->Buffer()) == 0 || strcmp(">=", machine->Buffer()) == 0)
+	{
 		machine->Priority = 8;
+		return;
+	}
 	if (strcmp("==", machine->Buffer()) == 0 || strcmp("!=", machine->Buffer()) == 0)
+	{
 		machine->Priority = 9;
+		return;
+	}
 	if (strcmp("|", machine->Buffer()) == 0)
+	{
 		machine->Priority = 12;
+		return;
+	}
 	if (strcmp("&&", machine->Buffer()) == 0)
+	{
 		machine->Priority = 13;
+		return;
+	}
 	if (strcmp("||", machine->Buffer()) == 0)
+	{
 		machine->Priority = 14;
+		return;
+	}
 	if (strcmp(":", machine->Buffer()) == 0 || strcmp("?", machine->Buffer()))
 	{
 		machine->Priority = 15;
 		machine->ChangeType(TERNARYOPERATION);
+		return;
 	}
 	if (strcmp("=", machine->Buffer()) == 0)
+	{
 		machine->Priority = 16;
+		return;
+	}
 	if (strcmp(",", machine->Buffer()) == 0)
+	{
 		machine->Priority = 17;
-
+		return;
+	}
 	if (strcmp("+", machine->Buffer()) == 0 || strcmp("-", machine->Buffer()) == 0)
 	{
 		if (machine->CurrentLexType() == BYNARYOPERATION)
 			machine->Priority = 6;
 		if (machine->CurrentLexType() == UNARYOPERATION)
 			machine->Priority = 3;
+		return;
 	}
 
 	if (strcmp("*", machine->Buffer()) == 0)
@@ -325,6 +363,7 @@ void MachineWorker::GetOperationPriority(mStateMachine * machine)
 			machine->Priority = 10;
 		if (machine->CurrentLexType() == UNARYOPERATION)
 			machine->Priority = 3;
+		return;
 	}
 
 	if (strcmp("&", machine->Buffer()) == 0)
@@ -333,11 +372,13 @@ void MachineWorker::GetOperationPriority(mStateMachine * machine)
 			machine->Priority = 5;
 		if (machine->CurrentLexType() == UNARYOPERATION)
 			machine->Priority = 3;
+		return;
 	}
-
-
 	if (strcmp(machine->CurrentLexName(), "Operation") == 0)
+	{
 		machine->Priority = 50;
+		return;
+	}
 	machine->Priority = 100;
 }
 
