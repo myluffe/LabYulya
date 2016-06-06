@@ -35,10 +35,10 @@ protected:
 	bool _error = false;
 
 private:
-	int FuncWithNumberParam(List* expression, int pos, lexeme* spec, bool finaldevider);
-	int FuncWithTwoNumberParams(List* expression, int pos, lexeme* spec, bool finaldevider);
-	int FuncWithStringParam(List* expression, int pos, lexeme* spec, bool finaldevider);
-	int FuncWithBoolParam(List* expression, int pos, lexeme* spec, bool finaldevider);
+	int FuncWithNumberParam(List* expression, int pos, lexeme* spec, bool finaldevider, List* param);
+	int FuncWithTwoNumberParams(List* expression, int pos, lexeme* spec, bool finaldevider, List* param1, List* param2);
+	int FuncWithStringParam(List* expression, int pos, lexeme* spec, bool finaldevider, List* param);
+	int FuncWithBoolParam(List* expression, int pos, lexeme* spec, bool finaldevider, List* param);
 
 	bool InnerExpression(List* expression, TList* storage);
 	bool WhateverCheck(char ** perone, int c1, int * types, int c2, List * expression, bool equal);
