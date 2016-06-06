@@ -72,10 +72,10 @@ bool LexemeWorker::Processing(List* lexes)
 						LexemeTable.auto_create(newlex);
 						//удаление ненужных и мухлеж с щетчиком :
 						int ti = i - 2;
-						lexes->remove(i + 3); //удалять ли точку с запятой после переменной?
+						lexes->remove(i + 3);
 						lexes->remove(i + 2);
 						lexes->remove(i + 1);
-						lexes->remove(i); //удалять все?
+						lexes->remove(i);
 						lexes->remove(i - 1);
 						i = ti;
 					}
@@ -123,7 +123,6 @@ bool LexemeWorker::Processing(List* lexes)
 				}
 				else
 				{
-					//
 					errorReporter.FReport(logfile, "No type of undefined variable!", temp_lexeme->Line(), temp_lexeme->Start_Position());
 					return false;
 				}
@@ -298,7 +297,6 @@ int LexemeWorker::CorrectShortIfOperation(List * expression, int i, TList* stora
 		return i;
 	}
 
-	//
 	List* body2 = new List(sizeof(sizeof(lexeme)));
 	int y = h + 1;
 	for (y; y < expression->count(); y++)
@@ -835,10 +833,6 @@ int LexemeWorker::CorrectWhile(List * expression, int pos, lexeme * spec, TList*
 		_error = true;
 		return pos;
 	}
-	//
-	for (int jj = 0; jj < hl->count(); jj++)
-		printf("%s", ((lexeme*)hl->get(jj))->Data());
-	//
 	TNode* h = treeWorker.GetTNode(hl, 0, hl->count() - 1);
 	h->print();
 	pos2++;

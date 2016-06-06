@@ -55,9 +55,9 @@ TNode* TreeWorker::GetTNode(List* lexes, int start, int finish)
 	{
 		lexeme* temp = (lexeme*)lexes->get(start);
 		if (strcmp(temp->Name(), "Number") == 0)
-			return (TNode*)new TConst((lexeme*)lexes->get(start));
+			return (TNode*)new TConst(temp);
 		if (temp->Type() == INT || temp->Type() == DOUBLE || temp->Type() == FLOAT || temp->Type() == BOOL || temp->Type() == STRING || temp->Type() == CHAR)
-			return (TNode*)new TVariable((lexeme*)lexes->get(start));
+			return (TNode*)new TVariable(temp);
 		return NULL;
 	}
 }
