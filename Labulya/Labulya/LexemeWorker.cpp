@@ -839,7 +839,8 @@ int LexemeWorker::CorrectWhile(List * expression, int pos, lexeme * spec, TList*
 	for (int jj = 0; jj < hl->count(); jj++)
 		printf("%s", ((lexeme*)hl->get(jj))->Data());
 	//
-	TNode* h = treeWorker.GetTNode(hl, 0, hl->count());
+	TNode* h = treeWorker.GetTNode(hl, 0, hl->count() - 1);
+	h->print();
 	pos2++;
 	
 	List* tlist = new List(sizeof(lexeme));
@@ -961,7 +962,7 @@ int LexemeWorker::CorrectDo(List * expression, int origpos, lexeme * spec, TList
 						return origpos;
 					}
 					//int ghj = 0;
-					TNode* h = treeWorker.GetTNode(hl, 0, hl->count());
+					TNode* h = treeWorker.GetTNode(hl, 0, hl->count() - 1);
 					storage->addNode((TNode*)new TDoWhile(body, h));
 					return pos2;
 				}
@@ -1135,8 +1136,8 @@ int LexemeWorker::CorrectFor(List * expression, int origpos, lexeme * spec, TLis
 		if (InnerExpression(body, sbody))
 		{
 			TVariable* tparam1 = new TVariable((lexeme*)param1->get(0));
-			TNode* tparam2 = treeWorker.GetTNode(param2, 0,  param2->count());
-			TNode* tparam3 = treeWorker.GetTNode(param3, 0, param3->count());
+			TNode* tparam2 = treeWorker.GetTNode(param2, 0,  param2->count() - 1);
+			TNode* tparam3 = treeWorker.GetTNode(param3, 0, param3->count() - 1);
 			storage->addNode((TNode*)new TFor(tparam1, tparam2, tparam3, sbody));
 			//body->~List();
 			//param3->~List();
@@ -1182,7 +1183,7 @@ int LexemeWorker::CorrectIf(List * expression, int origpos, lexeme * spec, TList
 		_error = true;
 		return origpos;
 	}
-	TNode* h = treeWorker.GetTNode(hl, 0, hl->count());
+	TNode* h = treeWorker.GetTNode(hl, 0, hl->count() - 1);
 	TList* body;
 	pos3++;
 
