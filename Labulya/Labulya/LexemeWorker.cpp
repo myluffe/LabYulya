@@ -160,7 +160,7 @@ bool LexemeWorker::Processing(List* lexes)
 		{
 			lexes->remove(i);
 			i--;
-			break;
+			continue;
 		}
 		if (temp_lexeme->Type() == SPECIALWORD)
 		{

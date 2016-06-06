@@ -1,15 +1,12 @@
 {
 float i = 36.e1;
-max (i, 2);
 //dfdfdf
 bool f = true ;
-if (f)
-	output ("oi!");
-int h = 666;
-do 
+int h = 5;
+while (h > 0)
 {
-	h++;
+	h--;
+	output ("fi");
 }
-while (f)
 int s1 = h;
 }
