@@ -872,7 +872,6 @@ int LexemeWorker::CorrectWhile(List * expression, int pos, lexeme * spec, TList*
 		TList* body = new TList();
 		if (InnerExpression(tlist, body))
 		{
-			body->print();
 			storage->addNode((TNode*)(new TWhile(h, body)));
 			//tlist->~List();
 			return pos2;

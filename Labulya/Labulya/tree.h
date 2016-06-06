@@ -44,7 +44,7 @@ class TVariable : TNode
 		}
 		void print()
 		{
-			printf("%s", m_variable->Name());
+			printf("%s", m_variable->Data());
 		}
 	protected:
 		lexeme* m_variable;
