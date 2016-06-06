@@ -153,6 +153,16 @@ bool LexemeWorker::Processing(List* lexes)
 
 	TList* storage = new TList();
 
+	//
+	int lcount = lexes->count();
+	for (int j = 0; j < lcount; j++)
+	{
+		lexeme tl = *(lexeme*)lexes->get(j);
+		printf("%d. ", j);
+		tl.Print();
+	}
+	//
+
 	for (int i = 0; i < lexes->count(); i++)
 	{
 		lexeme* temp_lexeme = (lexeme*)lexes->get(i);
@@ -435,7 +445,8 @@ int LexemeWorker::CorrectSpecial(lexeme* spec, int pos, List* expression, TList*
 			return res;
 		}
 	}
-	return 0;
+	ErrorReporter().FReport(logfile, "Неизвестное или неправильно использованное спец.слово!", spec->Line(), spec->Start_Position());
+	return pos;
 }
 
 int LexemeWorker::FuncWithTwoNumberParams(List * expression, int pos, lexeme * spec, bool finaldevider, List* param1, List* param2)
@@ -825,8 +836,9 @@ int LexemeWorker::CorrectWhile(List * expression, int pos, lexeme * spec, TList*
 	int pos2 = FuncWithBoolParam(expression, pos, spec, false, hl);
 	if (pos2 <= pos)
 	{
+		ErrorReporter().FReport(logfile, "Незаконченное выражение!", spec->Line(), spec->Start_Position() + strlen(spec->Data()));
 		_error = true;
-		return 0;
+		return pos;
 	}
 	TNode* h = treeWorker.GetTNode(hl, 0, hl->count());
 	pos2++;
@@ -874,7 +886,7 @@ int LexemeWorker::CorrectWhile(List * expression, int pos, lexeme * spec, TList*
 		{
 			_error = true;
 			tlist->~List();
-			return 0;
+			return pos;
 		}
 	}
 	else
@@ -882,16 +894,17 @@ int LexemeWorker::CorrectWhile(List * expression, int pos, lexeme * spec, TList*
 		errorReporter.FReport(logfile, "Незаконченное выражение!", spec->Line(), spec->Start_Position());
 		_error = true;
 		tlist->~List();
-		return 0;
+		return pos;
 	}
 
 	tlist->~List();
-	return 0;
+	return pos;
 }
 
-int LexemeWorker::CorrectDo(List * expression, int pos, lexeme * spec, TList* storage)
+int LexemeWorker::CorrectDo(List * expression, int origpos, lexeme * spec, TList* storage)
 {
 	List* tlist = new List(sizeof(lexeme));
+	int pos = origpos;
 	if (pos < expression->count())
 	{
 		pos++;
@@ -938,25 +951,26 @@ int LexemeWorker::CorrectDo(List * expression, int pos, lexeme * spec, TList* st
 						errorReporter.FReport(logfile, "Ожидается \"while \" после тела цикла \"do \"!", tlex->Line(), tlex->Start_Position());
 						_error = true;
 						tlist->~List();
-						return 0;
+						return origpos;
 					}
 					List* hl = new List(sizeof(lexeme));
 					int pos2 = FuncWithBoolParam(expression, pos, spec, true, hl);
-					if (hl == nullptr)
+					if (pos2 <= pos)
 					{
 						_error = true;
-						return 0;
+						return origpos;
 					}
 					int ghj = 0;
 					TNode* h = treeWorker.GetTNode(hl, 0, hl->count());
 					storage->addNode((TNode*)new TDoWhile(body, h));
-					return pos2;
+					return origpos;
 				}
 				else
 				{
+					ErrorReporter().FReport(logfile, "Незаконченное выражение!", spec->Line(), spec->Start_Position());
 					_error = true;
 					tlist->~List();
-					return 0;
+					return origpos;
 				}
 			}
 		}
@@ -964,7 +978,7 @@ int LexemeWorker::CorrectDo(List * expression, int pos, lexeme * spec, TList* st
 		{
 			_error = true;
 			tlist->~List();
-			return 0;
+			return origpos;
 		}
 	}
 	else
@@ -972,26 +986,27 @@ int LexemeWorker::CorrectDo(List * expression, int pos, lexeme * spec, TList* st
 		errorReporter.FReport(logfile, "Ожидается тело цикла \"do \"!", spec->Line(), spec->Start_Position());
 		_error = true;
 		tlist->~List();
-		return 0;
+		return origpos;
 	}
-	return 0;
+	return origpos;
 }
 
-int LexemeWorker::CorrectFor(List * expression, int pos, lexeme * spec, TList* storage)
+int LexemeWorker::CorrectFor(List * expression, int origpos, lexeme * spec, TList* storage)
 {
+	int pos = origpos;
 	pos++;
 	if (pos >= expression->count())
 	{
 		errorReporter.FReport(logfile, "Ожидаются параметры для \"for \"!", spec->Line(), spec->Start_Position());
 		_error = true;
-		return 0;
+		return origpos;
 	}
 	lexeme* tlex = (lexeme*)expression->get(pos);
 	if (strcmp(tlex->Data(), "(") != 0)
 	{
 		errorReporter.FReport(logfile, "Ожидается \"(\"!", tlex->Line(), tlex->Start_Position());
 		_error = true;
-		return 0;
+		return origpos;
 	}
 	pos++;
 	List* param1 = new List(sizeof(lexeme));
@@ -1007,14 +1022,14 @@ int LexemeWorker::CorrectFor(List * expression, int pos, lexeme * spec, TList* s
 		errorReporter.FReport(logfile, "Незаконченное выражение \"for \"!", tlex->Line(), tlex->Start_Position());
 		_error = true;
 		param1->~List();
-		return 0;
+		return origpos;
 	}
 	if (param1->count() != 1)
 	{
 		errorReporter.FReport(logfile, "Ожидается инициализированная переменная в качестве первого параметра!", tlex->Line(), tlex->Start_Position());
 		_error = true;
 		param1->~List();
-		return 0;
+		return origpos;
 	}
 	lexeme* first = (lexeme*)param1->get(0);
 	if (!(first->Type() == INT || first->Type() == DOUBLE || first->Type() == FLOAT))
@@ -1037,7 +1052,7 @@ int LexemeWorker::CorrectFor(List * expression, int pos, lexeme * spec, TList* s
 		_error = true;
 		param1->~List();
 		param2->~List();
-		return 0;
+		return origpos;
 	}
 	if (!IsNumberExpressionWithBoolOperations(param2) && !IsBoolExpression(param2, false) && !IsNumberExpressionWithBoolOperations(param2))
 	{
@@ -1045,7 +1060,7 @@ int LexemeWorker::CorrectFor(List * expression, int pos, lexeme * spec, TList* s
 		_error = true;
 		param2->~List();
 		param1->~List();
-		return 0;
+		return origpos;
 	}
 
 	List* param3 = new List(sizeof(lexeme));
@@ -1064,7 +1079,7 @@ int LexemeWorker::CorrectFor(List * expression, int pos, lexeme * spec, TList* s
 		param1->~List();
 		param2->~List();
 		param3->~List();
-		return 0;
+		return origpos;
 	}
 	if (pos >= expression->count())
 	{
@@ -1073,7 +1088,7 @@ int LexemeWorker::CorrectFor(List * expression, int pos, lexeme * spec, TList* s
 		param1->~List();
 		param2->~List();
 		param3->~List();
-		return 0;
+		return origpos;
 	}
 	if (!IsNumberExpression(param3, true))
 	{
@@ -1082,7 +1097,7 @@ int LexemeWorker::CorrectFor(List * expression, int pos, lexeme * spec, TList* s
 		param3->~List();
 		param2->~List();
 		param1->~List();
-		return 0;
+		return origpos;
 	}
 
 	pos++;
@@ -1136,7 +1151,7 @@ int LexemeWorker::CorrectFor(List * expression, int pos, lexeme * spec, TList* s
 			param3->~List();
 			param2->~List();
 			param1->~List();
-			return 0;
+			return origpos;
 		}
 	}
 	else
@@ -1147,24 +1162,25 @@ int LexemeWorker::CorrectFor(List * expression, int pos, lexeme * spec, TList* s
 		param3->~List();
 		param2->~List();
 		param1->~List();
-		return 0;
+		return origpos;
 	}
 
 	body->~List();
 	param2->~List();
 	param2->~List();
 	param1->~List();
-	return 0;
+	return origpos;
 }
 
-int LexemeWorker::CorrectIf(List * expression, int pos, lexeme * spec, TList* storage)
+int LexemeWorker::CorrectIf(List * expression, int origpos, lexeme * spec, TList* storage)
 {
 	List* hl = new List(sizeof(lexeme));
+	int pos = origpos;
 	int pos3 = FuncWithBoolParam(expression, pos, spec, false, hl);
 	if (pos3 <= pos)
 	{
 		_error = true;
-		return 0;
+		return origpos;
 	}
 	TNode* h = treeWorker.GetTNode(hl, 0, hl->count());
 	TList* body;
@@ -1212,7 +1228,7 @@ int LexemeWorker::CorrectIf(List * expression, int pos, lexeme * spec, TList* st
 		{
 			_error = true;
 			tlist1->~List();
-			return 0;
+			return origpos;
 		}
 	}
 	else
@@ -1220,7 +1236,7 @@ int LexemeWorker::CorrectIf(List * expression, int pos, lexeme * spec, TList* st
 		errorReporter.FReport(logfile, "Незаконченное выражение!", spec->Line(), spec->Start_Position());
 		_error = true;
 		tlist1->~List();
-		return 0;
+		return origpos;
 	}
 	
 	if (pos >= expression->count())
@@ -1274,14 +1290,13 @@ int LexemeWorker::CorrectIf(List * expression, int pos, lexeme * spec, TList* st
 		{
 			storage->addNode((TNode*)new TIf(h, body, body2));
 			pos = pos3;
-			tlist2->~List();
-			//return pos3;
+			//tlist2->~List();
 		}
 		else
 		{
 			_error = true;
 			tlist2->~List();
-			return 0;
+			return origpos;
 		}
 	}
 	else
@@ -1289,8 +1304,7 @@ int LexemeWorker::CorrectIf(List * expression, int pos, lexeme * spec, TList* st
 		errorReporter.FReport(logfile, "Незаконченное выражение!", spec->Line(), spec->Start_Position());
 		_error = true;
 		tlist2->~List();
-		return 0;
+		return origpos;
 	}
-
 	return pos;
 }
