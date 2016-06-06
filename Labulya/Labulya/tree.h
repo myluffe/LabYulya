@@ -318,13 +318,17 @@ class TIf : TNode
 		}
 		void print()
 		{
-			printf("if(");
+			printf("if (");
 			condition->print();
-			printf(")\n{");
+			printf(")\n{\n");
 			branch_then->print();
-			printf("\n}\nelse\n{");
-			branch_else->print();
 			printf("}\n");
+			if (branch_else != nullptr)
+			{
+				printf("else\n{\n");
+				branch_else->print();
+				printf("\n}\n");
+			}
 		}
 	protected:
 		TNode* condition;
