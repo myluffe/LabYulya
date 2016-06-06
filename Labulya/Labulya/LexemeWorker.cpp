@@ -688,7 +688,7 @@ bool LexemeWorker::InnerExpression(List * expression, TList* storage)
 					return false;
 				}
 				storage->addNode(treeWorker.GetTNode(tlist, 0, i - 1));
-				tlist->~List();
+				//tlist->~List();
 				tlist = new List(sizeof(lexeme));
 				startstring = false;
 			}
@@ -828,7 +828,7 @@ int LexemeWorker::CorrectWhile(List * expression, int pos, lexeme * spec, TList*
 		_error = true;
 		return 0;
 	}
-	TNode* h = treeWorker.GetTNode(hl, 2, hl->count() - 2);
+	TNode* h = treeWorker.GetTNode(hl, 0, hl->count());
 	pos2++;
 	
 	List* tlist = new List(sizeof(lexeme));
@@ -867,7 +867,7 @@ int LexemeWorker::CorrectWhile(List * expression, int pos, lexeme * spec, TList*
 		if (InnerExpression(tlist, body))
 		{
 			storage->addNode((TNode*)(new TWhile(h, body)));
-			tlist->~List();
+			//tlist->~List();
 			return pos2;
 		}
 		else
@@ -940,14 +940,15 @@ int LexemeWorker::CorrectDo(List * expression, int pos, lexeme * spec, TList* st
 						tlist->~List();
 						return 0;
 					}
-					List* hl = nullptr;
+					List* hl = new List(sizeof(lexeme));
 					int pos2 = FuncWithBoolParam(expression, pos, spec, true, hl);
 					if (hl == nullptr)
 					{
 						_error = true;
 						return 0;
 					}
-					TNode* h = treeWorker.GetTNode(hl, 2, hl->count() - 3);
+					int ghj = 0;
+					TNode* h = treeWorker.GetTNode(hl, 0, hl->count());
 					storage->addNode((TNode*)new TDoWhile(body, h));
 					return pos2;
 				}
@@ -1119,13 +1120,13 @@ int LexemeWorker::CorrectFor(List * expression, int pos, lexeme * spec, TList* s
 		if (InnerExpression(body, sbody))
 		{
 			TVariable* tparam1 = new TVariable((lexeme*)param1->get(0));
-			TNode* tparam2 = treeWorker.GetTNode(param2, 0,  param2->count() - 1);
-			TNode* tparam3 = treeWorker.GetTNode(param3, 0, param3->count() - 1);
+			TNode* tparam2 = treeWorker.GetTNode(param2, 0,  param2->count());
+			TNode* tparam3 = treeWorker.GetTNode(param3, 0, param3->count());
 			storage->addNode((TNode*)new TFor(tparam1, tparam2, tparam3, sbody));
-			body->~List();
-			param3->~List();
-			param2->~List();
-			param1->~List();
+			//body->~List();
+			//param3->~List();
+			//param2->~List();
+			//param1->~List();
 			return pos;
 		}
 		else
@@ -1165,7 +1166,7 @@ int LexemeWorker::CorrectIf(List * expression, int pos, lexeme * spec, TList* st
 		_error = true;
 		return 0;
 	}
-	TNode* h = treeWorker.GetTNode(hl, 2, hl->count() - 2);
+	TNode* h = treeWorker.GetTNode(hl, 0, hl->count());
 	TList* body;
 	pos3++;
 
@@ -1205,8 +1206,7 @@ int LexemeWorker::CorrectIf(List * expression, int pos, lexeme * spec, TList* st
 		if (InnerExpression(tlist1, body))
 		{
 			pos = pos3;
-			tlist1->~List();
-			//return pos3;
+			//tlist1->~List();
 		}
 		else
 		{
