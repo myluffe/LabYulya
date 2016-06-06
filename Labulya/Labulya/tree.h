@@ -314,7 +314,8 @@ class TIf : TNode
 			if(Parser().ToBool(condition->exec()->Data()))
 				return branch_then->exec();
 			else
-				return branch_else->exec();
+				if (branch_else != nullptr)
+					return branch_else->exec();
 		}
 		void print()
 		{
