@@ -693,7 +693,11 @@ bool LexemeWorker::InnerExpression(List * expression, TList* storage)
 					tlist->~List();
 					return false;
 				}
-				storage->addNode(treeWorker.GetTNode(tlist, 0, i - 1));
+				//
+				for (int huh = 0; huh < tlist->count(); huh++)
+					printf("%s", ((lexeme*)tlist->get(huh))->Data());
+				//
+				storage->addNode(treeWorker.GetTNode(tlist, 0, tlist->count() - 1));
 				//tlist->~List();
 				tlist = new List(sizeof(lexeme));
 				startstring = false;
