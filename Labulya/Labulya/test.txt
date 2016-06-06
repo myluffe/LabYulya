@@ -3,9 +3,15 @@ float i = 36.e1;
 //dfdfdf
 bool f = true ;
 int h = 5;
-do 
+for (h; h < i; h++)
+{
+	if (f)
+		f = false ;	
+	f = true ;
+}
+
+while (f) 
 	h++;
-while (f);
-else h++;
+//else h++;
 int s1 = h;
 }

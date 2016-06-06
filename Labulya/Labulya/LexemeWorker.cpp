@@ -153,16 +153,6 @@ bool LexemeWorker::Processing(List* lexes)
 
 	TList* storage = new TList();
 
-	//
-	int lcount = lexes->count();
-	for (int j = 0; j < lcount; j++)
-	{
-		lexeme tl = *(lexeme*)lexes->get(j);
-		printf("%d. ", j);
-		tl.Print();
-	}
-	//
-
 	for (int i = 0; i < lexes->count(); i++)
 	{
 		lexeme* temp_lexeme = (lexeme*)lexes->get(i);
@@ -682,15 +672,20 @@ bool LexemeWorker::InnerExpression(List * expression, TList* storage)
 		{
 			i = CorrectShortIfOperation(expression, i, storage);
 		}
-		if (!startstring && tlex->Type() == SPECIALWORD)
+		if (tlex->Type() == SPECIALWORD)
 		{
+			if (startstring)
+				ErrorReporter().FReport(logfile, "Ожидается \";\"", tlex->Line(), tlex->Start_Position());
 			i = CorrectSpecial(tlex, i, expression, storage);
 			startstring = true;
 		}
 		else
 		{
 			if (strcmp(tlex->Data(), ";") != 0)
+			{
+				if (!startstring) startstring = true;
 				tlist->add(tlex);
+			}
 			else
 			{
 				if (!(IsNumberExpression(tlist, true) || IsBoolExpression(tlist, true) || IsStringExpression(tlist, true) || IsNumberExpressionWithBoolOperations(tlist) || IsStringExpressionWithBoolOperations(tlist)))
@@ -798,7 +793,7 @@ bool LexemeWorker::IsNumberExpression(List * expression, bool equal)
 	//char* perone[] = { "++", "--", "+", "-", "(", "/", "*", ")", "%", "==", ">=", "<=", "!=", ">", "<" };
 	char* perone[] = { "++", "--", "<<", ">>", "+", "-", "/", "*", "%"};
 	int types[] = { INT, FLOAT, DOUBLE };
-	return WhateverCheck(perone, (sizeof(perone) / sizeof(int)), types, (sizeof(types) / sizeof(char)), expression, equal);
+	return WhateverCheck(perone, 9, types, (sizeof(types) / sizeof(int)), expression, equal);
 }
 
 bool LexemeWorker::IsNumberExpressionWithBoolOperations(List * expression)
@@ -806,28 +801,28 @@ bool LexemeWorker::IsNumberExpressionWithBoolOperations(List * expression)
 	//char* perone[] = { "++", "--", "+", "-", "(", "/", "*", ")", "%", "==", ">=", "<=", "!=", ">", "<" };
 	char* perone[] = { "==", ">=", "<=", "!=", ">", "<" };
 	int types[] = { INT, FLOAT, DOUBLE };
-	return WhateverCheck(perone, (sizeof(perone) / sizeof(int)), types, (sizeof(types) / sizeof(char)), expression, false);
+	return WhateverCheck(perone, 6, types, (sizeof(types) / sizeof(int)), expression, false);
 }
 
 bool LexemeWorker::IsStringExpressionWithBoolOperations(List * expression)
 {
 	char* perone[] = { "==", "!=" };
 	int types[] = { STRING, CHAR };
-	return WhateverCheck(perone, (sizeof(perone) / sizeof(int)), types, (sizeof(types) / sizeof(char)), expression, false);
+	return WhateverCheck(perone, 2, types, (sizeof(types) / sizeof(int)), expression, false);
 }
 
 bool LexemeWorker::IsBoolExpression(List * expression, bool equal)
 {
 	char* perone[] = { "==", "||", "&&", "!=" };
 	int types[] = { BOOL };
-	return WhateverCheck(perone, (sizeof(perone) / sizeof(int)), types, (sizeof(types) / sizeof(char)), expression, equal);
+	return WhateverCheck(perone, 4, types, (sizeof(types) / sizeof(int)), expression, equal);
 }
 
 bool LexemeWorker::IsStringExpression(List * expression, bool equal)
 {
 	char* perone[] = { "+" };
 	int types[] = { STRING, CHAR };
-	return WhateverCheck(perone, (sizeof(perone) / sizeof(int)), types, (sizeof(types) / sizeof(char)), expression, equal);
+	return WhateverCheck(perone, 1, types, (sizeof(types) / sizeof(int)), expression, equal);
 }
 
 int LexemeWorker::CorrectWhile(List * expression, int pos, lexeme * spec, TList* storage)
@@ -918,7 +913,6 @@ int LexemeWorker::CorrectDo(List * expression, int origpos, lexeme * spec, TList
 					tlist->add(tlex);
 				else
 				{
-					tlist->add(tlex);
 					break;
 				}
 			}
@@ -940,7 +934,7 @@ int LexemeWorker::CorrectDo(List * expression, int origpos, lexeme * spec, TList
 		TList* body = new TList();
 		if (InnerExpression(tlist, body))
 		{
-			tlist->~List();
+			//tlist->~List();
 			{
 				pos++;
 				if (pos <= expression->count())
@@ -960,10 +954,10 @@ int LexemeWorker::CorrectDo(List * expression, int origpos, lexeme * spec, TList
 						_error = true;
 						return origpos;
 					}
-					int ghj = 0;
+					//int ghj = 0;
 					TNode* h = treeWorker.GetTNode(hl, 0, hl->count());
 					storage->addNode((TNode*)new TDoWhile(body, h));
-					return origpos;
+					return pos2;
 				}
 				else
 				{
