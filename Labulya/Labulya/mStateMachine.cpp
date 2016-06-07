@@ -6,7 +6,6 @@ mStateMachine::mStateMachine(char* name, char* lexname, int lextype)
 	_isFinished = false;
 	_isError = false;
 	_start = false;
-	_checkError = false;
 	_buffer = (char*)heap.get_mem(sizeof(char) * Chunck);
 	_buffer[0] = '\0';
 	strcpy_s(_machineName, name);
@@ -48,11 +47,6 @@ bool mStateMachine::IsError()
 bool mStateMachine::IsStart()
 {
 	return _start;
-}
-
-bool mStateMachine::CheckError()
-{
-	return _checkError;
 }
 
 char * mStateMachine::CurrentLexName()
@@ -108,7 +102,6 @@ void mStateMachine::UpdateStatus()
 	_isError = false;
 	_isFinished = false;
 	_start = false;
-	_checkError = false;
 	_step = 0;
 	_chunckcount = 1;
 	_buffer = (char*)heap.get_mem(sizeof(char) * Chunck);
@@ -394,7 +387,7 @@ void Type3Machine::CheckType()
 			if (slen != 2)
 			{
 				errorReporter.FReport(logfile, "To many symbols for char!", _curlexline, _currentLexemePosition);
-				_checkError = true;
+				_isError = true;
 				return;
 			}
 			else
@@ -402,7 +395,7 @@ void Type3Machine::CheckType()
 				if (_buffer[0] != '\\')
 				{
 					errorReporter.FReport(logfile, "To many Symbols for char!", _curlexline, _currentLexemePosition);
-					_checkError = true;
+					_isError = true;
 					return;
 				}
 			}

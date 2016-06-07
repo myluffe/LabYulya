@@ -151,7 +151,7 @@ int MachineWorker::Work(char* filename, List* lexes)
 				}
 				if (_currentaut->IsFinished())
 				{
-					if (_currentaut->CheckError())
+					if (_currentaut->IsError())
 					{
 						fr.~mFileReader();
 						return -3;
