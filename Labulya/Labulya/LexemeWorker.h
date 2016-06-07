@@ -45,3 +45,4 @@ private:
 	//lexeme* Exe3Pression(List* expression);
 } LWorker = *new LexemeWorker();
 
+static List Todel = *new List(sizeof(List*));

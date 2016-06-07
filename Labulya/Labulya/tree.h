@@ -1,6 +1,7 @@
 #pragma once
 #include "lec.h"
 #include "heap.h"
+#include "list.h"
 #include "Types.h"
 #include "Parser.h"
 
@@ -44,7 +45,7 @@ class TVariable : TNode
 		}
 		void print()
 		{
-			printf("%s", m_variable->Data());
+			printf("%s", m_variable->Name());
 		}
 	protected:
 		lexeme* m_variable;
@@ -109,8 +110,11 @@ class TUnaryOperation : TNode
 		}
 		void print()
 		{
-			printf(m_operation->Data());
+			if(m_left)
+				printf(m_operation->Data());
 			m_operand->print();
+			if(!m_left)
+				printf(m_operation->Data());
 		}
 	protected:
 		bool    m_left;
@@ -204,7 +208,6 @@ class TBinaryOperation : TNode
 			printf(m_operation->Data());
 			printf(" ");
             m_operand2->print();
-			printf("\n");
 		}
 	protected:
 		lexeme* m_operation;
@@ -248,56 +251,37 @@ class TList : TNode
 	public:
 		TList()
 		{
-			start = NULL;
+			nods = new List(sizeof(TNode*));
 		}
 		~TList()
 		{
-			list* cur = start;
-			while (cur)
-			{
-				list* next = cur->next;
-				heap.free_mem(&cur);
-				cur = next;
-			}
+			nods->~List();
 		}
 		lexeme* exec()  
 		{  
-			list* cur = start;
-            while(cur)
-            {
-				cur->sentence->exec();
-                cur=cur->next;
-            }
+			for (int i = 0; i < nods->count(); ++i)
+			{
+				TNode* cur = *(TNode**)nods->get(i);
+				cur->exec();
+			}
             lexeme* res = nullptr;
             return res;
 		}
 		void print() 
 		{  
-			list* cur = start;
-			while (cur != nullptr)
+			
+			for(int i = 0; i < nods->count(); i++)
 			{
-				cur->sentence->print();
-				cur=cur->next;
+				TNode* cur = *(TNode**)nods->get(i);
+				cur->print();
 			}
 		}
 		void  addNode(TNode* node)
 		{
-			list *a = (list*)heap.get_mem(sizeof(list));
-			a->sentence = node;
-			a->next = NULL;
-			if (start != NULL)
-			{
-				start->next = a;
-			}
-			start = a;
+			nods->add(&node);
 		}
 	protected:
-		struct list
-		{
-			TNode* sentence;
-			list* next;
-		};
-		list* start;
+		List* nods;
 };
 
 class TIf : TNode
@@ -323,7 +307,7 @@ class TIf : TNode
 			condition->print();
 			printf(")\n{\n");
 			branch_then->print();
-			printf("}\n");
+			printf("\n}\n");
 			if (branch_else != nullptr)
 			{
 				printf("else\n{\n");
@@ -357,7 +341,7 @@ class TWhile : TNode
 			condition->print();
 			printf(")\n{");
 			body->print();
-			printf("}\n");
+			printf("\n}\n");
 		}
 	protected:
 		TNode* condition;
@@ -384,7 +368,7 @@ public:
 	{
 		printf("do\n{");
 		body->print();
-		printf("}while(");
+		printf("\n}while(");
 		condition->print();
 		printf(");\n");
 	}
@@ -419,7 +403,7 @@ public:
 		loop->print();
 		printf(")\n{");
 		body->print();
-		printf("}\n");
+		printf("\n}\n");
 	}
 protected:
 	TVariable* initialization;
