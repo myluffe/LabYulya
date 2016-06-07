@@ -19,6 +19,7 @@
 #define CHAR 301
 #define STRING 300
 
+//Неиспользованная ф-ция, преобразующая строковое название типа в int идентификотор типа
 static int GetType(char * stype)
 {
 	if (strcmp("int ", stype) == 0)
@@ -51,6 +52,7 @@ static int GetType(char * stype)
 	return 0;
 }
 
+//Ф-ция, проверяющая возможность приведения type1 к totype2
 static bool IsCastable(int type1, int totype2)
 {
 	if ((type1 == INT || type1 == DOUBLE || type1 == FLOAT || type1 == BOOL) && (totype2 == INT || totype2 == DOUBLE || totype2 == FLOAT || totype2 == BOOL))

@@ -12,16 +12,16 @@ public:
 	mStateMachine(char* name, char* lexname, int lextype);
 	~mStateMachine();
 
-	char* Buffer();
-	char* MachineName();
+	char* Buffer(); //Возвращает _buffer.
+	char* MachineName(); //Возвращает имя машины.
 
-	bool IsFinished();
-	bool IsError();
-	bool IsStart();
+	bool IsFinished(); //Возвращает _isFinished.
+	bool IsError(); //Возвращает _isError.
+	bool IsStart(); //Возвращает _start.
 
 	bool CheckError();
 
-	char* CurrentLexName();
+	char* CurrentLexName(); //
 	int CurrentLexType();
 	void ChangeType(int stype);
 
@@ -41,28 +41,28 @@ public:
 protected:
 	List* _words = new List(sizeof(char[Chunck]));
 
-	virtual void ClearAdditionals() = 0;
-	//
-	virtual void PrintAdditionals() = 0;
-	//
+	virtual void ClearAdditionals() = 0; //Дополнительная очистка для наследников данного класса. Используется в деструкторах наследников.
 
-	char _machineName[Chunck]; //name
-	char* _buffer; //current lexem
+	virtual void PrintAdditionals() = 0; //Отладочная печать для наследников данного класса.
 
-	bool _isFinished;
-	bool _isError;
-	bool _start; // true if we are expect this type lexeme
+	char _machineName[Chunck]; //Имя машины.
+	char* _buffer; //Буффер, в который записываются символы при формировании лексемы. В случае успеха содежит кусок текста из обрабатываемого файла, соответсвующий лексеме.
+
+	bool _isFinished; //true, если автомат успешно сформировал лексему.
+	bool _isError; //true, если данный автомат не смог сформировать лексему.
+	bool _start; //true, если мы начали работу с данным автоматом.
 
 	bool _checkError;
 	
-	char _currentLexemName[Chunck];
-	int _currentLexemeType;
-	int _originaltype;
+	char _currentLexemName[Chunck]; //Имя формируемой лексемы
+	int _currentLexemeType; //Текущий тип формируемой лексемы
+	int _originaltype; //Тип формируемых данной машиной лексем по умолчанию 
 
-	int _currentLexemePosition;
-	int _curlexline;
-	int _step;
-	int _chunckcount;
+	int _currentLexemePosition; //Стартовая позиция, относительно начала строки, лексемы, которая формируется в данный момент.
+	int _curlexline; //Номер строки лексемы, которая формируется в данный момент.
+	int _step; //Шаг. Позиция _buffer, в которую будет записываться следующий символ при формировании лексемы.
+	
+	int _chunckcount; //Количество кусков, которые вмещает в себя _buffer. По умолчанию _chunckcount = 1, а _buffer[chunck]. При переплнении создается новый буффер на один chunk больше предыдущего, в который копируется старый _buffer, _chunckcount увеличивается на еденицу. Проще говоря, это вспомогательный счетчик для динамического выделения памяти по кускам для _buffer.
 };
 
 class Type1Machine : public mStateMachine
