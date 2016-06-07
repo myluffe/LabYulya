@@ -10,7 +10,7 @@
 static class LexemeWorker
 {
 public:
-	bool Processing(List* lexes);
+	bool Processing(List* lexes); //Вызавается ф-цией MachineWorker().Work после формирования списка из лексем для их последующей обработки (запись переменных в хэш-таблицу и замена этой переменной в коде на ссылку из хэша во всей области видимости этой переменной) и записи в дерево.
 	LexemeWorker();
 	~LexemeWorker();
 protected:
