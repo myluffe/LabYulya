@@ -5,17 +5,19 @@
 class lexeme
 {
 private:
-	char* _name;
-	char* _data;
-	int _type;
-	int _line;
-	int _startposition;
-	int _priority;
+	char* _name; //Назвоние лексемы. Или имя переменной
+	char* _data; //Значение лексемы, считанные из файла. В случае переменной заменяются на её значение.
+	int _type; //Тип лексемы. В случае переменной или константы сначала внутренний (Number или Variable) затем по типу значения.
+	int _line; //Номер строки, на которой находится лексема в обрабатываемом файле.
+	int _startposition; //Позиция лексемы относительно начала сторки.
+	int _priority; //Приоритет. По умолчанию 100, далее, если лексема явл. операцией, в спец. функции определяется её приоритет по таблице: http://cppstudio.com/post/302/
+	//Скобки "(" и ")" имеют приоритет 0.
 public: 
 	lexeme(char* name, char* type, char* data, int line, int startposition, int priority);
 	lexeme(char* name, int type, char* data, int line, int startposition, int priority);
 	~lexeme();
 
+	//Получение полей лексемы:
 	char* Data() { return _data; }
 	char* Name() { return _name; }
 	int Type() { return _type; }
@@ -23,9 +25,9 @@ public:
 	int Start_Position() { return _startposition; }
 	int Priority() { return _priority; }
 
-	bool GetNumber(double* value);
-	bool SetNumber(double value);
+	bool GetNumber(double* value); //Получает значение лексемы (поле Data). С конвертацией входного параметра в строку с помощью Parser
+	bool SetNumber(double value); //Менет значение лексемы (поле Data).
 
-	void DataChange(char* newdata);
+	void DataChange(char* newdata); //Менет значение лексемы (поле Data).
 	void Print();
 };

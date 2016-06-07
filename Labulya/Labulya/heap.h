@@ -12,9 +12,9 @@ class Heap
 public:
 	Heap(int _segment_size = SEGMENTSIZE);
 	~Heap();
-	void*      get_mem(int size);
-	void       free_mem(void*);
-	void print();
+	void*      get_mem(int size); //Возвращает указатель на выделенную память. На вход принимает кол-во байт для выделения.
+	void       free_mem(void*); //Освобождает выделенную get_mem память по указателю. Знает сколько удалять.
+	void print(); //Отладочная ф-ция печати.
 private:
 	struct Chunk
 	{
