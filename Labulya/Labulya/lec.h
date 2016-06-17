@@ -12,9 +12,11 @@ private:
 	int _startposition; //Позиция лексемы относительно начала сторки.
 	int _priority; //Приоритет. По умолчанию 100, далее, если лексема явл. операцией, в спец. функции определяется её приоритет по таблице: http://cppstudio.com/post/302/
 	//Скобки "(" и ")" имеют приоритет 0.
+	int _rank = 0; //степень массива (если не массив, то 0).
 public: 
 	lexeme(char* name, char* type, char* data, int line, int startposition, int priority);
 	lexeme(char* name, int type, char* data, int line, int startposition, int priority);
+	lexeme mass(lexeme *name, int type, List values, int rank);
 	~lexeme();
 
 	//Получение полей лексемы:
@@ -30,4 +32,8 @@ public:
 
 	void DataChange(char* newdata); //Менет значение лексемы (поле Data).
 	void Print();
+
+	//поля для массивов
+	List* valuse = nullptr;
+	int Rank() { return _rank; }
 };

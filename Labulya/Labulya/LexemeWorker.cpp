@@ -4,7 +4,6 @@
 bool LexemeWorker::Processing(List* lexes)
 {
 	//изменение
-	//LexemeStack* temp_stack = new LexemeStack();
 	Lexeme_list* dob = new Lexeme_list(); //стэк для области видимости
 	for (int i = 0; i < lexes->count(); i++)
 	{
@@ -14,7 +13,7 @@ bool LexemeWorker::Processing(List* lexes)
 			dob->add(temp_lexeme);
 			continue;
 		}
-		if (temp_lexeme->Type() == VARIABLE)
+		if (temp_lexeme->Type() == VARIABLE) //обработка переменных, из размещение в хэш-таблицу 
 		{
 			if (dob->find(temp_lexeme->Data()) == nullptr) //если нет в дов
 			{
