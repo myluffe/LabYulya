@@ -13,9 +13,80 @@ bool LexemeWorker::Processing(List* lexes)
 			dob->add(temp_lexeme);
 			continue;
 		}
+		if (strcmp(temp_lexeme->Data(), "[") == 0) //обработка массивов, из размещение в хэш-таблицу
+		{
+			lexeme* ttype = nullptr;
+			lexeme* name = nullptr;
+			int namepos = 0;
+			if (i - 1 < 0)
+				continue;
+			ttype = (lexeme*)lexes->get(i - 1);
+			int k = 1;
+			bool open = true;
+			lexeme* tempdevider = (lexeme*)lexes->get(i + k);
+			while (true)
+			{
+				if (strcmp(tempdevider->Data(), "[") == 0 || strcmp(tempdevider->Data(), "]") == 0)
+				{
+					k++;
+					if (strcmp(tempdevider->Data(), "]") == 0)
+						open = false;
+					if (open)
+					{
+						errorReporter.FReport(logfile, "Ожидается \"]\"!", tempdevider->Line(), tempdevider->Start_Position());
+						return false;
+					}
+					if (k >= lexes->count())
+					{
+						errorReporter.FReport(logfile, "#909 Незаконченное выражение!", tempdevider->Line(), tempdevider->Start_Position());
+						return false;
+					}
+					tempdevider = (lexeme*)lexes->get(i + k);
+					continue;
+				}
+				if (tempdevider->Type() == VARIABLE)
+				{
+					namepos = k;
+					name = tempdevider;
+					break;
+				}
+				errorReporter.FReport(logfile, "Ожидается \"[\" или \"]\"!", tempdevider->Line(), tempdevider->Start_Position());
+				return false;
+			}
+			if (k % 2 != 0)
+			{
+				errorReporter.FReport(logfile, "В конце ожидается \"]\"!", tempdevider->Line(), tempdevider->Start_Position());
+				return false;
+			}
+			k+=2;
+			if (k >= lexes->count())
+			{
+				errorReporter.FReport(logfile, "Ожидается \"=\"!", tempdevider->Line(), tempdevider->Start_Position());
+				return false;
+			}
+			tempdevider = (lexeme*)lexes->get(k);
+			if (strcmp(tempdevider->Data(), "=") != 0)
+			{
+				errorReporter.FReport(logfile, "Ожидается \"=\"!", tempdevider->Line(), tempdevider->Start_Position());
+				return false;
+			}
+			k++;
+			int posend = k;
+			//...рекурсивная ф-ция разбора элементов.
+			List* tempvalues = GetMassValues(lexes, k, ttype->Type(), &posend);
+			int rank = k - 1 / 2;
+			if (posend > k)
+			{
+				//...формирование лексемы массива на позиции namepos
+				//удаление лишних лексем
+				//запись в хэш-таблицу (и в dov?)
+			}
+			else
+				return false;
+		}
 		if (temp_lexeme->Type() == VARIABLE) //обработка переменных, из размещение в хэш-таблицу 
 		{
-			if (dob->find(temp_lexeme->Data()) == nullptr) //если нет в дов
+			if (dob->find(temp_lexeme->Data()) == nullptr) //если нет в стеке для области видимости
 			{
 				if (i > 0)
 				{
@@ -368,13 +439,13 @@ int LexemeWorker::CorrectSpecial(lexeme* spec, int pos, List* expression, TList*
 	{
 		return CorrectDo(expression, pos, spec, storage);
 	}
-	if (strcmp(spec->Data(), "input ") == 0)
+	if (strcmp(spec->Data(), "input ") == 0 || strcmp(spec->Data(), "output ") == 0)
 	{
-		/*
 		List* param = new List(sizeof(lexeme*));
 		int	res = FuncWithStringParam(expression, pos, spec, true, param);
 		if (res > pos)
 		{
+			//input or output
 			//storage->addNode();
 			param->~List();
 			return res;
@@ -382,6 +453,7 @@ int LexemeWorker::CorrectSpecial(lexeme* spec, int pos, List* expression, TList*
 		res = FuncWithNumberParam(expression, pos, spec, true, param);
 		if (res > pos)
 		{
+			//input or output
 			//storage->addNode();
 			param->~List();
 			return res;
@@ -389,82 +461,34 @@ int LexemeWorker::CorrectSpecial(lexeme* spec, int pos, List* expression, TList*
 		res = FuncWithBoolParam(expression, pos, spec, true, param);
 		if (res > pos)
 		{
+			//input or output
 			//storage->addNode();
 			param->~List();
 			return res;
 		}
-		*/
 		return pos;
 	}
-	if (strcmp(spec->Data(), "output ") == 0)
-	{
-		/*
-		List* param = new List(sizeof(lexeme*));
-		int	res = FuncWithStringParam(expression, pos, spec, true, param);
-		if (res > pos)
-		{
-		//storage->addNode();
-		param->~List();
-		return res;
-		}
-		res = FuncWithNumberParam(expression, pos, spec, true, param);
-		if (res > pos)
-		{
-		//storage->addNode();
-		param->~List();
-		return res;
-		}
-		res = FuncWithBoolParam(expression, pos, spec, true, param);
-		if (res > pos)
-		{
-		//storage->addNode();
-		param->~List();
-		return res;
-		}
-		*/
-		return pos;
-	}
-	if (strcmp(spec->Data(), "min ") == 0)
+	if (strcmp(spec->Data(), "min ") == 0 || strcmp(spec->Data(), "max ") == 0)
 	{
 		List* param1 = new List(sizeof(lexeme*));
 		List* param2 = new List(sizeof(lexeme*));
 		int res = FuncWithTwoNumberParams(expression, pos, spec, true, param1, param2);
 		if (res != pos)
-			//storage->addNode();
-		param1->~List();
-		param2->~List();
-		return res;
-	}
-	if (strcmp(spec->Data(), "max ") == 0)
-	{
-		List* param1 = new List(sizeof(lexeme*));
-		List* param2 = new List(sizeof(lexeme*));
-		int res = FuncWithTwoNumberParams(expression, pos, spec, true, param1, param2);
-		if (res > pos)
-			//storage->addNode();
-		param1->~List();
-		param2->~List();
-		return res;
-	}
-	if (strcmp(spec->Data(), "sin ") == 0)
-	{
-		List* param = new List(sizeof(lexeme*));
-		int res = FuncWithNumberParam(expression, pos, spec, true, param);
-		if (res > pos)
 		{
+			//min or max node
 			//storage->addNode();
-			param->~List();
-			return res;
 		}
-		param->~List();
-		return pos;
+		param1->~List();
+		param2->~List();
+		return res;
 	}
-	if (strcmp(spec->Data(), "cos ") == 0)
+	if (strcmp(spec->Data(), "sin ") == 0 || strcmp(spec->Data(), "cos ") == 0)
 	{
 		List* param = new List(sizeof(lexeme*));
 		int res = FuncWithNumberParam(expression, pos, spec, true, param);
 		if (res > pos)
 		{
+			//sin or cos
 			//storage->addNode();
 			param->~List();
 			return res;
@@ -760,7 +784,7 @@ bool LexemeWorker::WhateverCheck(char ** perone, int c1, int * types, int c2, Li
 				hook_count--;
 				if (hook_count < 0)
 				{
-					errorReporter.FReport(logfile, "Вы забыли открыть скобку!", tlex->Line(), tlex->Start_Position());
+					errorReporter.FReport(logfile, "Вы забыли открыть скобку \"(\"!", tlex->Line(), tlex->Start_Position());
 					_error = true;
 					return false;
 				}
@@ -1340,4 +1364,10 @@ int LexemeWorker::CorrectIf(List * expression, int origpos, lexeme * spec, TList
 		return origpos;
 	}
 	return pos;
+}
+
+List * LexemeWorker::GetMassValues(List * expression, int start, int type, int* putend)
+{
+	//...
+	return nullptr;
 }

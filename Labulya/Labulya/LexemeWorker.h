@@ -37,6 +37,8 @@ protected:
 	bool _error = false;
 
 private:
+	List* GetMassValues(List* expression, int start, int type, int* putend);
+
 	//pos - позиция лексемы ф-ции (в случае output(...) pos - позиция output в expression)
 	//возвращают позицию последней лексемы, при ошибке - pos.
 	//spec - указатель на лексему-ф-цию

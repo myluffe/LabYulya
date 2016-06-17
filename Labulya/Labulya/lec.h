@@ -1,6 +1,7 @@
 #pragma once
 
 #include "string.h"
+#include "List.h"
 
 class lexeme
 {
@@ -16,7 +17,7 @@ private:
 public: 
 	lexeme(char* name, char* type, char* data, int line, int startposition, int priority);
 	lexeme(char* name, int type, char* data, int line, int startposition, int priority);
-	lexeme mass(lexeme *name, int type, List values, int rank);
+	static lexeme* mass(lexeme* name, int type, List* val, int rank);
 	~lexeme();
 
 	//ѕолучение полей лексемы:
@@ -34,6 +35,6 @@ public:
 	void Print();
 
 	//пол€ дл€ массивов
-	List* valuse = nullptr;
+	List* values = nullptr;
 	int Rank() { return _rank; }
 };

@@ -25,6 +25,13 @@ lexeme::lexeme(char * name, int type, char * data, int line, int startposition, 
 	_priority = priority;
 }
 
+lexeme* lexeme::mass(lexeme* name, int type, List* val, int rank)
+{
+	lexeme* lex = new lexeme(name->Data(), type, nullptr, name->Line(), name->Start_Position(), name->Priority());
+	lex->_rank = rank;
+	lex->values = val;
+}
+
 lexeme::~lexeme()
 {
 	heap.free_mem(_name);
