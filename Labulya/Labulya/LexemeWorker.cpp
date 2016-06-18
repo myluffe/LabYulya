@@ -123,13 +123,6 @@ bool LexemeWorker::Processing(List* lexes)
 				}	
 				//смещение на нужную позицию в цикле
 				i--;
-				for (int y = 0; y < lexes->count(); y++)
-				{
-					printf_s("%d. ", y);
-					lexeme* temp = (lexeme*)lexes->get(y);
-					temp->Print();
-					printf_s("\n");
-				}
 			}
 			else
 				return false;
@@ -1438,15 +1431,18 @@ lexeme * LexemeWorker::GetMassValues(List* expression, int start, char* ttype, i
 		heap.free_mem(tempsizes);
 		return nullptr;
 	}
-	
-	temp = (lexeme*)expression->get(currentpos);
-	if (temp == nullptr || strcmp(temp->Data(), "}") != 0)
+	int stemp = currentpos;
+	for (int s = stemp; s < stemp + rank - 1; s++)
 	{
-		errorReporter.FReport(logfile, "Ожидается \"}\"", temp->Line(), temp->Start_Position());
-		heap.free_mem(tempsizes);
-		return nullptr;
+		temp = (lexeme*)expression->get(currentpos);
+		if (temp == nullptr || strcmp(temp->Data(), "}") != 0)
+		{
+			errorReporter.FReport(logfile, "Ожидается \"}\"", temp->Line(), temp->Start_Position());
+			heap.free_mem(tempsizes);
+			return nullptr;
+		}
+		currentpos++;
 	}
-	currentpos++;
 	temp = (lexeme*)expression->get(currentpos);
 	if (temp == nullptr || strcmp(temp->Data(), ";") != 0)
 	{
@@ -1543,8 +1539,53 @@ bool LexemeWorker::GetValue(Lexeme_list * dob, lexeme * place, List* expression,
 		if (cond->Rank() > 0)
 		{
 			//...получение элемента из массива и запись в *place
-			
-			//...
+			int quanity = cond->Rank() + cond->Rank() * 2;
+			List* index = new List(sizeof(int));
+			int i = 0;
+			for (i = pos + 1; i < pos + quanity; i++)
+			{
+				lexeme* temp = (lexeme*)expression->get(i);
+				if (temp == nullptr || strcmp(temp->Data(), "[") != 0)
+				{
+					errorReporter.FReport(logfile, "Ожидается \"[\"!", temp->Line(), temp->Start_Position());
+					return false;
+				}
+				i++;
+				temp = (lexeme*)expression->get(i);
+				if (temp == nullptr)
+				{
+					errorReporter.FReport(logfile, "Ожидается индекс типа int!", temp->Line(), temp->Start_Position());
+					return false;
+				}
+				if (temp->Type() == MASSIVE || temp->Type() == VARIABLE)
+					if (!GetValue(dob, temp, expression, i))
+						return false;
+				if (temp->Type() != INT)
+				{
+					errorReporter.FReport(logfile, "Ожидается индекс типа int!", temp->Line(), temp->Start_Position());
+					return false;
+				}
+				int ti = parser.ToInt(temp->Data());
+				index->add(&ti);
+				i++;
+				temp = (lexeme*)expression->get(i);
+				if (temp == nullptr || strcmp(temp->Data(), "]") != 0)
+				{
+					errorReporter.FReport(logfile, "Ожидается \"]\"!", temp->Line(), temp->Start_Position());
+					return false;
+				}
+			}
+			for (int h = i - 1; h > pos; h--)
+				expression->remove(h);
+			//Получение значения из массива!
+			int realindex = 1;
+			for (int f = 0; f < index->count(); f++)
+			{
+				realindex *= *(int*)index->get(f);
+				for (int kf = f + 1; kf < index->count(); kf++)
+					realindex *= *(int*)index->get(kf);
+			}
+			*place = cond->Values[realindex];
 		}
 		else *place = *cond;
 		return true;
