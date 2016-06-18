@@ -1,5 +1,5 @@
 {
-float irs = 36.e1;
+float i = 36.e1;
 //dfdfdf
 int a = 3;
 int [2] gt = {1, 2};

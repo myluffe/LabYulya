@@ -107,25 +107,19 @@ bool LexemeWorker::Processing(List* lexes)
 				newlex->ToMass(name, MASSIVE, tempvalues, rank);
 				//в дов уже готовую добавляем
 				dob->add(newlex);
+				//dob->print_list();
 				//добавление в хэш-таблицу
 				LexemeTable.auto_create(newlex);
 				//...формирование лексемы массива на позиции namepos
 				//удаление лишних лексем
-				for (int g = posend; g > namepos; g--)
-				{
-					lexeme* temp = (lexeme*)lexes->get(g);
+				for (int g = posend; g >= i - 1; g--)
 					lexes->remove(g);
-				}
-				for (int g = namepos - 1; g >= i - 1; g--)
-				{
-					lexeme* temp = (lexeme*)lexes->get(g);
-					lexes->remove(g);
-				}	
 				//смещение на нужную позицию в цикле
-				i--;
+				i-=2;
 			}
 			else
 				return false;
+			continue;
 		}
 		if (temp_lexeme->Type() == VARIABLE) //обработка переменных, из размещение в хэш-таблицу 
 		{
@@ -205,13 +199,13 @@ bool LexemeWorker::Processing(List* lexes)
 					lexeme* ttype = (lexeme*)lexes->get(i - 1);
 					if (ttype->Type() == TYPE)
 					{
-						dob->print_list();
 						errorReporter.FReport(logfile, "This variable is alredy defined!", temp_lexeme->Line(), temp_lexeme->Start_Position());
 						return false;
 					}
 					else
 					{
 						//заменяем на ссылку
+						//dob->print_list();
 						int pos = dob->findpos(temp_lexeme->Data());
 						if (pos != -1)
 							*temp_lexeme = *(lexeme*)dob->get(pos);
@@ -313,7 +307,7 @@ int LexemeWorker::CorrectExpression(List* expression, int pos, TList* storage)
 
 	for (i = 0; i < expression->count(); i++)
 	{
-		lexeme* temp_lexeme = (lexeme*)expression->get(i);
+		lexeme* temp_lexeme = *(lexeme**)expression->get(i);
 		tlist->add(&temp_lexeme);
 		if (strcmp(temp_lexeme->Data(), "?") == 0)
 		{
