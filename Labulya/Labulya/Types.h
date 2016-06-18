@@ -16,6 +16,8 @@
 #define FLOAT 101
 #define BOOL 103
 
+#define MASSIVE 201
+
 #define CHAR 301
 #define STRING 300
 

@@ -17,69 +17,119 @@ bool LexemeWorker::Processing(List* lexes)
 		{
 			lexeme* ttype = nullptr;
 			lexeme* name = nullptr;
+			List* sizes = new List(sizeof(int));
 			int namepos = 0;
 			if (i - 1 < 0)
 				continue;
 			ttype = (lexeme*)lexes->get(i - 1);
-			int k = 1;
-			bool open = true;
+			if (ttype->Type() != TYPE)
+				continue;
+			int k = 0;
+			bool open = false;
 			lexeme* tempdevider = (lexeme*)lexes->get(i + k);
 			while (true)
 			{
+				tempdevider = (lexeme*)lexes->get(i + k);
 				if (strcmp(tempdevider->Data(), "[") == 0 || strcmp(tempdevider->Data(), "]") == 0)
 				{
 					k++;
 					if (strcmp(tempdevider->Data(), "]") == 0)
-						open = false;
+					{
+						open = false; 
+						continue;
+					}
 					if (open)
 					{
 						errorReporter.FReport(logfile, "Ожидается \"]\"!", tempdevider->Line(), tempdevider->Start_Position());
 						return false;
 					}
+					if (strcmp(tempdevider->Data(), "[") == 0)
+						open = true;
 					if (k >= lexes->count())
 					{
 						errorReporter.FReport(logfile, "#909 Незаконченное выражение!", tempdevider->Line(), tempdevider->Start_Position());
 						return false;
 					}
 					tempdevider = (lexeme*)lexes->get(i + k);
+					if (tempdevider->Type() == VARIABLE)
+						if (!GetValue(dob, tempdevider, lexes, i + k))
+						{
+							errorReporter.FReport(logfile, "Неопределенная переменная!", tempdevider->Line(), tempdevider->Start_Position());
+							return false;
+						}
+					if (tempdevider->Type() == INT)
+					{
+						int ghp = (int)parser.ToInt(tempdevider->Data());
+						sizes->add(&ghp);
+						k++;
+					}	
+					else
+					{
+						errorReporter.FReport(logfile, "Ожидается значение типа int!", tempdevider->Line(), tempdevider->Start_Position());
+						return false;
+					}
 					continue;
 				}
 				if (tempdevider->Type() == VARIABLE)
 				{
-					namepos = k;
+					namepos = i + k;
 					name = tempdevider;
+					if (dob->findpos(name->Data()) != -1)
+					{
+						errorReporter.FReport(logfile, "Имя переменной уже используется!", tempdevider->Line(), tempdevider->Start_Position());
+						return false;
+					}
 					break;
 				}
 				errorReporter.FReport(logfile, "Ожидается \"[\" или \"]\"!", tempdevider->Line(), tempdevider->Start_Position());
 				return false;
 			}
-			if (k % 2 != 0)
+			if (k % 3 != 0)
 			{
 				errorReporter.FReport(logfile, "В конце ожидается \"]\"!", tempdevider->Line(), tempdevider->Start_Position());
 				return false;
 			}
-			k+=2;
-			if (k >= lexes->count())
-			{
-				errorReporter.FReport(logfile, "Ожидается \"=\"!", tempdevider->Line(), tempdevider->Start_Position());
-				return false;
-			}
-			tempdevider = (lexeme*)lexes->get(k);
-			if (strcmp(tempdevider->Data(), "=") != 0)
+			int rank = k / 3;
+			k++;
+			tempdevider = (lexeme*)lexes->get(i + k);
+			if (tempdevider == nullptr || strcmp(tempdevider->Data(), "=") != 0)
 			{
 				errorReporter.FReport(logfile, "Ожидается \"=\"!", tempdevider->Line(), tempdevider->Start_Position());
 				return false;
 			}
 			k++;
-			int posend = k;
-			//...рекурсивная ф-ция разбора элементов.
-			List* tempvalues = GetMassValues(lexes, k, ttype->Type(), &posend);
-			int rank = k - 1 / 2;
-			if (posend > k)
+			int posend = k + i;
+			//...ф-ция разбора элементов и записи их в память, возвратит ссылку на первый элемент, в posend запишет позицию ";" (конца выражения).
+			lexeme* tempvalues = GetMassValues(lexes, k + i, ttype->Data(), &posend, dob, rank, sizes);
+			if (posend > k + 1)
 			{
+				lexeme* newlex = (lexeme*)lexes->get(namepos);
+				newlex->ToMass(name, MASSIVE, tempvalues, rank);
+				//в дов уже готовую добавляем
+				dob->add(newlex);
+				//добавление в хэш-таблицу
+				LexemeTable.auto_create(newlex);
 				//...формирование лексемы массива на позиции namepos
 				//удаление лишних лексем
-				//запись в хэш-таблицу (и в dov?)
+				for (int g = posend; g > namepos; g--)
+				{
+					lexeme* temp = (lexeme*)lexes->get(g);
+					lexes->remove(g);
+				}
+				for (int g = namepos - 1; g >= i - 1; g--)
+				{
+					lexeme* temp = (lexeme*)lexes->get(g);
+					lexes->remove(g);
+				}	
+				//смещение на нужную позицию в цикле
+				i--;
+				for (int y = 0; y < lexes->count(); y++)
+				{
+					printf_s("%d. ", y);
+					lexeme* temp = (lexeme*)lexes->get(y);
+					temp->Print();
+					printf_s("\n");
+				}
 			}
 			else
 				return false;
@@ -107,16 +157,10 @@ bool LexemeWorker::Processing(List* lexes)
 						lexeme* tdata = (lexeme*)lexes->get(i + 2);
 						if (!(tdata->Type() == INT || tdata->Type() == DOUBLE || tdata->Type() == FLOAT || tdata->Type() == CHAR || tdata->Type() == STRING || tdata->Type() == BOOL))
 						{
-							if (tdata->Type() == VARIABLE)
+							if (tdata->Type() == VARIABLE || tdata->Type() == MASSIVE)
 							{
-								int pos = dob->findpos(tdata->Data());
-								if (pos != -1)
-									*tdata = *(lexeme*)dob->get(pos);
-								else
-								{
-									errorReporter.FReport(logfile, "Нельзя непоределенное присвоить значение!", tdata->Line(), tdata->Start_Position());
+								if (!GetValue(dob, tdata, lexes, i + 2))
 									return false;
-								}
 							}
 							else
 							{
@@ -1366,8 +1410,148 @@ int LexemeWorker::CorrectIf(List * expression, int origpos, lexeme * spec, TList
 	return pos;
 }
 
-List * LexemeWorker::GetMassValues(List * expression, int start, int type, int* putend)
+lexeme * LexemeWorker::GetMassValues(List* expression, int start, char* ttype, int* putend, Lexeme_list* dob, int rank, List* sizes)
 {
-	//...
-	return nullptr;
+	List* poses = new List(sizeof(int));
+	int type = GetType(ttype);
+	int currentpos = start;
+
+	//int* tempsizes = new int[sizes->count() + 1];
+	int* tempsizes = (int*)heap.get_mem(sizeof(int) * (sizes->count() + 1));
+	for (int m = 0; m < sizes->count(); m++)
+	{
+		int h = *(int*)sizes->get(m);
+		tempsizes[m] = (*(int*)sizes->get(m));
+	}
+
+	lexeme* temp = (lexeme*)expression->get(currentpos);
+	if (temp == nullptr || strcmp(temp->Data(), "{") != 0)
+	{
+		errorReporter.FReport(logfile, "Ожидается \"{\"", temp->Line(), temp->Start_Position());
+		heap.free_mem(tempsizes);
+		return nullptr;
+	}
+	currentpos++;
+	//отбор и подсчет элементов
+	if (!ReInnerFind(expression, &currentpos, 0, tempsizes, rank, poses, dob, type))
+	{
+		heap.free_mem(tempsizes);
+		return nullptr;
+	}
+	
+	temp = (lexeme*)expression->get(currentpos);
+	if (temp == nullptr || strcmp(temp->Data(), "}") != 0)
+	{
+		errorReporter.FReport(logfile, "Ожидается \"}\"", temp->Line(), temp->Start_Position());
+		heap.free_mem(tempsizes);
+		return nullptr;
+	}
+	currentpos++;
+	temp = (lexeme*)expression->get(currentpos);
+	if (temp == nullptr || strcmp(temp->Data(), ";") != 0)
+	{
+		errorReporter.FReport(logfile, "Ожидается \";\"", temp->Line(), temp->Start_Position());
+		heap.free_mem(tempsizes);
+		return nullptr;
+	}
+
+	//запись элементов в память
+	lexeme* a = (lexeme*)heap.get_mem(sizeof(lexeme) * (poses->count() + 1));
+	for (int h = 0; h < poses->count(); h++)
+	{
+		a[h] = *(lexeme*)expression->get(*(int*)poses->get(h));
+	}
+	heap.free_mem(tempsizes);
+	*putend = currentpos;
+	return a;
+}
+
+bool LexemeWorker::ReInnerFind(List * expression, int * currentpos, int currentstep, int * s, int rank, List* poses, Lexeme_list* dob, int type)
+{
+	if (currentstep == rank - 1)
+	{
+		lexeme* temp = nullptr;
+		bool deviderneeded = false;
+		int y = 0;
+		for (y = *currentpos; y < *currentpos + (2 * s[rank - 1] - 1); y++)
+		{
+			temp = (lexeme*)expression->get(y);
+			if (deviderneeded)
+			{
+				if (strcmp(temp->Data(), ",") != 0)
+				{
+					errorReporter.FReport(logfile, "Ожидается \",\"", temp->Line(), temp->Start_Position());
+					return false;
+				}
+				deviderneeded = false;
+				continue;
+			}
+			else
+			{
+				if (temp->Type() == VARIABLE || temp->Type() == MASSIVE)
+					if (!GetValue(dob, temp, expression, y))
+						return false;
+				if (temp->Type() != type)
+				{
+					errorReporter.FReport(logfile, "Тип элемента не соответсвует типу массива!", temp->Line(), temp->Start_Position());
+					return false;
+				}
+				poses->add(&y);
+				deviderneeded = true;
+			}
+		}
+		*currentpos = y;
+		temp = (lexeme*)expression->get(*currentpos);
+		if (strcmp(temp->Data(), "}") != 0)
+		{
+			errorReporter.FReport(logfile, "Ожидается \"}\"!", temp->Line(), temp->Start_Position());
+			return false;
+		}
+		(*currentpos)++;
+		return true;
+	}
+	int st = s[currentstep];
+	while (st > 0)
+	{
+		st--;
+		lexeme* temp = (lexeme*)expression->get(*currentpos);
+		if (strcmp(temp->Data(), "{") != 0)
+			return false;
+		(*currentpos)++;
+		if (!ReInnerFind(expression, currentpos, currentstep + 1, s, rank, poses, dob, type))
+			return false;
+		if (st > 0)
+		{
+			temp = (lexeme*)expression->get(*currentpos);
+			if (strcmp(temp->Data(), ",") != 0)
+			{
+				errorReporter.FReport(logfile, "Ожидается \",\"", temp->Line(), temp->Start_Position());
+				return false;
+			}
+			(*currentpos)++;
+		}
+	}
+	return true;
+}
+
+bool LexemeWorker::GetValue(Lexeme_list * dob, lexeme * place, List* expression, int pos)
+{
+	int dpos = dob->findpos(place->Data());
+	if (dpos != -1)
+	{
+		lexeme* cond = (lexeme*)dob->get(dpos);
+		if (cond->Rank() > 0)
+		{
+			//...получение элемента из массива и запись в *place
+			
+			//...
+		}
+		else *place = *cond;
+		return true;
+	}
+	else
+	{
+		errorReporter.FReport(logfile, "Нельзя непоределенное присвоить значение!", place->Line(), place->Start_Position());
+		return false;
+	}
 }

@@ -1,6 +1,8 @@
 {
-float i = 36.e1;
+float irs = 36.e1;
 //dfdfdf
+int a = 3;
+int [a][2] rt = {{1, 2}, {3, 4}, {5, 6}};
 bool f = true ;
 int h = 5;
 for (h; h < i; h++)

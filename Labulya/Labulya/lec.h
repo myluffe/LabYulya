@@ -17,7 +17,7 @@ private:
 public: 
 	lexeme(char* name, char* type, char* data, int line, int startposition, int priority);
 	lexeme(char* name, int type, char* data, int line, int startposition, int priority);
-	static lexeme* mass(lexeme* name, int type, List* val, int rank);
+	void ToMass(lexeme* name, int type, lexeme* values, int rank);
 	~lexeme();
 
 	//Получение полей лексемы:
@@ -35,6 +35,6 @@ public:
 	void Print();
 
 	//поля для массивов
-	List* values = nullptr;
+	lexeme* Values = nullptr; //ссылка на первый элемент?
 	int Rank() { return _rank; }
 };

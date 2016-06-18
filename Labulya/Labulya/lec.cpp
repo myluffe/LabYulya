@@ -25,11 +25,17 @@ lexeme::lexeme(char * name, int type, char * data, int line, int startposition, 
 	_priority = priority;
 }
 
-lexeme* lexeme::mass(lexeme* name, int type, List* val, int rank)
+void lexeme::ToMass(lexeme* name, int type, lexeme* val, int rank)
 {
-	lexeme* lex = new lexeme(name->Data(), type, nullptr, name->Line(), name->Start_Position(), name->Priority());
-	lex->_rank = rank;
-	lex->values = val;
+	_name = name->Data();
+	_type = type;
+	heap.free_mem(_data);
+	_data = "";
+	_line = name->Line();
+	_startposition = name->Start_Position();
+	_priority = name->Priority();
+	_rank = rank;
+	Values = val;
 }
 
 lexeme::~lexeme()
