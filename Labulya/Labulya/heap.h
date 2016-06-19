@@ -4,7 +4,6 @@
 
 #include <stdio.h>
 #include "windows.h"
-#include "Log.h"
 #include "ErrorReporter.h"
 
 #define SEGMENTSIZE 65539
@@ -14,14 +13,11 @@
 static class Heap
 {
 public:
-	Heap();
-	Heap GetHeap();
+	Heap(int _segment_size);
 	~Heap();
 	void*      get_mem(int size); //Возвращает указатель на выделенную память. На вход принимает кол-во байт для выделения.
 	void       free_mem(void*); //Освобождает выделенную get_mem память по указателю. Знает сколько удалять.
 private:
-	Heap(int _segment_size);
-	Heap* heap = nullptr;
 	void print(); //Отладочная ф-ция печати.
 	struct Chunk
 	{
@@ -45,4 +41,4 @@ private:
 
 	Segment*  current;
 
-};
+}heap_my = *new Heap(SEGMENTSIZE);

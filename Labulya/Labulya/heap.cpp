@@ -154,7 +154,7 @@ int Heap::make_segment()
 			my_Chunk->size = segment_size;
 			my_Chunk->used = false;
 			my_Segment->descriptor[0] = *my_Chunk;
-			LogFile.Write(("new Seg:\n%d\t%s\n", my_Segment->descriptor_count, (char*)my_Segment->data));
+			//LogFile.Write(("new Seg:\n%d\t%s\n", my_Segment->descriptor_count, (char*)my_Segment->data));
 			return 0;
 		}
 	}
@@ -166,21 +166,11 @@ void Heap::print()
 	Segment*  now_current = current;
 	while (now_current != 0)
 	{
-		LogFile.Write(("new Seg:\n%d\t%s\n", now_current->descriptor_count, (char*)now_current->data));
+		//LogFile.Write(("new Seg:\n%d\t%s\n", now_current->descriptor_count, (char*)now_current->data));
 		for (int i = 0; i < now_current->descriptor_count; i++)
 		{
-			LogFile.Write(("%d\t%s\t%s\n", now_current->descriptor[i].size, (char*)now_current->descriptor[i].offset, (char*)now_current->descriptor[i].used));
+			//LogFile.Write(("%d\t%s\t%s\n", now_current->descriptor[i].size, (char*)now_current->descriptor[i].offset, (char*)now_current->descriptor[i].used));
 		}
 		now_current = now_current->prev;
 	}
-}
-Heap::Heap()
-{
-}
-
-Heap Heap::GetHeap()
-{
-	if(heap == nullptr)
-		heap = new Heap(SEGMENTSIZE);
-	return *heap;
 }

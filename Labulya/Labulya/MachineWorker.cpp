@@ -269,7 +269,7 @@ int MachineWorker::Work(char* filename, List* lexes)
 		fr.~mFileReader();
 		return -6;
 	}
-	Diction_lexem().GetLexemeTable().~Diction_lexem();
+	HLexemeTable.~Diction_lexem();
 	fr.~mFileReader();
 	return 1;
 }
@@ -398,13 +398,13 @@ void MachineWorker::Addmachine(mStateMachine * machine)
 
 void MachineWorker::NumberCheck(int line)
 {
-	char* first = (char*)Heap().GetHeap().get_mem(sizeof(char) * Chunck * _currentaut->ChunkCount());
+	char* first = (char*)heap_my.get_mem(sizeof(char) * Chunck * _currentaut->ChunkCount());
 	first[0] = '\0';
 
-	char* second = (char*)Heap().GetHeap().get_mem(sizeof(char) * Chunck * _currentaut->ChunkCount());
+	char* second = (char*)heap_my.get_mem(sizeof(char) * Chunck * _currentaut->ChunkCount());
 	second[0] = 0;
 
-	char* number = (char*)Heap().GetHeap().get_mem(sizeof(char) * Chunck * _currentaut->ChunkCount());
+	char* number = (char*)heap_my.get_mem(sizeof(char) * Chunck * _currentaut->ChunkCount());
 	number[0] = '\0';
 	strcpy_s(number, Chunck * _currentaut->ChunkCount(), _currentaut->Buffer());
 
@@ -422,9 +422,9 @@ void MachineWorker::NumberCheck(int line)
 				{
 					errorReporter.FReport(logfile, "Uncorrect number. \"e\" - уже встретилось.", line, _currentaut->CurrentLexPos() + i);
 					_error = true;
-					Heap().GetHeap().free_mem(first);
-					Heap().GetHeap().free_mem(second);
-					Heap().GetHeap().free_mem(number);
+					heap_my.free_mem(first);
+					heap_my.free_mem(second);
+					heap_my.free_mem(number);
 					return;
 				}
 				else flagE = true;
@@ -438,9 +438,9 @@ void MachineWorker::NumberCheck(int line)
 			{
 				errorReporter.FReport(logfile, "Uncorrect number. \"e\" - если присутствует в числителе, знаменателя не может быть.", line, _currentaut->CurrentLexPos() + i);
 				_error = true;
-				Heap().GetHeap().free_mem(first);
-				Heap().GetHeap().free_mem(second);
-				Heap().GetHeap().free_mem(number);
+				heap_my.free_mem(first);
+				heap_my.free_mem(second);
+				heap_my.free_mem(number);
 				return;
 			}
 			break;
@@ -459,9 +459,9 @@ void MachineWorker::NumberCheck(int line)
 		{
 			errorReporter.FReport(logfile, "Uncorrect number. \".\" - не может быть несколько.", line, _currentaut->CurrentLexPos() + i);
 			_error = true;
-			Heap().GetHeap().free_mem(first);
-			Heap().GetHeap().free_mem(second);
-			Heap().GetHeap().free_mem(number);
+			heap_my.free_mem(first);
+			heap_my.free_mem(second);
+			heap_my.free_mem(number);
 			return;
 		}
 		if (number[i] == 'e')
@@ -474,9 +474,9 @@ void MachineWorker::NumberCheck(int line)
 			{
 				errorReporter.FReport(logfile, "Uncorrect number. \"e\" - не может быть несколько.", line, _currentaut->CurrentLexPos() + i);
 				_error = true;
-				Heap().GetHeap().free_mem(first);
-				Heap().GetHeap().free_mem(second);
-				Heap().GetHeap().free_mem(number);
+				heap_my.free_mem(first);
+				heap_my.free_mem(second);
+				heap_my.free_mem(number);
 				return;
 			}
 		}
@@ -492,9 +492,9 @@ void MachineWorker::NumberCheck(int line)
 		else
 			_currentaut->ChangeType(INT);
 	}
-	Heap().GetHeap().free_mem(first);
-	Heap().GetHeap().free_mem(second);
-	Heap().GetHeap().free_mem(number);
+	heap_my.free_mem(first);
+	heap_my.free_mem(second);
+	heap_my.free_mem(number);
 	return;
 }
 

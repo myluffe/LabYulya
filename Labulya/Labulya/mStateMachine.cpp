@@ -6,7 +6,7 @@ mStateMachine::mStateMachine(char* name, char* lexname, int lextype)
 	_isFinished = false;
 	_isError = false;
 	_start = false;
-	_buffer = (char*)Heap().GetHeap().get_mem(sizeof(char) * Chunck);
+	_buffer = (char*)heap_my.get_mem(sizeof(char) * Chunck);
 	_buffer[0] = '\0';
 	strcpy_s(_machineName, name);
 	strcpy_s(_currentLexemName, lexname);
@@ -20,7 +20,7 @@ mStateMachine::mStateMachine(char* name, char* lexname, int lextype)
 
 mStateMachine::~mStateMachine()
 {
-	Heap().GetHeap().free_mem(_buffer);
+	heap_my.free_mem(_buffer);
 	_words->~List();
 }
 
@@ -104,7 +104,7 @@ void mStateMachine::UpdateStatus()
 	_start = false;
 	_step = 0;
 	_chunckcount = 1;
-	_buffer = (char*)Heap().GetHeap().get_mem(sizeof(char) * Chunck);
+	_buffer = (char*)heap_my.get_mem(sizeof(char) * Chunck);
 	_buffer[0] = '\0';
 	_currentLexemePosition = -100;
 	_curlexline = -100;
@@ -236,9 +236,9 @@ void Type1Machine::EnterChar(char ch, int pos, int line)
 			if (_step >= Chunck * _chunckcount) //Chunck * кол-во кусков
 			{
 				_chunckcount++;
-				char* _buffer2 = (char*)Heap().GetHeap().get_mem(sizeof(char) * Chunck * _chunckcount);
+				char* _buffer2 = (char*)heap_my.get_mem(sizeof(char) * Chunck * _chunckcount);
 				strcpy_s(_buffer2, strlen(_buffer), _buffer);
-				Heap().GetHeap().free_mem(_buffer);
+				heap_my.free_mem(_buffer);
 				_buffer = _buffer2;
 			}
 			_buffer[_step++] = ch;
@@ -294,9 +294,9 @@ void Type2Machine::EnterChar(char ch, int pos, int line)
 			if (_step >= Chunck * _chunckcount) //50 * кол-во кусков
 			{
 				_chunckcount++;
-				char* _buffer2 = (char*)Heap().GetHeap().get_mem(sizeof(char) * Chunck * _chunckcount);
+				char* _buffer2 = (char*)heap_my.get_mem(sizeof(char) * Chunck * _chunckcount);
 				strcpy_s(_buffer2, strlen(_buffer), _buffer);
-				Heap().GetHeap().free_mem(_buffer);
+				heap_my.free_mem(_buffer);
 				_buffer = _buffer2;
 			}
 			_buffer[_step++] = ch;
@@ -371,14 +371,14 @@ void Type3Machine::CheckType()
 		strcpy_s(_currentLexemName, "Char");
 		_currentLexemeType = CHAR;
 	}
-	char* tbuffer = (char*)Heap().GetHeap().get_mem(sizeof(char) * Chunck * _chunckcount);
+	char* tbuffer = (char*)heap_my.get_mem(sizeof(char) * Chunck * _chunckcount);
 	for (int k = 1; k < strlen(_buffer) - 1; k++)
 	{
 		tbuffer[k - 1] = _buffer[k];
 	}
 	tbuffer[strlen(_buffer) - 2] = '\0';
 	strcpy_s(_buffer, Chunck * _chunckcount, tbuffer);
-	Heap().GetHeap().free_mem(tbuffer);
+	heap_my.free_mem(tbuffer);
 	if (_currentLexemeType == CHAR)
 	{
 		int slen = (int)strlen(_buffer);

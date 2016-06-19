@@ -31,7 +31,7 @@ Hash::Hash(int _n1, int _n2, int _n3, int _n4, int _n5)
 	{
 		table->add(new Diction_list());
 	}
-	/*table = (List**)Heap().GetHeap().get_mem(n1*n2*n3*n4*n5*sizeof(List*));
+	/*table = (List**)heap_my.get_mem(n1*n2*n3*n4*n5*sizeof(List*));
 	memset(table, 0, n1*n2*n3*n4*n5*sizeof(List*));*/
 };
 
@@ -138,16 +138,16 @@ void Diction_list::put(Article* article)
 { 
 	if (article != nullptr)
 	{
-		Article* art = (Article*)Heap().GetHeap().get_mem(sizeof(Article));
+		Article* art = (Article*)heap_my.get_mem(sizeof(Article));
 
-		art->word = (char*)Heap().GetHeap().get_mem(strlen(article->word) + 1);		
-		art->description = (char*)Heap().GetHeap().get_mem(strlen(article->description) + 1);
+		art->word = (char*)heap_my.get_mem(strlen(article->word) + 1);		
+		art->description = (char*)heap_my.get_mem(strlen(article->description) + 1);
 
 		memcpy(art->word, article->word, strlen(article->word)+1);
 		memcpy(art->description, article->description, strlen(article->description)+1);
 
 		add(art);		
-		Heap().GetHeap().free_mem(art);
+		heap_my.free_mem(art);
 	}
 }
 */
@@ -157,8 +157,8 @@ void Diction_list::del(char* word)
 	int a = findpos(word);
 	if (a != -1)
 	{
-		Heap().GetHeap().free_mem(((Article*)get(a))->word);
-	    Heap().GetHeap().free_mem(((Article*)get(a))->description);
+		heap_my.free_mem(((Article*)get(a))->word);
+	    heap_my.free_mem(((Article*)get(a))->description);
 		remove(a);
 	}
 }
@@ -194,7 +194,7 @@ Article* Diction::auto_create(char*word)
 		Diction_list* list = (Diction_list*)find_list(word);
 		if (!list)
 		{
-			list = (Diction_list*)Heap().GetHeap().get_mem(sizeof(Diction_list));
+			list = (Diction_list*)heap_my.get_mem(sizeof(Diction_list));
 		}
 		list->add(&art);
 	}

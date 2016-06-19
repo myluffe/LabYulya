@@ -12,29 +12,29 @@ Parser::~Parser()
 
 int Parser::ToInt(char * str)
 {
-	char* number = (char*)Heap().GetHeap().get_mem(sizeof(char) * ((int)strlen(str) + 1));
+	char* number = (char*)heap_my.get_mem(sizeof(char) * ((int)strlen(str) + 1));
 	strcpy_s(number, strlen(str) + 1, str);
 	int res = atoi(number);
-	Heap().GetHeap().free_mem(number);
+	heap_my.free_mem(number);
 	return res;
 }
 
 double Parser::ToDouble(char * str)
 {
-	char* number = (char*)Heap().GetHeap().get_mem(sizeof(char) * ((int)strlen(str) + 1));
+	char* number = (char*)heap_my.get_mem(sizeof(char) * ((int)strlen(str) + 1));
 	strcpy_s(number, strlen(str) + 1, str);
 	double res = atof(number);
-	Heap().GetHeap().free_mem(number);
+	heap_my.free_mem(number);
 	return res;
 }
 
 float Parser::ToFloat(char * str)
 {
-	char* number = (char*)Heap().GetHeap().get_mem(sizeof(char) * ((int)strlen(str) + 1));
+	char* number = (char*)heap_my.get_mem(sizeof(char) * ((int)strlen(str) + 1));
 	strcpy_s(number, strlen(str) + 1, str);
 	long temp = 0;
 	float res = _Stof(number, nullptr, temp);
-	Heap().GetHeap().free_mem(number);
+	heap_my.free_mem(number);
 	return res;
 }
 
@@ -47,16 +47,16 @@ char * Parser::IntToString(int value)
 		value /= 10;
 		count++;
 	}
-	char* str = (char*)Heap().GetHeap().get_mem(sizeof(char) * (count + 1) );
+	char* str = (char*)heap_my.get_mem(sizeof(char) * (count + 1) );
 	char* res = (char*)_itoa_s(value, str, count, 10);
-	Heap().GetHeap().free_mem(str);
+	heap_my.free_mem(str);
 	return res;
 }
 
 char * Parser::DoubleToString(double value)
 {
 	int decimal, sign;
-	char* res = (char*)Heap().GetHeap().get_mem(_CVTBUFSIZE);
+	char* res = (char*)heap_my.get_mem(_CVTBUFSIZE);
 	int buf = _ecvt_s(res, _CVTBUFSIZE, value, 100, &decimal, &sign);
 	if (buf != 0)
 		return nullptr;
@@ -66,7 +66,7 @@ char * Parser::DoubleToString(double value)
 char * Parser::FloatToString(float value)
 {
 	int decimal, sign;
-	char* res = (char*)Heap().GetHeap().get_mem(_CVTBUFSIZE);
+	char* res = (char*)heap_my.get_mem(_CVTBUFSIZE);
 	int buf = _fcvt_s(res, _CVTBUFSIZE, value, 100, &decimal, &sign);
 	if (buf != 0)
 		return nullptr;
@@ -82,7 +82,7 @@ bool Parser::ToBool(char * str)
 
 char * Parser::BoolToString(bool value)
 {
-	char* temp = (char*)Heap().GetHeap().get_mem(sizeof(char) * (6));
+	char* temp = (char*)heap_my.get_mem(sizeof(char) * (6));
 	if (value)
 		strcpy_s(temp, 6, "true");
 	else strcpy_s(temp, 6, "false");
