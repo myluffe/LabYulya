@@ -300,6 +300,7 @@ class TIf : TNode
 			else
 				if (branch_else != nullptr)
 					return branch_else->exec();
+			return nullptr;
 		}
 		void print()
 		{

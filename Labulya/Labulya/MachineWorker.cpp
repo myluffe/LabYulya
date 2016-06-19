@@ -408,7 +408,7 @@ void MachineWorker::NumberCheck(int line)
 	number[0] = '\0';
 	strcpy_s(number, Chunck * _currentaut->ChunkCount(), _currentaut->Buffer());
 
-	int count = strlen(number);
+	int count = (int)strlen(number);
 	int i = 0;
 	bool flagE = false;
 
