@@ -42,6 +42,7 @@ lexeme::~lexeme()
 {
 	heap.free_mem(_name);
 	heap.free_mem(_data);
+	heap.free_mem(Values);
 }
 
 bool lexeme::GetNumber(double * value)
