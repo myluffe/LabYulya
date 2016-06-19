@@ -4,9 +4,9 @@
 static class Log
 {
 public:
-	Log(char* FileName);
+	Log();
 	void Write(char* Out); //Функция вывода памяти
 	~Log();
-private:
-	char* _logfile; //Стандартный файл для вывода ошибок или предупреждений. По умолчанию - консоль.
-}LogFile = *new Log("log.txt");
+}LogFile = Log();
+
+static char LogFileName[] = "log.txt"; //Стандартный файл для вывода ошибок или предупреждений. По умолчанию - консоль.

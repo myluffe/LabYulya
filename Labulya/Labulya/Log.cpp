@@ -1,20 +1,17 @@
 #include "stdafx.h"
 #include "Log.h"
 
-Log::Log(char* FileName)
+Log::Log()
 {
-	_logfile = new char[(int)strlen(FileName) + 1];
-	strcpy_s(_logfile, (int)strlen(FileName) + 1, FileName);
 }
 
 void Log::Write(char* Out)
 {
-	if (_logfile != nullptr)
+	if (LogFileName != nullptr)
 	{
 		FILE* f;
-		fopen_s(&f, _logfile, "w");
-		if (f != nullptr)
-			fprintf_s(logfile, "%s\n", Out);
+		if (fopen_s(&f, LogFileName, "w+") == 0)
+			fprintf_s(f, "%s\n", Out);
 		fclose(f);
 	}
 }
