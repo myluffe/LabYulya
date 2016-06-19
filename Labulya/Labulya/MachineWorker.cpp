@@ -269,7 +269,7 @@ int MachineWorker::Work(char* filename, List* lexes)
 		fr.~mFileReader();
 		return -6;
 	}
-	
+	LexemeTable.~Diction_lexem();
 	fr.~mFileReader();
 	return 1;
 }
