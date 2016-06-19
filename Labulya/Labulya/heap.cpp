@@ -132,7 +132,7 @@ void Heap::delete_segments()
 	Segment*  now_current = current;
 	while (now_current != 0)
 	{
-		VirtualFree(now_current->data, segment_size, MEM_RELEASE);
+		free(now_current->data);
 		now_current = now_current->prev;
 	}
 }
