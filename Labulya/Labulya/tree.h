@@ -65,41 +65,41 @@ class TUnaryOperation : TNode
 			lexeme* res1 = m_operand->exec();
 			double o = Parser().ToDouble(res1->Data());
 			lexeme* res = new lexeme("Number", NUMBER, "0", res1->Line(), res1->Start_Position(), 100);
-			if (m_operation->Data() == "-" && m_left)
+			if (strcmp(m_operation->Data(), "-") == 0 && m_left)
 			{
 				res1->DataChange(Parser().DoubleToString(-o));
 				res->DataChange(res1->Data());
 				return res;
 			}
-			if (m_operation->Data() == "++" && m_left)
+			if (strcmp(m_operation->Data(), "++") == 0 && m_left)
 			{
 				res1->DataChange(Parser().DoubleToString(o + 1));
 				res->DataChange(res1->Data());
 				return res;
 			}
-			if (m_operation->Data() == "--" && m_left)
+			if (strcmp(m_operation->Data(), "--") == 0 && m_left)
 			{
 				res1->DataChange(Parser().DoubleToString(o - 1));
 				res->DataChange(res1->Data());
 				return res;
 			}
-			if (m_operation->Data() == "++" && !m_left)
+			if (strcmp(m_operation->Data(), "++") == 0 && !m_left)
 			{
 				res->DataChange(res1->Data());
 				res1->DataChange(Parser().DoubleToString(o + 1));
 				return res;
 			}
-			if (m_operation->Data() == "--" && !m_left)
+			if (strcmp(m_operation->Data(), "--") == 0 && !m_left)
 			{
 				res->DataChange(res1->Data());
 				res1->DataChange(Parser().DoubleToString(o - 1));
 				return res;
 			}
-			if (m_operation->Data() == "+" && m_left)
+			if (strcmp(m_operation->Data(), "+") == 0 && m_left)
 			{
 				return m_operand->exec();
 			}
-			if (m_operation->Data() == "!" && m_left)
+			if (strcmp(m_operation->Data(), "!") == 0 && m_left)
 			{
 				bool b = Parser().ToBool(res1->Data());
 				res1->DataChange(Parser().BoolToString(!b));
@@ -139,23 +139,23 @@ class TBinaryOperation : TNode
 			double o1 = Parser().ToDouble(res1->Data());
 			double o2 = Parser().ToDouble(res2->Data());
 			lexeme* res = new lexeme("Number", NUMBER, "0", res1->Line(), res1->Start_Position(), 100);
-			if (m_operation->Data() == "+")
+			if (strcmp(m_operation->Data(), "+") == 0)
 			{
 				res->DataChange(Parser().DoubleToString(o1 + o2));
 			}
-			if (m_operation->Data() == "-")
+			if (strcmp(m_operation->Data(), "-") == 0)
 			{
 				res->DataChange(Parser().DoubleToString(o1 - o2));
 			}
-			if (m_operation->Data() == "*")
+			if (strcmp(m_operation->Data(), "*") == 0)
 			{
 				res->DataChange(Parser().DoubleToString(o1 * o2));
 			}
-			if (m_operation->Data() == "/")
+			if (strcmp(m_operation->Data(), "/") == 0)
 			{
 				res->DataChange(Parser().DoubleToString(o1 / o2));
 			}
-			if (m_operation->Data() == "=")
+			if (strcmp(m_operation->Data(), "=") == 0)
 			{
 				if(IsCastable(res1->Type(), res2->Type()))
 				{
@@ -163,37 +163,37 @@ class TBinaryOperation : TNode
 					res = res1;
 				}
 			}
-			if (m_operation->Data() == "==")
+			if (strcmp(m_operation->Data(), "==") == 0)
 			{
 				res->DataChange(Parser().BoolToString(o1 == o2));
 			}
-			if (m_operation->Data() == "!=")
+			if (strcmp(m_operation->Data(), "!=") == 0)
 			{
 				res->DataChange(Parser().BoolToString(o1 != o2));
 			}
-			if (m_operation->Data() == "<=")
+			if (strcmp(m_operation->Data(), "<=") == 0)
 			{
 				res->DataChange(Parser().BoolToString(o1 <= o2));
 			}
-			if (m_operation->Data() == ">=")
+			if (strcmp(m_operation->Data(), ">=") == 0)
 			{
 				res->DataChange(Parser().BoolToString(o1 >= o2));
 			}
-			if (m_operation->Data() == "<")
+			if (strcmp(m_operation->Data(), "<") == 0)
 			{
 				res->DataChange(Parser().BoolToString(o1 < o2));
 			}
-			if (m_operation->Data() == ">")
+			if (strcmp(m_operation->Data(), ">") == 0)
 			{
 				res->DataChange(Parser().BoolToString(o1 > o2));
 			}
-			if (m_operation->Data() == "&&")
+			if (strcmp(m_operation->Data(), "&&") == 0)
 			{
 				bool b1 = Parser().ToBool(res1->Data());
 				bool b2 = Parser().ToBool(res2->Data());
 				res->DataChange(Parser().BoolToString(b1 && b2));
 			}
-			if (m_operation->Data() == "||")
+			if (strcmp(m_operation->Data(), "||") == 0)
 			{
 				bool b1 = Parser().ToBool(res1->Data());
 				bool b2 = Parser().ToBool(res2->Data());

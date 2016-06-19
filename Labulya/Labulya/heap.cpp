@@ -3,6 +3,7 @@
 
 Heap::Heap(int _segment_size)
 {
+	count_segments = 0;
 	segment_size = _segment_size;
 	current = 0;
 	make_segment();
@@ -69,12 +70,15 @@ void* Heap::get_mem(int size)
 
 			return current->descriptor[0].offset;
 		}
+		else
+		{
+			errorReporter.FReport(logfile, "A lot of segment of memory", 0, 0);
+		}
 	}
 	else
-		//error "a lot of memory"
-		;
+		errorReporter.FReport(logfile, "A big size for segment of memory", 0, 0);
 
-	return 0;
+	return nullptr;
 }
 
 void Heap::free_mem(void* free_m)
@@ -133,19 +137,23 @@ void Heap::delete_segments()
 
 int Heap::make_segment()
 {
-	Segment *my_Segment = (Segment*)malloc(sizeof(Segment));
-	my_Segment->data = malloc(segment_size);
-	if (my_Segment->data != NULL)
+	if (count_segments * segment_size < MAXSIZE)
 	{
-		my_Segment->prev = current;
-		my_Segment->descriptor_count = 1;
-		current = my_Segment;
-		Chunk *my_Chunk = (Chunk*)malloc(sizeof(Chunk));
-		my_Chunk->offset = my_Segment->data;
-		my_Chunk->size = segment_size;
-		my_Chunk->used = false;
-		my_Segment->descriptor[0] = *my_Chunk;
-		return 0;
+		Segment *my_Segment = (Segment*)malloc(sizeof(Segment));
+		my_Segment->data = malloc(segment_size);
+		if (my_Segment->data != NULL)
+		{
+			count_segments++;
+			my_Segment->prev = current;
+			my_Segment->descriptor_count = 1;
+			current = my_Segment;
+			Chunk *my_Chunk = (Chunk*)malloc(sizeof(Chunk));
+			my_Chunk->offset = my_Segment->data;
+			my_Chunk->size = segment_size;
+			my_Chunk->used = false;
+			my_Segment->descriptor[0] = *my_Chunk;
+			return 0;
+		}
 	}
 	return -1;
 }

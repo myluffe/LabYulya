@@ -9,7 +9,6 @@ List::List(int element_size)
 	first = nullptr;
 	last = nullptr;
 	_error = false;
-	ListHeap = new Heap();
 }
 
 List::~List()
@@ -17,12 +16,10 @@ List::~List()
 	Segment* s = first;
 	while (s != nullptr)
 	{
-		
 		Segment* snext = s->next;
 		delete_segment(s);
 		s = snext;
 	}
-	ListHeap->~Heap();
 }
 
 void * List::get(int pos)
@@ -145,8 +142,8 @@ bool List::error()
 
 void List::new_segment()
 {
-	Segment *a = (Segment*)ListHeap->get_mem(sizeof(Segment));
-	a->data = ListHeap->get_mem(_element_size);
+	Segment *a = (Segment*)heap.get_mem(sizeof(Segment));
+	a->data = heap.get_mem(_element_size);
     a->next = nullptr;
 	if (_count == 0)
 	{
@@ -193,8 +190,8 @@ void List::delete_segment(Segment * seg)
 			a->next = seg->next;
 		}
 	}
-	ListHeap->free_mem(seg->data);
-	ListHeap->free_mem(seg);
+	heap.free_mem(seg->data);
+	heap.free_mem(seg);
 	_count--;
 }
 

@@ -4,8 +4,11 @@
 
 #include <stdio.h>
 #include "windows.h"
+#include "ErrorReporter.h"
+
 #define SEGMENTSIZE 65539
 #define SEGMENTCOUNT 1024
+#define MAXSIZE 838860800
 
 class Heap
 {
@@ -30,7 +33,7 @@ private:
 		Chunk  descriptor[SEGMENTCOUNT];
 		int          descriptor_count;
 	};
-
+	int		count_segments;
 	int       make_segment();
 	void      delete_segments();
 

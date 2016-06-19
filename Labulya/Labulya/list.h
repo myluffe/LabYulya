@@ -4,6 +4,7 @@
 #define LIST_H_INCLUDED
 
 #include <stdio.h>
+#include "heap.h"
 
 #define LISTSIZE 64
 
@@ -38,7 +39,6 @@ private:
 	int              _element_count;
 	int              _count;
 	bool             _error;
-    Heap*             ListHeap;
 
 	void new_segment(); //выделяет память в конце списка под сегмент и данные
 	void delete_segment(Segment* seg); //освобождает определенный элемент
