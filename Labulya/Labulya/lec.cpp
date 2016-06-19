@@ -27,7 +27,9 @@ lexeme::lexeme(char * name, int type, char * data, int line, int startposition, 
 
 void lexeme::ToMass(lexeme* name, int type, lexeme* val, int rank)
 {
-	_name = name->Data();
+	heap.free_mem(_name);
+	_name = (char*)heap.get_mem(sizeof(char) * (strlen(name->Data()) + 1));
+	strcpy_s(_name, (strlen(name->Data()) + 1), name->Data());
 	_type = type;
 	heap.free_mem(_data);
 	_data = "";
