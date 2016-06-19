@@ -57,7 +57,7 @@ char * Parser::DoubleToString(double value)
 {
 	int decimal, sign;
 	char* res = (char*)heap.get_mem(_CVTBUFSIZE);
-	int buf = _ecvt_s(res, _CVTBUFSIZE, value, 100, &decimal, &sign);
+	int buf = _ecvt_s(res, _CVTBUFSIZE, value, 10, &decimal, &sign);
 	if (buf != 0)
 		return nullptr;
 	return res;

@@ -109,7 +109,7 @@ void mStateMachine::UpdateStatus()
 	_currentLexemePosition = -100;
 	_curlexline = -100;
 	ClearAdditionals();
-	Priority = 100;
+	Priority = 0;
 }
 
 void Type1Machine::ClearAdditionals()

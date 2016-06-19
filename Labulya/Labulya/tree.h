@@ -4,6 +4,7 @@
 #include "list.h"
 #include "Types.h"
 #include "Parser.h"
+#include "ErrorReporter.h"
 
 class TNode
 {
@@ -138,7 +139,10 @@ class TBinaryOperation : TNode
 			lexeme* res2 = m_operand2->exec();
 			double o1 = Parser().ToDouble(res1->Data());
 			double o2 = Parser().ToDouble(res2->Data());
-			lexeme* res = new lexeme("Number", NUMBER, "0", res1->Line(), res1->Start_Position(), 100);
+			int type = res1->Type();
+			if(res1->Type() > res2->Type())
+				type = res2->Type();
+			lexeme* res = new lexeme("Number", type, "0", res1->Line(), res1->Start_Position(), 100);
 			if (strcmp(m_operation->Data(), "+") == 0)
 			{
 				res->DataChange(Parser().DoubleToString(o1 + o2));
@@ -162,6 +166,8 @@ class TBinaryOperation : TNode
 					res1->DataChange(res2->Data());
 					res = res1;
 				}
+				else
+					ErrorReporter().FReport(logfile, "Нельзя привечсти типы!", m_operation->Line(), m_operation->Start_Position());
 			}
 			if (strcmp(m_operation->Data(), "==") == 0)
 			{

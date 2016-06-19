@@ -361,7 +361,7 @@ void MachineWorker::GetOperationPriority(mStateMachine * machine)
 	if (strcmp("*", machine->Buffer()) == 0)
 	{
 		if (machine->CurrentLexType() == BYNARYOPERATION)
-			machine->Priority = 10;
+			machine->Priority = 5;
 		if (machine->CurrentLexType() == UNARYOPERATION)
 			machine->Priority = 3;
 		return;
@@ -380,7 +380,7 @@ void MachineWorker::GetOperationPriority(mStateMachine * machine)
 		machine->Priority = 50;
 		return;
 	}
-	machine->Priority = 100;
+	machine->Priority = 0;
 }
 
 
