@@ -135,7 +135,7 @@ void Type2Machine::ClearAdditionals()
 void Type2Machine::PrintAdditionals()
 {
 	printf("Permissible Start: ");
-	int count = strlen(_permissiblestart);
+	int count = (int)strlen(_permissiblestart);
 	for (int i = 0; i < count; i++)
 	{
 		printf("\'%c\' ", _permissiblestart[i]);
@@ -224,7 +224,7 @@ void Type1Machine::EnterChar(char ch, int pos, int line)
 			{
 				char sstemp[Chunck];
 				sprintf_s(sstemp, "Maybe you misse space? Maybe you mean \"%s\"?", temp);
-				errorReporter.WarningReport(logfile, sstemp, _curlexline, _currentLexemePosition + strlen(_buffer));
+				errorReporter.WarningReport(logfile, sstemp, _curlexline, _currentLexemePosition + (int)strlen(_buffer));
 			}
 			//
 			_potentialwords.remove(i);
@@ -255,7 +255,7 @@ Type2Machine::~Type2Machine()
 
 void Type2Machine::CheckStart(char ch)
 {
-	int listcount = strlen(_permissiblestart);
+	int listcount = (int)strlen(_permissiblestart);
 	for (int i = 0; i < listcount; i++)
 	{
 		if (_permissiblestart[i] == ch)
@@ -381,7 +381,7 @@ void Type3Machine::CheckType()
 	heap.free_mem(tbuffer);
 	if (_currentLexemeType == CHAR)
 	{
-		int slen = strlen(_buffer);
+		int slen = (int)strlen(_buffer);
 		if (slen > 1)
 		{
 			if (slen != 2)
