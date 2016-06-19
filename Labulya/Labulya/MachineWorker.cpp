@@ -269,7 +269,7 @@ int MachineWorker::Work(char* filename, List* lexes)
 		fr.~mFileReader();
 		return -6;
 	}
-	
+	LexemeTable.~Diction_lexem();
 	fr.~mFileReader();
 	return 1;
 }
@@ -408,7 +408,7 @@ void MachineWorker::NumberCheck(int line)
 	number[0] = '\0';
 	strcpy_s(number, Chunck * _currentaut->ChunkCount(), _currentaut->Buffer());
 
-	int count = strlen(number);
+	int count = (int)strlen(number);
 	int i = 0;
 	bool flagE = false;
 

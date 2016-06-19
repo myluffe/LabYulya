@@ -138,7 +138,7 @@ bool LexemeWorker::Processing(List* lexes)
 						lexeme* tdevider = (lexeme*)lexes->get(i + 1);
 						if (strcmp(tdevider->Data(), "=") != 0)
 						{
-							errorReporter.FReport(logfile, "You should define the variable!", temp_lexeme->Line(), temp_lexeme->Start_Position() + strlen(temp_lexeme->Data()));
+							errorReporter.FReport(logfile, "You should define the variable!", temp_lexeme->Line(), temp_lexeme->Start_Position() + (int)strlen(temp_lexeme->Data()));
 							return false;
 						}
 						lexeme* tdata = (lexeme*)lexes->get(i + 2);
@@ -182,7 +182,7 @@ bool LexemeWorker::Processing(List* lexes)
 					}
 					else
 					{
-						errorReporter.FReport(logfile, "You should define the variable!", temp_lexeme->Line(), temp_lexeme->Start_Position() + strlen(temp_lexeme->Data()));
+						errorReporter.FReport(logfile, "You should define the variable!", temp_lexeme->Line(), temp_lexeme->Start_Position() + (int)strlen(temp_lexeme->Data()));
 						return false;
 					}
 				}
@@ -228,10 +228,12 @@ bool LexemeWorker::Processing(List* lexes)
 					return false;
 				}
 			}
+			continue;
 		}
 		if (temp_lexeme->Type() == NUMBER)
 		{
 			//обработка для чисел
+			continue;
 		}
 		if (strcmp(temp_lexeme->Data(), "}") == 0)
 		{
@@ -248,6 +250,7 @@ bool LexemeWorker::Processing(List* lexes)
 					break;
 				}
 			}
+			continue;
 		}
 	}
 
@@ -276,6 +279,7 @@ bool LexemeWorker::Processing(List* lexes)
 		else
 		{
 			i = CorrectExpression(expression, i, storage);
+			continue;
 		}
 	}
 
@@ -283,7 +287,9 @@ bool LexemeWorker::Processing(List* lexes)
 	printf_s("\n|---------------|\nVariable Table:\n");
 	LexemeTable.print_lexems();
 	printf_s("\n|---------------|\n");
+	printf_s("Tree View: \n");
 	storage->print();
+	printf_s("\n|---------------|\n");
 	//
 	dob->~Lexeme_list();
 	storage->~TList();
@@ -301,11 +307,11 @@ LexemeWorker::~LexemeWorker()
 
 int LexemeWorker::CorrectExpression(List* expression, int pos, TList* storage)
 {
-	int start = 0;
+	int start = pos;
 	int i;
 	List* tlist = new List(sizeof(sizeof(lexeme*)));
 
-	for (i = 0; i < expression->count(); i++)
+	for (i = pos; i < expression->count(); i++)
 	{
 		lexeme* temp_lexeme = *(lexeme**)expression->get(i);
 		tlist->add(&temp_lexeme);
@@ -444,6 +450,7 @@ int LexemeWorker::CorrectShortIfOperation(List * expression, int i, TList* stora
 		body2->~List();
 		return i;
 	}
+	return i;
 }
 
 int LexemeWorker::CorrectSpecial(lexeme* spec, int pos, List* expression, TList* storage)
@@ -922,7 +929,7 @@ int LexemeWorker::CorrectWhile(List * expression, int pos, lexeme * spec, TList*
 	int pos2 = FuncWithBoolParam(expression, pos, spec, false, hl);
 	if (pos2 <= pos)
 	{
-		ErrorReporter().FReport(logfile, "Незаконченное выражение!", spec->Line(), spec->Start_Position() + strlen(spec->Data()));
+		ErrorReporter().FReport(logfile, "Незаконченное выражение!", spec->Line(), spec->Start_Position() + (int)strlen(spec->Data()));
 		_error = true;
 		return pos;
 	}
