@@ -145,7 +145,7 @@ void List::new_segment()
 	Segment *a = (Segment*)heap.get_mem(sizeof(Segment));
 	a->data = heap.get_mem(_element_size);
     a->next = nullptr;
-	if (_count == 0)
+	if (first == nullptr)
 	{
 		first = a;
         a->prev = nullptr;
@@ -162,32 +162,30 @@ void List::new_segment()
 
 void List::delete_segment(Segment * seg)
 {
-	if (seg->prev == NULL)
+	if (seg->prev == nullptr)
 	{
-		if (seg->next == NULL)
+		if (seg->next == nullptr)
 		{
-			first = NULL;
-			last = NULL;
+			first = nullptr;
+			last = nullptr;
 		}
 		else
 		{
 			first = seg->next;
-			first->prev = NULL;
+			first->prev = nullptr;
 		}
 	}
 	else
 	{
-		if (seg->next == NULL)
+		if (seg->next == nullptr)
 		{
 			last = seg->prev;
-			last->next = NULL;
+			last->next = nullptr;
 		}
 		else
 		{
-			Segment *a = seg->next;
-			a->prev = seg->prev;
-			a = seg->prev;
-			a->next = seg->next;
+			seg->next->prev = seg->prev;
+			seg->prev->next = seg->next;
 		}
 	}
 	heap.free_mem(seg->data);

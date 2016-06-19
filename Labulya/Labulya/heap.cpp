@@ -48,6 +48,7 @@ void* Heap::get_mem(int size)
 								now_current->descriptor[h] = now_current->descriptor[h - 1];
 							}
 							now_current->descriptor[i + 1] = my_Chunk;
+							print();
 							return now_current->descriptor[i].offset;
 						}
 					}
@@ -67,7 +68,7 @@ void* Heap::get_mem(int size)
 			current->descriptor[0].size = size;
 			current->descriptor[1] = my_Chunk;
 			current->descriptor_count++;
-
+			print();
 			return current->descriptor[0].offset;
 		}
 		else
@@ -118,6 +119,7 @@ void Heap::free_mem(void* free_m)
 					}
 					now_current->descriptor_count -= count;
 				}
+				print();
 				return;
 			}
 		}
@@ -141,7 +143,7 @@ int Heap::make_segment()
 	{
 		Segment *my_Segment = (Segment*)malloc(sizeof(Segment));
 		my_Segment->data = malloc(segment_size);
-		if (my_Segment->data != NULL)
+		if (my_Segment->data != nullptr)
 		{
 			count_segments++;
 			my_Segment->prev = current;
@@ -152,6 +154,7 @@ int Heap::make_segment()
 			my_Chunk->size = segment_size;
 			my_Chunk->used = false;
 			my_Segment->descriptor[0] = *my_Chunk;
+			LogFile.Write(("new Seg:\n%d\t%s\n", my_Segment->descriptor_count, (char*)my_Segment->data));
 			return 0;
 		}
 	}
@@ -163,10 +166,10 @@ void Heap::print()
 	Segment*  now_current = current;
 	while (now_current != 0)
 	{
-		printf("new Seg:\n%d\t%s\n", now_current->descriptor_count, (char*)now_current->data);
+		LogFile.Write(("new Seg:\n%d\t%s\n", now_current->descriptor_count, (char*)now_current->data));
 		for (int i = 0; i < now_current->descriptor_count; i++)
 		{
-			printf("%d\t%s\t%d\n", now_current->descriptor[i].size, (char*)now_current->descriptor[i].offset, now_current->descriptor[i].used ? 1 : 0);
+			LogFile.Write(("%d\t%s\t%s\n", now_current->descriptor[i].size, (char*)now_current->descriptor[i].offset, (char*)now_current->descriptor[i].used));
 		}
 		now_current = now_current->prev;
 	}
