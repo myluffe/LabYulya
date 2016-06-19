@@ -6,12 +6,12 @@ mStateMachine::mStateMachine(char* name, char* lexname, int lextype)
 	_isFinished = false;
 	_isError = false;
 	_start = false;
-	_checkError = false;
 	_buffer = (char*)heap.get_mem(sizeof(char) * Chunck);
 	_buffer[0] = '\0';
 	strcpy_s(_machineName, name);
 	strcpy_s(_currentLexemName, lexname);
 	_currentLexemeType = lextype;
+	_originaltype = lextype;
 	_currentLexemePosition = -100;
 	_curlexline = -100;
 	_step = 0;
@@ -47,11 +47,6 @@ bool mStateMachine::IsError()
 bool mStateMachine::IsStart()
 {
 	return _start;
-}
-
-bool mStateMachine::CheckError()
-{
-	return _checkError;
 }
 
 char * mStateMachine::CurrentLexName()
@@ -103,21 +98,21 @@ void mStateMachine::AddWord(void * word)
 
 void mStateMachine::UpdateStatus()
 {
+	_currentLexemeType = _originaltype;
 	_isError = false;
 	_isFinished = false;
 	_start = false;
-	_checkError = false;
 	_step = 0;
 	_chunckcount = 1;
 	_buffer = (char*)heap.get_mem(sizeof(char) * Chunck);
 	_buffer[0] = '\0';
 	_currentLexemePosition = -100;
 	_curlexline = -100;
-	ClearAdditional();
+	ClearAdditionals();
 	Priority = 100;
 }
 
-void Type1Machine::ClearAdditional()
+void Type1Machine::ClearAdditionals()
 {
 	_potentialwords.~List();
 	_potentialwords = List(sizeof(char[Chunck]));
@@ -133,14 +128,14 @@ void Type1Machine::PrintAdditionals()
 	printf("\n");
 }
 
-void Type2Machine::ClearAdditional()
+void Type2Machine::ClearAdditionals()
 {
 }
 
 void Type2Machine::PrintAdditionals()
 {
 	printf("Permissible Start: ");
-	int count = strlen(_permissiblestart);
+	int count = (int)strlen(_permissiblestart);
 	for (int i = 0; i < count; i++)
 	{
 		printf("\'%c\' ", _permissiblestart[i]);
@@ -215,7 +210,11 @@ void Type1Machine::EnterChar(char ch, int pos, int line)
 	for (int i = 0; i < listcount; i++)
 	{
 		strcpy_s(temp, (char*)_potentialwords.get(i));
-		if (temp[_step] != ch)
+		bool ftemp;
+		if (!f) ftemp = (temp[_step] != ch);
+		else 
+			ftemp = (temp[_step - 1] != ch);
+		if (ftemp)
 		{
 			//test for missed space
 			char stemp[Chunck];
@@ -225,7 +224,7 @@ void Type1Machine::EnterChar(char ch, int pos, int line)
 			{
 				char sstemp[Chunck];
 				sprintf_s(sstemp, "Maybe you misse space? Maybe you mean \"%s\"?", temp);
-				ErrorReporter().WarningReport(stdout, sstemp, _curlexline, _currentLexemePosition + strlen(_buffer));
+				errorReporter.WarningReport(logfile, sstemp, _curlexline, _currentLexemePosition + (int)strlen(_buffer));
 			}
 			//
 			_potentialwords.remove(i);
@@ -256,7 +255,7 @@ Type2Machine::~Type2Machine()
 
 void Type2Machine::CheckStart(char ch)
 {
-	int listcount = strlen(_permissiblestart);
+	int listcount = (int)strlen(_permissiblestart);
 	for (int i = 0; i < listcount; i++)
 	{
 		if (_permissiblestart[i] == ch)
@@ -285,6 +284,8 @@ void Type2Machine::EnterChar(char ch, int pos, int line)
 
 	int listcount = _words->count();
 	_isFinished = true;
+	if (ch == '\0')
+		return;
 	for (int i = 0; i < listcount; i++)
 	{
 		if (strchr((char*)_words->get(i), ch) != nullptr)
@@ -380,21 +381,21 @@ void Type3Machine::CheckType()
 	heap.free_mem(tbuffer);
 	if (_currentLexemeType == CHAR)
 	{
-		int slen = strlen(_buffer);
+		int slen = (int)strlen(_buffer);
 		if (slen > 1)
 		{
 			if (slen != 2)
 			{
-				ErrorReporter().FReport(stdout, "To many symbols for char!", _curlexline, _currentLexemePosition);
-				_checkError = true;
+				errorReporter.FReport(logfile, "To many symbols for char!", _curlexline, _currentLexemePosition);
+				_isError = true;
 				return;
 			}
 			else
 			{
 				if (_buffer[0] != '\\')
 				{
-					ErrorReporter().FReport(stdout, "To many Symbols for char!", _curlexline, _currentLexemePosition);
-					_checkError = true;
+					errorReporter.FReport(logfile, "To many Symbols for char!", _curlexline, _currentLexemePosition);
+					_isError = true;
 					return;
 				}
 			}

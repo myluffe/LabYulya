@@ -3,6 +3,7 @@
 #include "list.h"
 #include "lec.h"
 
+//Стэк для double
 class Stack : List
 {
 public:
@@ -27,6 +28,7 @@ public:
     }
 };
 
+//Стэк для lexeme
 class LexemeStack : List
 {
 public:
@@ -48,6 +50,7 @@ public:
 	}
 };
 
+//Очередь для double
 class Queue : List
 {
 public:
@@ -72,6 +75,7 @@ public:
     }
 };
 
+//Дэк (Стэк наоборот) для double
 class Deque : List
 {
     public:

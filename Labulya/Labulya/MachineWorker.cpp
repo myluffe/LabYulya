@@ -8,7 +8,7 @@ MachineWorker::MachineWorker()
 
 	// Special Words
 	sm = new Type1Machine("Special Words", "Special Word", SPECIALWORD);
-	char* ss[] = { "//", "/*", "*/", "return ", "for ", "if ", "else ", "while ", "do ", "input ", "output ", "max ", "min ", "sin ", "cos " };
+	char* ss[] = { "//", "/*", "*/", "for ", "if ", "else ", "while ", "do ", "input ", "output ", "max ", "min ", "sin ", "cos ", "Number" };
 	for each (char* var in ss)
 	{
 		sm->AddWord(var);
@@ -34,8 +34,9 @@ MachineWorker::MachineWorker()
 	Addmachine(bm);
 
 	// Operations1
+	//"?:" как добавить
 	om = new Type1Machine("Operations1", "Operation", OPERATION);
-	char* os[] = { "++", "--", "==", "!=", "||", "&&", ">=", "<=", "<<", ">>", "::" };
+	char* os[] = { "++", "--", "==", "!=", "||", "&&", ">=", "<=", "<<", ">>" };
 	for each (char* var in os)
 	{
 		om->AddWord(var);
@@ -44,7 +45,7 @@ MachineWorker::MachineWorker()
 
 	// Numbers
 	nm = new Type2Machine("Numbers", "Number", FLOAT);
-	char nm_perstart[] = "-+0123456789.";
+	char nm_perstart[] = "0123456789.";
 	char nm_optional[] = "e";
 	nm->AddWord(nm_perstart);
 	nm->AddWord(nm_optional);
@@ -53,7 +54,7 @@ MachineWorker::MachineWorker()
 
 	// Operations2
 	om2 = new Type1Machine("Operations2", "Operation", OPERATION);
-	char* os2[] = { "+", "-", "=", "/", "*", "|", "&", ">", "<", "%", ":", "!", "?" };
+	char* os2[] = { "+", "-", "=", "/", "*", "|", "&", ">", "<", "%", ":", "!", "?", "," };
 	for each (char* var in os2)
 	{
 		om2->AddWord(var);
@@ -81,7 +82,7 @@ MachineWorker::MachineWorker()
 	// String & Symbols
 	ssm = new Type3Machine("String & Symbols", "String", STRING);
 	char ssm_perstart[] = "\"\'";
-	char ssm_optional[] = "\\|:,<.>/?;\*]}[{-=!@#$%^&*()+`~";
+	char ssm_optional[] = "\\|:,<.>/?;]}[{-=!@#$%^&*()+`~";
 	ssm->AddWord(ssm_perstart);
 	ssm->AddWord(ssm_optional);
 	ssm->AddWord(vm_perstart);
@@ -89,12 +90,13 @@ MachineWorker::MachineWorker()
 	ssm->SetPerStartWords(ssm_perstart);
 	Addmachine(ssm);
 	
+	/*
 	for (int klick = 0; klick < _count; klick++)
 	{
 		_machines[klick]->PrintMachine();
 		printf("\n-------------\n");
 	}
-	
+	*/
 	_currentaut = _machines[0];
 	_curmachine = 0;
 }
@@ -102,6 +104,17 @@ MachineWorker::MachineWorker()
 
 MachineWorker::~MachineWorker()
 {
+	sm->~Type1Machine();
+	om->~Type1Machine();
+	om2->~Type1Machine();
+	dm->~Type1Machine();
+	tm->~Type1Machine();
+	bm->~Type1Machine();
+
+	nm->~Type2Machine();
+	vm->~Type2Machine();
+
+	ssm->~Type3Machine();
 }
 
 int MachineWorker::Work(char* filename, List* lexes)
@@ -131,14 +144,18 @@ int MachineWorker::Work(char* filename, List* lexes)
 					_currentaut->EnterChar(str[s], s, fr.CurrentLine());
 				else
 				{
-					s = strlen(str);
+					s = sizeof(strlen(str));
 					_currentaut->EnterChar('\0', s, fr.CurrentLine());
 					SuperFlag = false;
+					s = lenght;
 				}
 				if (_currentaut->IsFinished())
 				{
-					if (_currentaut->CheckError())
+					if (_currentaut->IsError())
+					{
+						fr.~mFileReader();
 						return -3;
+					}
 					if (strcmp(_currentaut->MachineName(), "Special Words") == 0)
 					{
 						if (strcmp(_currentaut->Buffer(), "//") == 0)
@@ -162,24 +179,34 @@ int MachineWorker::Work(char* filename, List* lexes)
 					{
 						NumberCheck(fr.CurrentLine());
 						if (_error)
+						{
+							fr.~mFileReader();
 							return -2;
+						}
 					}
 					if (strcmp(_currentaut->MachineName(), "Deviders") == 0)
 					{
 						Hooker(_currentaut->Buffer());
 						if (_error)
+						{
+							fr.~mFileReader();
 							return -5;
+						}
 						GetOperationPriority(_currentaut);
 					}
 					if (strcmp(_currentaut->CurrentLexName(), "Operation") == 0)
 					{
+						lexeme* tlex = (lexeme*)lexes->get(lexes->count() - 1);
+						if (tlex->Type() == VARIABLE || tlex->Type() == NUMBER || strcmp(tlex->Data(), ")") == 0)
+							_currentaut->ChangeType(BYNARYOPERATION);
+						else _currentaut->ChangeType(UNARYOPERATION);
 						GetOperationPriority(_currentaut);
 					}
 					lexes->add(new lexeme(_currentaut->CurrentLexName(),
 						_currentaut->CurrentLexType(), _currentaut->Buffer(),
 						_currentaut->CurrentLexLine(), _currentaut->CurrentLexPos(), _currentaut->Priority));
 					UpdateMachines();
-					s--;		
+					s--;
 				}
 				if (_currentaut->IsError())
 				{
@@ -193,8 +220,9 @@ int MachineWorker::Work(char* filename, List* lexes)
 						else
 						{
 							if (str[s] == EOF)
-								ErrorReporter().FReport(stdout, "Unprocessed word!", fr.CurrentLine(), _currentaut->CurrentLexPos());
+								errorReporter.FReport(logfile, "Unprocessed word!", fr.CurrentLine(), _currentaut->CurrentLexPos());
 							UpdateMachines();
+							fr.~mFileReader();
 							return -100;
 						}
 					}
@@ -211,15 +239,17 @@ int MachineWorker::Work(char* filename, List* lexes)
 			{
 				if (fr.EndFile() && s >= strlen(str) - 1 && EnterInComment)
 				{
-					ErrorReporter().FReport(stdout, "Maybe you forget to close the comment", commentline, commentpos);
-					_error = false;
+					errorReporter.FReport(logfile, "Maybe you forget to close the comment", commentline, commentpos);
+					//_error = false;
+					fr.~mFileReader();
 					return -1;
 				}
 				if (fr.EndFile())
 				{
 					if (!HooksCheck(&fr))
 					{
-						_error = true;
+						//_error = true;
+						fr.~mFileReader();
 						return -386;
 					}
 				}
@@ -233,8 +263,14 @@ int MachineWorker::Work(char* filename, List* lexes)
 			}
 		}
 	}
+	
 	if (!LWorker.Processing(lexes))
+	{
+		fr.~mFileReader();
 		return -6;
+	}
+	LexemeTable.~Diction_lexem();
+	fr.~mFileReader();
 	return 1;
 }
 
@@ -245,14 +281,108 @@ int MachineWorker::Count()
 
 void MachineWorker::GetOperationPriority(mStateMachine * machine)
 {
-	if (strcmp("(", machine->Buffer()) == 0)
+	if (strcmp("(", machine->Buffer()) == 0 || strcmp(")", machine->Buffer()) == 0)
+	{
 		machine->Priority = 0;
+		return;
+	}
+	if (strcmp("--", machine->Buffer()) == 0 || strcmp("++", machine->Buffer()) == 0)
+	{
+		machine->Priority = 2;
+		machine->ChangeType(UNARYOPERATION);
+		return;
+	}
+	if (strcmp("!", machine->Buffer()) == 0)
+	{
+		machine->Priority = 3;
+		return;
+	}
+	if (strcmp("/", machine->Buffer()) == 0 || strcmp("%", machine->Buffer()) == 0)
+	{
+		machine->Priority = 5;
+		return;
+	}
+	if (strcmp("<<", machine->Buffer()) == 0 || strcmp(">>", machine->Buffer()) == 0)
+	{
+		machine->Priority = 7;
+		return;
+	}	
+	if (strcmp("<", machine->Buffer()) == 0 || strcmp(">", machine->Buffer()) == 0 ||
+		strcmp("<=", machine->Buffer()) == 0 || strcmp(">=", machine->Buffer()) == 0)
+	{
+		machine->Priority = 8;
+		return;
+	}
+	if (strcmp("==", machine->Buffer()) == 0 || strcmp("!=", machine->Buffer()) == 0)
+	{
+		machine->Priority = 9;
+		return;
+	}
+	if (strcmp("|", machine->Buffer()) == 0)
+	{
+		machine->Priority = 12;
+		return;
+	}
+	if (strcmp("&&", machine->Buffer()) == 0)
+	{
+		machine->Priority = 13;
+		return;
+	}
+	if (strcmp("||", machine->Buffer()) == 0)
+	{
+		machine->Priority = 14;
+		return;
+	}
+	if (strcmp(":", machine->Buffer()) == 0 || strcmp("?", machine->Buffer()) == 0)
+	{
+		machine->Priority = 15;
+		machine->ChangeType(TERNARYOPERATION);
+		return;
+	}
+	if (strcmp("=", machine->Buffer()) == 0)
+	{
+		machine->Priority = 16;
+		return;
+	}
+	if (strcmp(",", machine->Buffer()) == 0)
+	{
+		machine->Priority = 17;
+		return;
+	}
+	if (strcmp("+", machine->Buffer()) == 0 || strcmp("-", machine->Buffer()) == 0)
+	{
+		if (machine->CurrentLexType() == BYNARYOPERATION)
+			machine->Priority = 6;
+		if (machine->CurrentLexType() == UNARYOPERATION)
+			machine->Priority = 3;
+		return;
+	}
+
 	if (strcmp("*", machine->Buffer()) == 0)
-		machine->Priority = 25;
+	{
+		if (machine->CurrentLexType() == BYNARYOPERATION)
+			machine->Priority = 10;
+		if (machine->CurrentLexType() == UNARYOPERATION)
+			machine->Priority = 3;
+		return;
+	}
+
+	if (strcmp("&", machine->Buffer()) == 0)
+	{
+		if (machine->CurrentLexType() == BYNARYOPERATION)
+			machine->Priority = 5;
+		if (machine->CurrentLexType() == UNARYOPERATION)
+			machine->Priority = 3;
+		return;
+	}
 	if (strcmp(machine->CurrentLexName(), "Operation") == 0)
+	{
 		machine->Priority = 50;
+		return;
+	}
 	machine->Priority = 100;
 }
+
 
 void MachineWorker::UpdateMachines()
 {
@@ -278,7 +408,7 @@ void MachineWorker::NumberCheck(int line)
 	number[0] = '\0';
 	strcpy_s(number, Chunck * _currentaut->ChunkCount(), _currentaut->Buffer());
 
-	int count = strlen(number);
+	int count = (int)strlen(number);
 	int i = 0;
 	bool flagE = false;
 
@@ -290,7 +420,7 @@ void MachineWorker::NumberCheck(int line)
 			{
 				if (flagE)
 				{
-					ErrorReporter().FReport(stdout, "Uncorrect number. \"e\" - уже встретилось.", line, _currentaut->CurrentLexPos() + i);
+					errorReporter.FReport(logfile, "Uncorrect number. \"e\" - уже встретилось.", line, _currentaut->CurrentLexPos() + i);
 					_error = true;
 					heap.free_mem(first);
 					heap.free_mem(second);
@@ -306,7 +436,7 @@ void MachineWorker::NumberCheck(int line)
 		{
 			if (flagE)
 			{
-				ErrorReporter().FReport(stdout, "Uncorrect number. \"e\" - если присутствует в числителе, знаменателя не может быть.", line, _currentaut->CurrentLexPos() + i);
+				errorReporter.FReport(logfile, "Uncorrect number. \"e\" - если присутствует в числителе, знаменателя не может быть.", line, _currentaut->CurrentLexPos() + i);
 				_error = true;
 				heap.free_mem(first);
 				heap.free_mem(second);
@@ -327,7 +457,7 @@ void MachineWorker::NumberCheck(int line)
 	{
 		if (number[i] == '.')
 		{
-			ErrorReporter().FReport(stdout, "Uncorrect number. \".\" - не может быть несколько.", line, _currentaut->CurrentLexPos() + i);
+			errorReporter.FReport(logfile, "Uncorrect number. \".\" - не может быть несколько.", line, _currentaut->CurrentLexPos() + i);
 			_error = true;
 			heap.free_mem(first);
 			heap.free_mem(second);
@@ -342,7 +472,7 @@ void MachineWorker::NumberCheck(int line)
 			}
 			else
 			{
-				ErrorReporter().FReport(stdout, "Uncorrect number. \"e\" - не может быть несколько.", line, _currentaut->CurrentLexPos() + i);
+				errorReporter.FReport(logfile, "Uncorrect number. \"e\" - не может быть несколько.", line, _currentaut->CurrentLexPos() + i);
 				_error = true;
 				heap.free_mem(first);
 				heap.free_mem(second);
@@ -380,7 +510,7 @@ void MachineWorker::Hooker(char * buffer)
 		_circlehooks--;
 		if (_circlehooks < 0)
 		{
-			ErrorReporter().FReport(stdout, "You have lost \"(\"", _currentaut->CurrentLexLine(), _currentaut->CurrentLexPos());
+			errorReporter.FReport(logfile, "You have lost \"(\"", _currentaut->CurrentLexLine(), _currentaut->CurrentLexPos());
 			_error = true;
 		}
 		return;
@@ -395,7 +525,7 @@ void MachineWorker::Hooker(char * buffer)
 		_squarehooks--;
 		if (_squarehooks < 0)
 		{
-			ErrorReporter().FReport(stdout, "You have lost \"[\"", _currentaut->CurrentLexLine(), _currentaut->CurrentLexPos());
+			errorReporter.FReport(logfile, "You have lost \"[\"", _currentaut->CurrentLexLine(), _currentaut->CurrentLexPos());
 			_error = true;
 		}
 		return;
@@ -410,7 +540,7 @@ void MachineWorker::Hooker(char * buffer)
 		_hooks--;
 		if (_hooks < 0)
 		{
-			ErrorReporter().FReport(stdout, "You have lost \"{\"", _currentaut->CurrentLexLine(), _currentaut->CurrentLexPos());
+			errorReporter.FReport(logfile, "You have lost \"{\"", _currentaut->CurrentLexLine(), _currentaut->CurrentLexPos());
 			_error = true;
 		}
 		return;
@@ -423,19 +553,19 @@ bool MachineWorker::HooksCheck(mFileReader* f)
 	if (_hooks > 0)
 	{
 		sprintf_s(temp, "You need to close %d hook(s)", _hooks);
-		ErrorReporter().FReport(stdout, temp, f->CurrentLine(), 0);
+		errorReporter.FReport(logfile, temp, f->CurrentLine(), 0);
 		return false;
 	}
 	if (_circlehooks > 0)
 	{
 		sprintf_s(temp, "You need to close %d circle hook(s)", _circlehooks);
-		ErrorReporter().FReport(stdout, temp, f->CurrentLine(), 0);
+		errorReporter.FReport(logfile, temp, f->CurrentLine(), 0);
 		return false;
 	}
 	if (_squarehooks > 0)
 	{
 		sprintf_s(temp, "You need to close %d square hook(s)", _squarehooks);
-		ErrorReporter().FReport(stdout, temp, f->CurrentLine(), 0);
+		errorReporter.FReport(logfile, temp, f->CurrentLine(), 0);
 		return false;
 	}
 	return true;

@@ -35,7 +35,7 @@ public:
 	void print_lexems();  // вывести на экран всю хэш - таблицу
 	Lexeme_list* find(int hash); //возвращает лист лексем по хэшкоду
 protected:
-	lexeme* auto_create(char* word);
+	//lexeme* auto_create(char* word);
 };
 
 static Diction_lexem LexemeTable = *new Diction_lexem(36, 36, 36, 0, 0);

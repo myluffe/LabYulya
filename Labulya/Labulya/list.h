@@ -14,14 +14,14 @@ public:
 	~List();
 
 	virtual int compare(void* i, void* j) { return 0; }; //сравнивает два элемента
-	void*      get(int pos); //возвращает данные i-ого элемента
-	void       add(void* data); //добавляет новый элемент
-	void	   set(int pos, void* data); //заменить значение на позиции pos на значение из data
-	void       take_first(void* store); //получает данные первого элемента
-	void       take_last(void* store); //получает данные последнего элемента
-	void       take(int pos, void* store); //получает данные указанного элемента
+	void*      get(int pos); //возвращает i-ый элемент списка
+	void       add(void* data); //добавляет новый элемент в список
+	void	   set(int pos, void* data); //заменяет значение на позиции pos на значение из data
+	void       take_first(void* store); //копирует первый элемент в storage
+	void       take_last(void* store); //копирует последний элемент в storage
+	void       take(int pos, void* store); //копирует элемент на позиции pos в storage
 	void       sort(bool dir = true, int method = 0); //сортировка
-	void	   remove(int pos); //удаляет элемент на posиции
+	void	   remove(int pos); //удаляет элемент на позиции pos
 	int        count(); //возвращает количество элементов
 	bool       error(); // true if error in last operation
 private:
@@ -40,8 +40,8 @@ private:
 	bool             _error;
     Heap*             ListHeap;
 
-	void new_segment(); //создает какой-то элемент в конце списка
-	void delete_segment(Segment* seg); //удаляет определенный элемент
+	void new_segment(); //выделяет память в конце списка под сегмент и данные
+	void delete_segment(Segment* seg); //освобождает определенный элемент
 };
 
 #endif // LIST_H_INCLUDED

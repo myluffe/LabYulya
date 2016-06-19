@@ -17,11 +17,10 @@ private:
 	FILE *file;
 	bool _end = false;
 public:
-	bool EndFile();
-	mFileReader(char* filename);
-	int CurrentLine();
-	int CurrentPosition();
-	//char ReadChar(int position); // _currentposition не мен€етс€
-	char* ReadNextLine();
+	bool EndFile(); //возвращает true, если файл зауончилс€
+	mFileReader(char* filename); //конструктор принимает им€ файла дл€ чтени€
+	int CurrentLine(); //возвращает номер последней прочитанной строки
+	int CurrentPosition(); //возвращает номер позиции, на которой остановилось чтение, не зависит от строки
+	char* ReadNextLine(); //читает следующую строку из файла, возвращает указатель на неЄ
 	~mFileReader();
 };
