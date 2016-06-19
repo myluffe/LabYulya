@@ -44,7 +44,7 @@ TNode* TreeWorker::GetTNode(List* lexes, int start, int finish)
 		if (temp->Type() == BYNARYOPERATION)
 			if (pos_min > start && pos_min < finish)
 				return (TNode*)new TBinaryOperation(GetTNode(lexes, start, pos_min - 1), GetTNode(lexes, pos_min + 1, finish), temp);
-			if ((*(lexeme**)lexes->get(pos_min))->Type() == UNARYOPERATION)
+		if (temp->Type() == UNARYOPERATION)
 		{
 			if (pos_min == finish)
 				return (TNode*)new TUnaryOperation(GetTNode(lexes, start, pos_min - 1), temp, false);

@@ -197,7 +197,7 @@ int MachineWorker::Work(char* filename, List* lexes)
 					if (strcmp(_currentaut->CurrentLexName(), "Operation") == 0)
 					{
 						lexeme* tlex = (lexeme*)lexes->get(lexes->count() - 1);
-						if (tlex->Type() == VARIABLE || tlex->Type() == NUMBER || strcmp(tlex->Data(), ")") == 0)
+						if (tlex->Type() == VARIABLE || strcmp(tlex->Name(), "Number") == 0 || strcmp(tlex->Data(), ")") == 0)
 							_currentaut->ChangeType(BYNARYOPERATION);
 						else _currentaut->ChangeType(UNARYOPERATION);
 						GetOperationPriority(_currentaut);
