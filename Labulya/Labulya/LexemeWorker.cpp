@@ -306,7 +306,7 @@ LexemeWorker::~LexemeWorker()
 
 int LexemeWorker::CorrectExpression(List* expression, int pos, TList* storage)
 {
-	int start = pos;
+	int start = pos; //fix
 	int i;
 	List* tlist = new List(sizeof(sizeof(lexeme*)));
 
