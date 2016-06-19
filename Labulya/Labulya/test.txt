@@ -1,21 +1,5 @@
 {
-float i = 36.e1;
-//dfdfdf
-int a = 3;
-int [2] gt = {1, 2};
-int s55 = gt[1];
-int [a][2] rt = {{1, 2}, {3, 4}, {5, 6}};
-bool f = true ;
-int h = 5;
-for (h; h < i; h++)
-{
-	if (f)
-		f = false ;	
-	f = true ;
-}
-
-while (f) 
-	h++;
-//else h++;
-int s1 = h;
+int a = 5;
+int b = 0;
+a = 2 + 3;
 }

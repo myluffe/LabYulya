@@ -288,7 +288,11 @@ bool LexemeWorker::Processing(List* lexes)
 	printf_s("\n|---------------|\n");
 	printf_s("Tree View:\n");
 	storage->print();
+	storage->exec();
+	printf_s("\n|---------------|\n");
+	printf_s("\n|---------------|\nVariable Table:\n");
 	printf_s("|---------------|\n");
+	LexemeTable.print_lexems();
 	//
 	dob->~Lexeme_list();
 	storage->~TList();

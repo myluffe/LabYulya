@@ -27,7 +27,7 @@ List::~List()
 
 void * List::get(int pos)
 {
-	if (pos < 0 && pos >= _count)
+	if (pos < 0 || pos >= _count)
 	{
 		_error = true;
 		return nullptr;
@@ -36,7 +36,7 @@ void * List::get(int pos)
 	{
 		int n;
 		Segment* s = first;
-		for(n = 0; n != pos; n++)
+		for(n = 0; n < pos; n++)
 		{
 			s = s->next;
 		}
