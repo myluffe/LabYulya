@@ -182,7 +182,7 @@ bool LexemeWorker::Processing(List* lexes)
 					}
 					else
 					{
-						errorReporter.FReport(logfile, "You should define the variable!", temp_lexeme->Line(), temp_lexeme->Start_Position() + strlen(temp_lexeme->Data()));
+						errorReporter.FReport(logfile, "You should define the variable!", temp_lexeme->Line(), temp_lexeme->Start_Position() + (int)strlen(temp_lexeme->Data()));
 						return false;
 					}
 				}
@@ -449,6 +449,7 @@ int LexemeWorker::CorrectShortIfOperation(List * expression, int i, TList* stora
 		body2->~List();
 		return i;
 	}
+	return i;
 }
 
 int LexemeWorker::CorrectSpecial(lexeme* spec, int pos, List* expression, TList* storage)
@@ -927,7 +928,7 @@ int LexemeWorker::CorrectWhile(List * expression, int pos, lexeme * spec, TList*
 	int pos2 = FuncWithBoolParam(expression, pos, spec, false, hl);
 	if (pos2 <= pos)
 	{
-		ErrorReporter().FReport(logfile, "Незаконченное выражение!", spec->Line(), spec->Start_Position() + strlen(spec->Data()));
+		ErrorReporter().FReport(logfile, "Незаконченное выражение!", spec->Line(), spec->Start_Position() + (int)strlen(spec->Data()));
 		_error = true;
 		return pos;
 	}
