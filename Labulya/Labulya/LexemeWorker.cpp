@@ -306,11 +306,11 @@ LexemeWorker::~LexemeWorker()
 
 int LexemeWorker::CorrectExpression(List* expression, int pos, TList* storage)
 {
-	int start = 0;
+	int start = pos;
 	int i;
 	List* tlist = new List(sizeof(sizeof(lexeme*)));
 
-	for (i = 0; i < expression->count(); i++)
+	for (i = pos; i < expression->count(); i++)
 	{
 		lexeme* temp_lexeme = *(lexeme**)expression->get(i);
 		tlist->add(&temp_lexeme);
@@ -330,7 +330,7 @@ int LexemeWorker::CorrectExpression(List* expression, int pos, TList* storage)
 		tlist->~List();
 		return i;
 	}
-	
+
 	tlist->~List();
 	return pos;
 }
