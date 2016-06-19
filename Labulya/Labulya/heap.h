@@ -11,14 +11,17 @@
 #define SEGMENTCOUNT 1024
 #define MAXSIZE 8388608
 
-class Heap
+static class Heap
 {
 public:
-	Heap(int _segment_size = SEGMENTSIZE);
+	Heap();
+	Heap GetHeap();
 	~Heap();
 	void*      get_mem(int size); //Возвращает указатель на выделенную память. На вход принимает кол-во байт для выделения.
 	void       free_mem(void*); //Освобождает выделенную get_mem память по указателю. Знает сколько удалять.
 private:
+	Heap(int _segment_size);
+	Heap* heap = nullptr;
 	void print(); //Отладочная ф-ция печати.
 	struct Chunk
 	{
@@ -43,5 +46,3 @@ private:
 	Segment*  current;
 
 };
-
-static Heap heap = *new Heap();

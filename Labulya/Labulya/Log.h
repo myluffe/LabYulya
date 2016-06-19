@@ -1,7 +1,7 @@
 #pragma once
 #include "string.h"
 
-static class Log
+class Log
 {
 public:
 	Log(char* FileName);
@@ -11,4 +11,4 @@ private:
 	char* _logfile; //Стандартный файл для вывода ошибок или предупреждений. По умолчанию - консоль.
 };
 
-Log LogFile = *new Log("log.txt");
+static Log LogFile = *new Log("log.txt");

@@ -174,3 +174,13 @@ void Heap::print()
 		now_current = now_current->prev;
 	}
 }
+Heap::Heap()
+{
+}
+
+Heap Heap::GetHeap()
+{
+	if(heap == nullptr)
+		heap = new Heap(SEGMENTSIZE);
+	return *heap;
+}

@@ -22,9 +22,9 @@ public:
 class Diction_lexem : public Hash  // хэш таблица для лексем
 {
 public:
-	Diction_lexem(int _n1, int _n2, int _n3, int _n4, int _n5);
+	Diction_lexem();
 	~Diction_lexem();
-
+	Diction_lexem GetLexemeTable();
 	int key1(char* key_word); //ключи для хэш таблицы
 	int key2(char* key_word); 
 	int key3(char* key_word);
@@ -35,9 +35,9 @@ public:
 	void print_lexems();  // вывести на экран всю хэш - таблицу
 	Lexeme_list* find(int hash); //возвращает лист лексем по хэшкоду
 protected:
+	Diction_lexem(int _n1, int _n2, int _n3, int _n4, int _n5);
+	Diction_lexem*  LexemeTable = nullptr;
 	//lexeme* auto_create(char* word);
 };
-
-static Diction_lexem LexemeTable = *new Diction_lexem(36, 36, 36, 0, 0);
 
 

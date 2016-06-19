@@ -109,7 +109,7 @@ bool LexemeWorker::Processing(List* lexes)
 				dob->add(newlex);
 				//dob->print_list();
 				//добавление в хэш-таблицу
-				LexemeTable.auto_create(newlex);
+				Diction_lexem().GetLexemeTable().auto_create(newlex);
 				//...формирование лексемы массива на позиции namepos
 				//удаление лишних лексем
 				for (int g = posend; g >= i - 1; g--)
@@ -170,7 +170,7 @@ bool LexemeWorker::Processing(List* lexes)
 						//в дов уже готовую добавл€ем
 						dob->add(newlex);
 						//добавление в хэш-таблицу
-						LexemeTable.auto_create(newlex);
+						Diction_lexem().GetLexemeTable().auto_create(newlex);
 						//удаление ненужных и мухлеж с щетчиком :
 						int ti = i - 2;
 						lexes->remove(i + 3);
@@ -210,7 +210,7 @@ bool LexemeWorker::Processing(List* lexes)
 						if (pos != -1)
 							*temp_lexeme = *(lexeme*)dob->get(pos);
 						/*
-						List* tlist = LexemeTable.find_list(temp_lexeme->Data());
+						List* tlist = Diction_lexem().GetLexemeTable().find_list(temp_lexeme->Data());
 						for (int k = 0; k < tlist->count(); k++)
 						{
 							if (strcmp(temp_lexeme->Data(), ((lexeme*)tlist->get(k))->Name()) == 0)
@@ -285,7 +285,7 @@ bool LexemeWorker::Processing(List* lexes)
 
 	//отладка
 	printf_s("\n|---------------|\nVariable Table:\n");
-	LexemeTable.print_lexems();
+	Diction_lexem().GetLexemeTable().print_lexems();
 	printf_s("\n|---------------|\n");
 	printf_s("Tree View: \n");
 	storage->print();
@@ -1411,7 +1411,7 @@ lexeme * LexemeWorker::GetMassValues(List* expression, int start, char* ttype, i
 	int currentpos = start;
 
 	//int* tempsizes = new int[sizes->count() + 1];
-	int* tempsizes = (int*)heap.get_mem(sizeof(int) * (sizes->count() + 1));
+	int* tempsizes = (int*)Heap().GetHeap().get_mem(sizeof(int) * (sizes->count() + 1));
 	for (int m = 0; m < sizes->count(); m++)
 	{
 		int h = *(int*)sizes->get(m);
@@ -1422,14 +1422,14 @@ lexeme * LexemeWorker::GetMassValues(List* expression, int start, char* ttype, i
 	if (temp == nullptr || strcmp(temp->Data(), "{") != 0)
 	{
 		errorReporter.FReport(logfile, "ќжидаетс€ \"{\"", temp->Line(), temp->Start_Position());
-		heap.free_mem(tempsizes);
+		Heap().GetHeap().free_mem(tempsizes);
 		return nullptr;
 	}
 	currentpos++;
 	//отбор и подсчет элементов
 	if (!ReInnerFind(expression, &currentpos, 0, tempsizes, rank, poses, dob, type))
 	{
-		heap.free_mem(tempsizes);
+		Heap().GetHeap().free_mem(tempsizes);
 		return nullptr;
 	}
 	int stemp = currentpos;
@@ -1439,7 +1439,7 @@ lexeme * LexemeWorker::GetMassValues(List* expression, int start, char* ttype, i
 		if (temp == nullptr || strcmp(temp->Data(), "}") != 0)
 		{
 			errorReporter.FReport(logfile, "ќжидаетс€ \"}\"", temp->Line(), temp->Start_Position());
-			heap.free_mem(tempsizes);
+			Heap().GetHeap().free_mem(tempsizes);
 			return nullptr;
 		}
 		currentpos++;
@@ -1448,17 +1448,17 @@ lexeme * LexemeWorker::GetMassValues(List* expression, int start, char* ttype, i
 	if (temp == nullptr || strcmp(temp->Data(), ";") != 0)
 	{
 		errorReporter.FReport(logfile, "ќжидаетс€ \";\"", temp->Line(), temp->Start_Position());
-		heap.free_mem(tempsizes);
+		Heap().GetHeap().free_mem(tempsizes);
 		return nullptr;
 	}
 
 	//запись элементов в пам€ть
-	lexeme* a = (lexeme*)heap.get_mem(sizeof(lexeme) * (poses->count() + 1));
+	lexeme* a = (lexeme*)Heap().GetHeap().get_mem(sizeof(lexeme) * (poses->count() + 1));
 	for (int h = 0; h < poses->count(); h++)
 	{
 		a[h] = *(lexeme*)expression->get(*(int*)poses->get(h));
 	}
-	heap.free_mem(tempsizes);
+	Heap().GetHeap().free_mem(tempsizes);
 	*putend = currentpos;
 	return a;
 }

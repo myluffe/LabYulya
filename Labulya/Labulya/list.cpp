@@ -142,8 +142,8 @@ bool List::error()
 
 void List::new_segment()
 {
-	Segment *a = (Segment*)heap.get_mem(sizeof(Segment));
-	a->data = heap.get_mem(_element_size);
+	Segment *a = (Segment*)Heap().GetHeap().get_mem(sizeof(Segment));
+	a->data = Heap().GetHeap().get_mem(_element_size);
     a->next = nullptr;
 	if (first == nullptr)
 	{
@@ -188,8 +188,8 @@ void List::delete_segment(Segment * seg)
 			seg->prev->next = seg->next;
 		}
 	}
-	heap.free_mem(seg->data);
-	heap.free_mem(seg);
+	Heap().GetHeap().free_mem(seg->data);
+	Heap().GetHeap().free_mem(seg);
 	_count--;
 }
 

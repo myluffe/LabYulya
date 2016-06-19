@@ -20,7 +20,7 @@ int TreeWorker::GetLexemePositionWithMinimalPriority(List * lexes, int start, in
 bool TreeWorker::DoTree(List* lexes)
 {
 	int start = 0;
-	TList* prog = (TList*)heap.get_mem(sizeof(TList));
+	TList* prog = (TList*)Heap().GetHeap().get_mem(sizeof(TList));
 	for (int i = 0; i < lexes->count(); i++)
 	{
 		lexeme* temp_lexeme = (lexeme*)lexes->get(i);
@@ -31,7 +31,7 @@ bool TreeWorker::DoTree(List* lexes)
 		}
 	}
 	prog->print();
-	heap.free_mem(prog);
+	Heap().GetHeap().free_mem(prog);
 	return true;
 }
 */

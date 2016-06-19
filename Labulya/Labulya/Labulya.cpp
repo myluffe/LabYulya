@@ -4,11 +4,11 @@
 #include "lec.h"
 #include <locale.h>
 #include "Parser.h"
+#include "hash_lec.h"
 
 int main(char* name)
-{	
+{
 	setlocale(LC_CTYPE, "");
-
 	//Имя обрабатываемого файла
 	name = "test.txt";
 

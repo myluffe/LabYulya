@@ -41,6 +41,11 @@ Diction_lexem::Diction_lexem(int _n1, int _n2, int _n3, int _n4, int _n5)
 	}
 };
 
+Diction_lexem::Diction_lexem()
+{
+
+}
+
 Diction_lexem::~Diction_lexem()
 {
 	Lexeme_list* list;
@@ -135,7 +140,7 @@ int Diction_lexem::auto_create(lexeme* lex)
 		Lexeme_list* list = (Lexeme_list*)find_list(lex->Name());
 		if (!list)
 		{
-			list = (Lexeme_list*)heap.get_mem(sizeof(Lexeme_list));
+			list = (Lexeme_list*)Heap().GetHeap().get_mem(sizeof(Lexeme_list));
 		}
 		list->add(lex);
 	}
@@ -169,4 +174,11 @@ void Diction_lexem::del(char*word)
 Lexeme_list* Diction_lexem::find(int hash)
 {
 	return (Lexeme_list*)(table->get(hash));
+}
+
+Diction_lexem Diction_lexem::GetLexemeTable()
+{
+	if (LexemeTable == nullptr)
+		LexemeTable = new Diction_lexem(36, 36, 36, 0, 0);
+	return *LexemeTable;
 }
