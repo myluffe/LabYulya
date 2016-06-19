@@ -9,4 +9,6 @@ public:
 	~Log();
 private:
 	char* _logfile; //Стандартный файл для вывода ошибок или предупреждений. По умолчанию - консоль.
-}LogFile = *new Log("log.txt");
+};
+
+Log LogFile = *new Log("log.txt");
