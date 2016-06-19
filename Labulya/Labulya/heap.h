@@ -9,7 +9,7 @@
 
 #define SEGMENTSIZE 65539
 #define SEGMENTCOUNT 1024
-#define MAXSIZE 838860800
+#define MAXSIZE 8388608
 
 class Heap
 {
