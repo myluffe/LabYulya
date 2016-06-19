@@ -138,7 +138,7 @@ bool LexemeWorker::Processing(List* lexes)
 						lexeme* tdevider = (lexeme*)lexes->get(i + 1);
 						if (strcmp(tdevider->Data(), "=") != 0)
 						{
-							errorReporter.FReport(logfile, "You should define the variable!", temp_lexeme->Line(), temp_lexeme->Start_Position() + strlen(temp_lexeme->Data()));
+							errorReporter.FReport(logfile, "You should define the variable!", temp_lexeme->Line(), temp_lexeme->Start_Position() + (int)strlen(temp_lexeme->Data()));
 							return false;
 						}
 						lexeme* tdata = (lexeme*)lexes->get(i + 2);
@@ -228,10 +228,12 @@ bool LexemeWorker::Processing(List* lexes)
 					return false;
 				}
 			}
+			continue;
 		}
 		if (temp_lexeme->Type() == NUMBER)
 		{
 			//обработка для чисел
+			continue;
 		}
 		if (strcmp(temp_lexeme->Data(), "}") == 0)
 		{
@@ -248,6 +250,7 @@ bool LexemeWorker::Processing(List* lexes)
 					break;
 				}
 			}
+			continue;
 		}
 	}
 
@@ -283,7 +286,9 @@ bool LexemeWorker::Processing(List* lexes)
 	printf_s("\n|---------------|\nVariable Table:\n");
 	LexemeTable.print_lexems();
 	printf_s("\n|---------------|\n");
+	printf_s("Tree View:\n");
 	storage->print();
+	printf_s("|---------------|\n");
 	//
 	dob->~Lexeme_list();
 	storage->~TList();
