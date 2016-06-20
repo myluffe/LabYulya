@@ -236,10 +236,11 @@ bool TreeWorker::PreprocessingElemMas(List* lexes, int start, int finish)
 			if (Iters != nullptr)
 			{
 				DoTNode* a = (DoTNode*)heap.get_mem(sizeof(DoTNode));
+				TElementArray* telem = new TElementArray(lexeme1, Iters);
 				a->start = i;
 				a->finish = step;
 				a->type = lexeme1->Type();
-				a->node = (TNode*)Iters;
+				a->node = (TNode*)telem;
 				if (a->node == nullptr)
 				{
 					ErrorReporter().FReport(logfile, "Ќе удалось получить внутренний операнд!", lexeme1->Line(), lexeme1->Start_Position());
