@@ -5,6 +5,7 @@
 #include "Types.h"
 #include "Parser.h"
 #include "ErrorReporter.h"
+#include "LexemeWorker.h"
 #include "cmath"
 
 class Lexes : lexeme
@@ -76,8 +77,8 @@ class TVariable : TNode
 	protected:
 		lexeme* m_variable;
 };
-/*
-class TElementArray
+
+class TElementArray : TNode
 {
 public:
 	TElementArray(lexeme* array, TList* pointer)
@@ -88,8 +89,7 @@ public:
 	lexeme* exec()
 	{
 		Lexes* a = (Lexes*)_pointer->exec();
-		//return funct(_array, a->RetLex());
-		return nullptr;
+		return LWorker.GetMassElem(_array, a->RetLex());
 	}
 	void print()
 	{
@@ -101,7 +101,6 @@ protected:
 	lexeme* _array;
 	TList* _pointer;
 };
-*/
 
 class TUnaryOperation : TNode
 {
