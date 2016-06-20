@@ -38,7 +38,8 @@ protected:
 
 private:
 	lexeme* GetMassValues(List* expression, int start, char* type, int* putend, Lexeme_list* dob, int rank, List* sizes); //разбирает выражение от { до } при инициализации массивов и записывате элементы подряд (в память?)
-	bool GetValue(Lexeme_list* dob, lexeme* place, List* expression, int pos);
+	bool GetVariableValue(Lexeme_list* dob, lexeme* place);
+	TList* GetMassElemIndexes(List * expression, lexeme * mass, int * pos);
 	bool ReInnerFind(List* expression, int* currentpos, int currentstep, int* s, int rank, List* poses, Lexeme_list* dob, int type);
 
 	//pos - позиция лексемы ф-ции (в случае output(...) pos - позиция output в expression)

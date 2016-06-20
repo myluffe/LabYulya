@@ -48,14 +48,14 @@ bool LexemeWorker::Processing(List* lexes)
 						open = true;
 					if (k >= lexes->count())
 					{
-						errorReporter.FReport(logfile, "#909 Незаконченное выражение!", tempdevider->Line(), tempdevider->Start_Position());
+						errorReporter.FReport(logfile, "Незаконченное выражение!", tempdevider->Line(), tempdevider->Start_Position());
 						return false;
 					}
 					tempdevider = (lexeme*)lexes->get(i + k);
-					if (tempdevider->Type() == VARIABLE || tempdevider->Type() == MASSIVE)
-						if (!GetValue(dob, tempdevider, lexes, i + k))
+					if (tempdevider->Type() == VARIABLE)
+						if (!GetVariableValue(dob, tempdevider))
 						{
-							errorReporter.FReport(logfile, "Неопределенная переменная!", tempdevider->Line(), tempdevider->Start_Position());
+							errorReporter.FReport(logfile, "Ожидается константа или переменная типа \"int\"!", tempdevider->Line(), tempdevider->Start_Position());
 							return false;
 						}
 					if (tempdevider->Type() == INT)
@@ -105,7 +105,7 @@ bool LexemeWorker::Processing(List* lexes)
 			if (posend > k + 1)
 			{
 				lexeme* newlex = (lexeme*)lexes->get(namepos);
-				newlex->ToMass(name, MASSIVE, tempvalues, rank);
+				newlex->ToMass(name, MASSIVE, tempvalues, rank, sizes);
 				//в дов уже готовую добавляем
 				dob->add(newlex);
 				//dob->print_list();
@@ -137,27 +137,27 @@ bool LexemeWorker::Processing(List* lexes)
 					if (i + 1 != lexes->count() && i + 2 != lexes->count() && i + 3 != lexes->count())
 					{
 						lexeme* tdevider = (lexeme*)lexes->get(i + 1);
-						if (strcmp(tdevider->Data(), "=") != 0)
+						if (tdevider == nullptr || strcmp(tdevider->Data(), "=") != 0)
 						{
 							errorReporter.FReport(logfile, "You should define the variable!", temp_lexeme->Line(), temp_lexeme->Start_Position() + (int)strlen(temp_lexeme->Data()));
 							return false;
 						}
 						lexeme* tdata = (lexeme*)lexes->get(i + 2);
-						if (!(tdata->Type() == INT || tdata->Type() == DOUBLE || tdata->Type() == FLOAT || tdata->Type() == CHAR || tdata->Type() == STRING || tdata->Type() == BOOL))
+						if (!(tdata->Type() == INT || tdata->Type() == DOUBLE || tdata->Type() == FLOAT || tdata->Type() == CHAR || tdata->Type() == STRING || tdata->Type() == BOOL) || tdata == nullptr)
 						{
-							if (tdata->Type() == VARIABLE || tdata->Type() == MASSIVE)
+							if (tdata->Type() == VARIABLE)
 							{
-								if (!GetValue(dob, tdata, lexes, i + 2))
+								if (!GetVariableValue(dob, tdata))
 									return false;
 							}
 							else
 							{
-								errorReporter.FReport(logfile, "There should be value!", tdevider->Line(), tdevider->Start_Position());
+								errorReporter.FReport(logfile, "Ожидается переменная или константа типа INT!", tdevider->Line(), tdevider->Start_Position());
 								return false;
 							}
 						}
 						lexeme* tdevider2 = (lexeme*)lexes->get(i + 3);
-						if (strcmp(tdevider2->Data(), ";") != 0)
+						if (tdevider2 != nullptr && strcmp(tdevider2->Data(), ";") != 0)
 						{
 							errorReporter.FReport(logfile, "There should be \";\" after value!", tdata->Line(), tdata->Start_Position());
 							return false;
@@ -318,6 +318,16 @@ int LexemeWorker::CorrectExpression(List* expression, int pos, TList* storage)
 	{
 		lexeme* temp_lexeme = *(lexeme**)expression->get(i);
 		tlist->add(&temp_lexeme);
+		if (temp_lexeme->Type() == MASSIVE)
+		{
+			TList* indexes = GetMassElemIndexes(expression, temp_lexeme, &i);
+			if (indexes = nullptr)
+			{
+				errorReporter.FReport(logfile, "Не удалось распознать синтаксис элемента массива!", temp_lexeme->Line(), temp_lexeme->Start_Position());
+				return start;
+			}
+			//... Создание нода элемента массива...
+		}
 		if (strcmp(temp_lexeme->Data(), "?") == 0)
 		{
 			i = CorrectShortIfOperation(expression, i, storage);
@@ -330,7 +340,13 @@ int LexemeWorker::CorrectExpression(List* expression, int pos, TList* storage)
 	}
 	if (IsNumberExpression(tlist, true) || IsBoolExpression(tlist, true) || IsStringExpression(tlist, true) || IsNumberExpressionWithBoolOperations(tlist) || IsStringExpressionWithBoolOperations(tlist))
 	{
-		storage->addNode(treeWorker.GetTNode(tlist, 0, tlist->count() - 2));
+		TNode* tn = treeWorker.GetTNode(tlist, 0, tlist->count() - 2);
+		if (tn == nullptr)
+		{
+			tlist->~List();
+			return i;
+		}	
+		storage->addNode(tn);
 		tlist->~List();
 		return i;
 	}
@@ -367,6 +383,8 @@ int LexemeWorker::CorrectShortIfOperation(List * expression, int i, TList* stora
 		{
 			param1 = treeWorker.GetTNode(shrtiflist, 0, i - 1);
 			shrtiflist->~List();
+			if (param1 == nullptr)
+				return i;
 		}
 		else
 		{
@@ -388,6 +406,8 @@ int LexemeWorker::CorrectShortIfOperation(List * expression, int i, TList* stora
 		{
 			param1 = treeWorker.GetTNode(shrtiflist, 0, i - 1);
 			shrtiflist->~List();
+			if (param1 == nullptr)
+				return i;
 		}
 		else
 		{
@@ -417,6 +437,8 @@ int LexemeWorker::CorrectShortIfOperation(List * expression, int i, TList* stora
 	{
 		param2 = treeWorker.GetTNode(body1, 0, body1->count() - 1);
 		body1->~List();
+		if (param2 == nullptr)
+			return i;
 	}
 	else
 	{
@@ -445,6 +467,11 @@ int LexemeWorker::CorrectShortIfOperation(List * expression, int i, TList* stora
 	if (IsBoolExpression(body2, true) || IsNumberExpressionWithBoolOperations(body2) || IsStringExpressionWithBoolOperations(body2) || IsNumberExpression(body2, true) || IsStringExpression(body2, true))
 	{
 		param3 = treeWorker.GetTNode(body2, 0, body2->count() - 1);
+		if (param3 == nullptr)
+		{
+			body2->~List();
+			return i;
+		}
 		storage->addNode((TNode*)new TTernaryOperator(param1, param2, param3));
 		body2->~List();
 	}
@@ -796,8 +823,13 @@ bool LexemeWorker::InnerExpression(List * expression, TList* storage)
 					tlist->~List();
 					return false;
 				}
-				storage->addNode(treeWorker.GetTNode(tlist, 0, tlist->count() - 2));
-				//storage->print();
+				TNode* tn = treeWorker.GetTNode(tlist, 0, tlist->count() - 2);
+				if (tn == nullptr)
+				{
+					tlist->~List();
+					return false;
+				}
+				storage->addNode(tn);
 				tlist->~List();
 				tlist = new List(sizeof(lexeme));
 				startstring = false;
@@ -937,6 +969,11 @@ int LexemeWorker::CorrectWhile(List * expression, int pos, lexeme * spec, TList*
 		return pos;
 	}
 	TNode* h = treeWorker.GetTNode(hl, 0, hl->count() - 1);
+	if (h == nullptr)
+	{
+		_error = true;
+		return pos;
+	}
 	pos2++;
 	
 	List* tlist = new List(sizeof(lexeme*));
@@ -1057,6 +1094,11 @@ int LexemeWorker::CorrectDo(List * expression, int origpos, lexeme * spec, TList
 					}
 					TNode* h = treeWorker.GetTNode(hl, 0, hl->count() - 1);
 					hl->~List();
+					if (h == nullptr)
+					{
+						_error = true;
+						return origpos;
+					}
 					storage->addNode((TNode*)new TDoWhile(body, h));
 					return pos2;
 				}
@@ -1232,6 +1274,15 @@ int LexemeWorker::CorrectFor(List * expression, int origpos, lexeme * spec, TLis
 			TVariable* tparam1 = new TVariable(*(lexeme**)param1->get(0));
 			TNode* tparam2 = treeWorker.GetTNode(param2, 0,  param2->count() - 1);
 			TNode* tparam3 = treeWorker.GetTNode(param3, 0, param3->count() - 1);
+			if (tparam2 == nullptr || tparam3 == nullptr)
+			{
+				param3->~List();
+				param2->~List();
+				param1->~List();
+				_error = true;
+				body->~List();
+				return origpos;
+			}
 			storage->addNode((TNode*)new TFor(tparam1, tparam2, tparam3, sbody));
 			//body->~List();
 			param3->~List();
@@ -1278,6 +1329,11 @@ int LexemeWorker::CorrectIf(List * expression, int origpos, lexeme * spec, TList
 		return origpos;
 	}
 	TNode* h = treeWorker.GetTNode(hl, 0, hl->count() - 1);
+	if (h == nullptr)
+	{
+		_error = true;
+		return origpos;
+	}
 	
 	hl->~List();
 	TList* body;
@@ -1489,7 +1545,7 @@ bool LexemeWorker::ReInnerFind(List * expression, int * currentpos, int currents
 			else
 			{
 				if (temp->Type() == VARIABLE || temp->Type() == MASSIVE)
-					if (!GetValue(dob, temp, expression, y))
+					if (!GetVariableValue(dob, temp))
 						return false;
 				if (temp->Type() != type)
 				{
@@ -1534,64 +1590,13 @@ bool LexemeWorker::ReInnerFind(List * expression, int * currentpos, int currents
 	return true;
 }
 
-bool LexemeWorker::GetValue(Lexeme_list * dob, lexeme * place, List* expression, int pos)
+bool LexemeWorker::GetVariableValue(Lexeme_list * dob, lexeme * place)
 {
 	int dpos = dob->findpos(place->Data());
 	if (dpos != -1)
 	{
 		lexeme* cond = (lexeme*)dob->get(dpos);
-		if (cond->Rank() > 0)
-		{
-			//...получение элемента из массива и запись в *place
-			int quanity = cond->Rank() + cond->Rank() * 2;
-			List* index = new List(sizeof(int));
-			int i = 0;
-			for (i = pos + 1; i < pos + quanity; i++)
-			{
-				lexeme* temp = (lexeme*)expression->get(i);
-				if (temp == nullptr || strcmp(temp->Data(), "[") != 0)
-				{
-					errorReporter.FReport(logfile, "Ожидается \"[\"!", temp->Line(), temp->Start_Position());
-					return false;
-				}
-				i++;
-				temp = (lexeme*)expression->get(i);
-				if (temp == nullptr)
-				{
-					errorReporter.FReport(logfile, "Ожидается индекс типа int!", temp->Line(), temp->Start_Position());
-					return false;
-				}
-				if (temp->Type() == MASSIVE || temp->Type() == VARIABLE)
-					if (!GetValue(dob, temp, expression, i))
-						return false;
-				if (temp->Type() != INT)
-				{
-					errorReporter.FReport(logfile, "Ожидается индекс типа int!", temp->Line(), temp->Start_Position());
-					return false;
-				}
-				int ti = parser.ToInt(temp->Data());
-				index->add(&ti);
-				i++;
-				temp = (lexeme*)expression->get(i);
-				if (temp == nullptr || strcmp(temp->Data(), "]") != 0)
-				{
-					errorReporter.FReport(logfile, "Ожидается \"]\"!", temp->Line(), temp->Start_Position());
-					return false;
-				}
-			}
-			for (int h = i - 1; h > pos; h--)
-				expression->remove(h);
-			//Получение значения из массива!
-			int realindex = 1;
-			for (int f = 0; f < index->count(); f++)
-			{
-				realindex *= *(int*)index->get(f);
-				for (int kf = f + 1; kf < index->count(); kf++)
-					realindex *= *(int*)index->get(kf);
-			}
-			*place = cond->Values[realindex];
-		}
-		else *place = *cond;
+		*place = *cond;
 		return true;
 	}
 	else
@@ -1599,4 +1604,92 @@ bool LexemeWorker::GetValue(Lexeme_list * dob, lexeme * place, List* expression,
 		errorReporter.FReport(logfile, "Нельзя непоределенное присвоить значение!", place->Line(), place->Start_Position());
 		return false;
 	}
+}
+
+TList * LexemeWorker::GetMassElemIndexes(List * expression, lexeme * mass, int * origpos)
+{
+	//Установить origpos на последнюю скобку
+	if (mass->Rank() > 0)
+	{
+		//...получение элемента из массива (и запись в *place?)
+		int quanity = mass->Rank() + mass->Rank() * 2;
+		TList* indexes = new TList();
+		int pos = *origpos;
+		int indexcount = 0;
+		int i = 0;
+		for (i = pos + 1; i < expression->count(); i++)
+		{
+			lexeme* temp = (lexeme*)expression->get(i);
+			if (temp == nullptr || strcmp(temp->Data(), "[") != 0)
+			{
+				errorReporter.FReport(logfile, "Ожидается \"[\"!", temp->Line(), temp->Start_Position());
+				return false;
+			}
+			List* templ = new List(sizeof(lexeme*));
+			int start = i + 1;
+			while (true)
+			{
+				i++;
+				temp = (lexeme*)expression->get(i);
+				if (temp == nullptr)
+				{
+					errorReporter.FReport(logfile, "Ожидается индекс типа int!", temp->Line(), temp->Start_Position());
+					return false;
+				}
+				if (strcmp(temp->Data(), "]") == 0)
+				{
+					*origpos = i;
+					break;
+				}
+				templ->add(&temp);
+			}
+			if (!IsNumberExpression(templ, false))
+				return false;
+			TNode* tl = treeWorker.GetTNode(expression, start, i - 1);
+			if (tl == nullptr)
+				return false;
+			indexes->addNode(tl);
+			indexcount++;
+		}
+		//Проверка
+		if (indexcount != mass->Sizes->count())
+		{
+			lexeme* temp = (lexeme*)expression->get(pos);
+			errorReporter.FReport(logfile, "Кол-во индексов не верное!", temp->Line(), temp->Start_Position());
+			return false;
+		}
+		return indexes;
+	}
+	return nullptr;
+}
+
+static lexeme* GetMassElem(lexeme* mass, List* indexes)
+{
+	if (mass->Rank() > 0)
+	{
+		//Доп проверка!
+		if (indexes->count() != mass->Sizes->count())
+		{
+			errorReporter.FReport(logfile, "Количество индексов не совпадает с размерностью массива!", mass->Line(), mass->Start_Position());
+			return nullptr;
+		}
+		int realindex = 1;
+		for (int p = 0; p < indexes->count(); p++)
+		{
+			int s = *(int*)mass->Sizes->get(p);
+			int index = *(int*)indexes->get(p);
+			realindex *= index;
+			if (index >= s)
+			{
+				char str[100];
+				sprintf_s(str, "Выход за границы диапазона! Индекс \"%d\" >= \"%d\"", index, s);
+				errorReporter.FReport(logfile, str, mass->Line(), mass->Start_Position());
+				return nullptr;
+			}
+			for (int g = p + 1; g < indexes->count(); g++)
+				realindex *= *(int*)indexes->get(g);
+		}
+		return &mass->Values[realindex];
+	}
+	return nullptr;
 }

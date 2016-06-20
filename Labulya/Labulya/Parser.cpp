@@ -40,16 +40,8 @@ float Parser::ToFloat(char * str)
 
 char * Parser::IntToString(int value)
 {
-	int buf = value;
-	int count = 0; //длина числа
-	while (buf!= 0) 
-	{
-		value /= 10;
-		count++;
-	}
-	char* str = (char*)heap.get_mem(sizeof(char) * (count + 1) );
-	char* res = (char*)_itoa_s(value, str, count, 10);
-	heap.free_mem(str);
+	char* res = (char*)heap.get_mem(sizeof(char) * 20 );
+	sprintf_s(res, sizeof(char) * 20, "%d", value);
 	return res;
 }
 
@@ -57,9 +49,7 @@ char * Parser::DoubleToString(double value)
 {
 	int decimal, sign;
 	char* res = (char*)heap.get_mem(_CVTBUFSIZE);
-	int buf = _ecvt_s(res, _CVTBUFSIZE, value, 10, &decimal, &sign);
-	if (buf != 0)
-		return nullptr;
+	sprintf_s(res, _CVTBUFSIZE, "%lf", value);
 	return res;
 }
 
@@ -67,9 +57,7 @@ char * Parser::FloatToString(float value)
 {
 	int decimal, sign;
 	char* res = (char*)heap.get_mem(_CVTBUFSIZE);
-	int buf = _fcvt_s(res, _CVTBUFSIZE, value, 100, &decimal, &sign);
-	if (buf != 0)
-		return nullptr;
+	sprintf_s(res, _CVTBUFSIZE, "%f", value);
 	return res;
 }
 

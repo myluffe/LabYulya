@@ -25,8 +25,9 @@ lexeme::lexeme(char * name, int type, char * data, int line, int startposition, 
 	_priority = priority;
 }
 
-void lexeme::ToMass(lexeme* name, int type, lexeme* val, int rank)
+void lexeme::ToMass(lexeme* name, int type, lexeme* val, int rank, List* sizes)
 {
+	Sizes = sizes;
 	heap.free_mem(_name);
 	_name = (char*)heap.get_mem(sizeof(char) * ((int)strlen(name->Data()) + 1));
 	strcpy_s(_name, (strlen(name->Data()) + 1), name->Data());
@@ -45,6 +46,7 @@ lexeme::~lexeme()
 	heap.free_mem(_name);
 	heap.free_mem(_data);
 	heap.free_mem(Values);
+	Sizes->~List();
 }
 
 bool lexeme::GetNumber(double * value)
