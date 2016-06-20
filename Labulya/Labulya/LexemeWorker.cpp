@@ -896,6 +896,20 @@ bool LexemeWorker::WhateverCheck(char ** perone, int c1, int * types, int c2, Li
 					break;
 				}
 			}
+			if (!correct && tlex->Type() == MASSIVE)
+			{
+				for (int f = 0; f < c2; f++)
+				{
+					if ((tlex->Values[0]).Type() == types[f])
+					{
+						correct = true;
+						varbefore = true;
+						break;
+					}
+				}
+				if (correct)
+					GetMassElemIndexes(expression, tlex, &k);
+			}
 		}
 		if (!correct)
 			return false;
