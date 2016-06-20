@@ -19,7 +19,7 @@ protected:
 public: 
 	lexeme(char* name, char* type, char* data, int line, int startposition, int priority);
 	lexeme(char* name, int type, char* data, int line, int startposition, int priority);
-	void ToMass(lexeme* name, int type, lexeme* values, int rank);
+	void ToMass(lexeme* name, int type, lexeme* values, int rank, List* sizes);
 	~lexeme();
 
 	//Получение полей лексемы:
@@ -39,4 +39,5 @@ public:
 	//поля для массивов
 	lexeme* Values = nullptr; //ссылка на первый элемент?
 	int Rank() { return _rank; }
+	List* Sizes = nullptr;
 };

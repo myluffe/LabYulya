@@ -5,6 +5,7 @@
 #include "Types.h"
 #include "Parser.h"
 #include "ErrorReporter.h"
+#include "cmath"
 
 class Lexes : lexeme
 {
@@ -468,4 +469,116 @@ protected:
 	TNode* condition;
 	TNode* loop;
 	TList* body;
+};
+
+class TOutPut : TNode
+{
+public:
+	TOutPut(TNode* mstringexpression)
+	{
+		stringexpression = mstringexpression;
+	}
+	lexeme* exec()
+	{
+		stringexpression->print();
+		return nullptr;
+	}
+	void print()
+	{
+		printf("output(");
+		stringexpression->print();
+		printf(");\n");
+	}
+protected:
+	TNode* stringexpression;
+};
+
+class TInPut : TNode
+{
+public:
+	TInPut(lexeme* Input)
+	{
+		input = Input;
+	}
+	lexeme* exec()
+	{
+		char* str;
+		scanf_s("%s", str, 100);
+		return new lexeme("String", STRING, str, input->Line(), input->Start_Position(), input->Priority());
+	}
+	void print()
+	{
+		printf("input();\n");
+	}
+protected:
+	lexeme* input;
+};
+
+class TMinMax : TNode
+{
+public:
+	TMinMax(lexeme* Spec, TNode* mparam1, TNode* mparam2, bool MAX)
+	{
+		param1 = mparam1;
+		param2 = mparam2;
+		max = MAX;
+		spec = Spec;
+	}
+	lexeme* exec()
+	{
+		bool f = false;
+		if (parser.ToDouble(param1->exec()->Data()) > parser.ToDouble(param2->exec()->Data()))
+			f = true;
+		if (!max)
+			f = !f;
+		return new lexeme("Bool", BOOL, parser.BoolToString(f), spec->Line(), spec->Start_Position(), spec->Priority());
+	}
+	void print()
+	{
+		if (max) 
+			printf("max(");
+		else
+			printf("min(");
+		param1->print();
+		printf(", ");
+		param2->print();
+		printf(");\n");
+	}
+protected:
+	TNode* param1;
+	TNode* param2;
+	bool max;
+	lexeme* spec;
+};
+
+class TSinCos : TNode
+{
+public:
+	TSinCos(lexeme* Spec, TNode* mparam, bool SIN)
+	{
+		param = mparam;
+		msin = SIN;
+		spec = Spec;
+	}
+	lexeme* exec()
+	{
+		double res;
+		if (msin)
+			res = sin(parser.ToDouble(param->exec()->Data()));
+		else res = cos(parser.ToDouble(param->exec()->Data()));
+		return new lexeme("Number", DOUBLE, parser.DoubleToString(res), spec->Line(), spec->Start_Position(), spec->Priority());
+	}
+	void print()
+	{
+		if (msin)
+			printf("sin(");
+		else
+			printf("cos(");
+		param->print();
+		printf(");\n");
+	}
+protected:
+	TNode* param;
+	bool msin;
+	lexeme* spec;
 };

@@ -11,12 +11,12 @@ static class LexemeWorker
 {
 public:
 	bool Processing(List* lexes); //¬ызаваетс€ ф-цией MachineWorker().Work после формировани€ списка из лексем дл€ их последующей обработки (запись переменных в хэш-таблицу и замена этой переменной в коде на ссылку из хэша во всей области видимости этой переменной) и записи в дерево.
+	bool IsNumberExpression(List* expression, bool equal); //ѕровер€ет, что список из лексем expression €вл. выражением с переменными типа INT, FLOAT или DOUBLE и включает только доступные дл€ этих типов операции (результат этих операций тоже должен иметь тип INT, FLOAT или DOUBLE).
 	LexemeWorker();
 	~LexemeWorker();
 protected:
 	//‘лаг equal в данных функци€х при значении true означает, что в expression разрешена операци€ присвоени€ (=).
 	//‘-ции типа Is...Expression используют ф-цию WhateverCheck дл€ свои проверок, отправл€€ в нее нужные параметры.
-	bool IsNumberExpression(List* expression, bool equal); //ѕровер€ет, что список из лексем expression €вл. выражением с переменными типа INT, FLOAT или DOUBLE и включает только доступные дл€ этих типов операции (результат этих операций тоже должен иметь тип INT, FLOAT или DOUBLE).  
 	bool IsBoolExpression(List* expression, bool equal); //ѕровер€ет, что список из лексем expression €вл. выражением с переменными типа BOOL и включает только доступные дл€ этого типа операции (результат этих операций тоже должен иметь тип BOOL).  
 	bool IsStringExpression(List * expression, bool equal); //ѕровер€ет, что список из лексем expression €вл. выражением с переменными типа STRING или CHAR и включает только доступные дл€ этих типов операции (результат этих операций тоже должен иметь тип STRING или CHAR).  
 
@@ -38,7 +38,7 @@ protected:
 
 private:
 	lexeme* GetMassValues(List* expression, int start, char* type, int* putend, Lexeme_list* dob, int rank, List* sizes); //разбирает выражение от { до } при инициализации массивов и записывате элементы подр€д (в пам€ть?)
-	bool GetValue(Lexeme_list* dob, lexeme* place, List* expression, int pos);
+	bool GetVariableValue(Lexeme_list* dob, lexeme* place);
 	bool ReInnerFind(List* expression, int* currentpos, int currentstep, int* s, int rank, List* poses, Lexeme_list* dob, int type);
 
 	//pos - позици€ лексемы ф-ции (в случае output(...) pos - позици€ output в expression)

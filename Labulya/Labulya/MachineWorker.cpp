@@ -283,7 +283,7 @@ void MachineWorker::GetOperationPriority(mStateMachine * machine)
 {
 	if (strcmp("(", machine->Buffer()) == 0 || strcmp(")", machine->Buffer()) == 0)
 	{
-		machine->Priority = 100;
+		machine->Priority = 0;
 		return;
 	}
 	if (strcmp("--", machine->Buffer()) == 0 || strcmp("++", machine->Buffer()) == 0)
@@ -373,11 +373,6 @@ void MachineWorker::GetOperationPriority(mStateMachine * machine)
 			machine->Priority = 5;
 		if (machine->CurrentLexType() == UNARYOPERATION)
 			machine->Priority = 3;
-		return;
-	}
-	if (strcmp(machine->CurrentLexName(), "Operation") == 0)
-	{
-		machine->Priority = 50;
 		return;
 	}
 	machine->Priority = 0;
