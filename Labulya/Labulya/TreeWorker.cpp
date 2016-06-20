@@ -175,29 +175,36 @@ TNode* TreeWorker::GetTNode2(List* lexes, int start, int finish)
 
 bool TreeWorker::PreprocessingBrackets(List* lexes, int start, int finish)
 {
+	int countBrac = 0;
 	for (int i = start; i <= finish; i++)
 	{
 		lexeme* lexeme1 = *(lexeme**)lexes->get(i);
 		if (strcmp(lexeme1->Data(), ")") == 0)
 		{
+			countBrac++;
+			int currBrac = 0;
 			bool flag = false;
 			for (int j = i - 1; j >= start && !flag; j--)
 			{
 				lexeme* lexeme2 = *(lexeme**)lexes->get(j);
 				if (strcmp(lexeme2->Data(), "(") == 0)
 				{
-					flag = true;
-					DoTNode* a = (DoTNode*)heap.get_mem(sizeof(DoTNode));
-					a->start = j;
-					a->finish = i;
-					a->type = lexeme2->Type();
-					a->node = GetTNode1(lexes, j + 1, i - 1);
-					if (a->node == nullptr)
+					if ((countBrac - currBrac - 1) == 0)
 					{
-						ErrorReporter().FReport(logfile, "Ќе удалось получить внутренний операнд!", lexeme1->Line(), lexeme1->Start_Position());
-						return false;
+						flag = true;
+						DoTNode* a = (DoTNode*)heap.get_mem(sizeof(DoTNode));
+						a->start = j;
+						a->finish = i;
+						a->type = lexeme2->Type();
+						a->node = GetTNode2(lexes, j + 1, i - 1);
+						if (a->node == nullptr)
+						{
+							ErrorReporter().FReport(logfile, "Ќе удалось получить внутренний операнд!", lexeme1->Line(), lexeme1->Start_Position());
+							return false;
+						}
+						nodes->add(&a);
 					}
-					nodes->add(&a);
+					currBrac++;
 				}
 			}
 			if (!flag)
