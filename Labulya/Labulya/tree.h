@@ -16,7 +16,8 @@ public:
 	}
 	~Lexes()
 	{
-		lex->~List();
+		if(lex != nullptr)
+			lex->~List();
 	}
 	void AddLexeme(lexeme* lexem)
 	{
@@ -76,7 +77,7 @@ class TVariable : TNode
 		lexeme* m_variable;
 };
 /*
-class TElementArray : TNode
+class TElementArray
 {
 public:
 	TElementArray(lexeme* array, TList* pointer)
@@ -100,8 +101,8 @@ protected:
 	lexeme* _array;
 	TList* _pointer;
 };
-
 */
+
 class TUnaryOperation : TNode
 {
 	public:

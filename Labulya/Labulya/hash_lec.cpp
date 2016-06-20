@@ -47,7 +47,8 @@ Diction_lexem::~Diction_lexem()
 	for (int i = 0; i < table->count(); i++)
 	{
 		list = (Lexeme_list*)table->get(i);
-		list->~Lexeme_list();
+		if(list != nullptr)
+			list->~Lexeme_list();
 	}
 };
 

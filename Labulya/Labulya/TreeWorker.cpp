@@ -7,7 +7,8 @@ TreeWorker::TreeWorker()
 }
 TreeWorker::~TreeWorker()
 {
-	nodes->~List();
+	if(nodes != nullptr)
+		nodes->~List();
 }
 
 int TreeWorker::GetLexemePositionWithMaximalPriority(List * lexes, int start, int finish)
@@ -46,8 +47,9 @@ TNode* TreeWorker::GetTNode(List* lexes, int start, int finish)
 {
 	if (Preprocessing(lexes, start, finish))
 	{
-		GetTNode2(lexes, start, finish);
+		return GetTNode2(lexes, start, finish);
 	}
+	ErrorReporter().FReport(logfile, "Не удалось обработать скобки!", (*(lexeme**)lexes->get(start))->Line(), (*(lexeme**)lexes->get(start))->Start_Position());
 	return nullptr;
 }
 
@@ -188,4 +190,5 @@ bool TreeWorker::Preprocessing(List* lexes, int start, int finish)
 
 		}
 	}
+	return true;
 }

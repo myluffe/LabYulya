@@ -297,8 +297,10 @@ bool LexemeWorker::Processing(List* lexes)
 	LexemeTable.print_lexems();
 	printf_s("|---------------|\n");
 	//
-	dob->~Lexeme_list();
-	storage->~TList();
+	if(dob != nullptr)
+		dob->~Lexeme_list();
+	if(storage != nullptr)
+		storage->~TList();
 	return true;
 }
 
