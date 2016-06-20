@@ -82,11 +82,49 @@ bool lexeme::SetNumber(double value)
 void lexeme::DataChange(char* newdata)
 {
 	heap.free_mem(_data);
+	if (Type() == INT)
+	{
+		int a = parser.ToInt(newdata);
+		_data = (char*)heap.get_mem(sizeof(char) * (int)strlen(newdata) + 1);
+		strcpy_s(_data, strlen(newdata) + 1, parser.IntToString(a));
+		return;
+	}
+	if (Type() == FLOAT)
+	{
+		int a = parser.ToFloat(newdata);
+		_data = (char*)heap.get_mem(sizeof(char) * (int)strlen(newdata) + 1);
+		strcpy_s(_data, strlen(newdata) + 1, parser.FloatToString(a));
+		return;
+	}
+	if (Type() == CHAR)
+	{
+		_data = (char*)heap.get_mem(sizeof(char));
+		char a = (char)newdata;
+		sprintf_s(_data, 1, "%d", a);
+		return;
+	}
 	_data = (char*)heap.get_mem(sizeof(char) * (int)strlen(newdata) + 1);
 	strcpy_s(_data, strlen(newdata) + 1, newdata);
 }
 
 void lexeme::Print()
 {   
-	printf("\"%s\" Name: \"%s\" Type: \"%d\" Line: \"%d\" Start Position: \"%d\" Priority: \"%d\"\n", _data, _name, _type, _line, _startposition, _priority);
+	if (_rank == 0)
+		printf("\"%s\" Name: \"%s\" Type: \"%d\" Line: \"%d\" Start Position: \"%d\" Priority: \"%d\"\n", _data, _name, _type, _line, _startposition, _priority);
+	else
+	{
+		printf("Array Name: \"%s\" Type: \"%d\" Line: \"%d\" Start Position: \"%d\" Priority: \"%d\"\n", _data, _name, _type, _line, _startposition, _priority);
+		printf("Data: ");
+		int q = 1;
+		for (int l = 0; l < Sizes->count(); l++)
+			q *= *(int*)Sizes->get(l);
+		for (int l = 0; l < q; l++)
+		{
+			lexeme* temp = &Values[l];
+			printf("\"%s\" Name: \"%s\" Type: \"%d\" Line: \"%d\" Start Position: \"%d\" Priority: \"%d\"", _data, _name, _type, _line, _startposition, _priority);
+			if (l != q - 1)
+				printf(", ");
+		}
+		printf(";\n");
+	}
 }
