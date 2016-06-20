@@ -6,6 +6,29 @@
 #include "Parser.h"
 #include "ErrorReporter.h"
 
+class Lexes : lexeme
+{
+public:
+	Lexes()
+	{
+		lex = new List(sizeof(lexeme));
+	}
+	~Lexes()
+	{
+		lex->~List();
+	}
+	void AddLexeme(lexeme* lexem)
+	{
+		lex->add(lexem);
+	}
+	List* RetLex()
+	{
+		return lex;
+	}
+private:
+	List* lex;
+};
+
 class TNode
 {
 	public:
@@ -55,15 +78,15 @@ class TVariable : TNode
 class TElementArray : TNode
 {
 public:
-	TElementArray(lexeme* array, TNode* pointer)
+	TElementArray(lexeme* array, TList* pointer)
 	{
 		_array = array;
 		_pointer = pointer;
 	}	
 	lexeme* exec()
 	{
-		//нужно вернуть значения из масива под конкретным номером, чтобы можно было его изменить
-		//return _array[_pointer];
+		Lexes* a = (Lexes*)_pointer->exec();
+		//return funct(_array, a->RetLex());
 		return nullptr;
 	}
 	void print()
@@ -74,7 +97,7 @@ public:
 	}
 protected:
 	lexeme* _array;
-	TNode* _pointer;
+	TList* _pointer;
 };
 
 
@@ -284,20 +307,21 @@ class TList : TNode
 		TList()
 		{
 			nods = new List(sizeof(TNode*));
+			lexems = new Lexes();
 		}
 		~TList()
 		{
 			nods->~List();
+			lexems->~Lexes();
 		}
 		lexeme* exec()  
 		{  
 			for (int i = 0; i < nods->count(); ++i)
 			{
 				TNode* cur = *(TNode**)nods->get(i);
-				cur->exec();
+				lexems->AddLexeme(cur->exec());
 			}
-            lexeme* res = nullptr;
-            return res;
+            return (lexeme*)lexems;
 		}
 		void print() 
 		{  
@@ -313,6 +337,7 @@ class TList : TNode
 			nods->add(&node);
 		}
 	protected:
+		Lexes* lexems;
 		List* nods;
 };
 

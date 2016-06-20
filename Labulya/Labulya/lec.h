@@ -14,6 +14,8 @@ private:
 	int _priority; //Приоритет. По умолчанию 0, далее, если лексема явл. операцией, в спец. функции определяется её приоритет по таблице: http://cppstudio.com/post/302/
 	//Скобки "(" и ")" имеют приоритет 100.
 	int _rank = 0; //степень массива (если не массив, то 0).
+protected:
+	lexeme();
 public: 
 	lexeme(char* name, char* type, char* data, int line, int startposition, int priority);
 	lexeme(char* name, int type, char* data, int line, int startposition, int priority);
