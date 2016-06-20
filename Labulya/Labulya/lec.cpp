@@ -121,7 +121,7 @@ void lexeme::Print()
 		for (int l = 0; l < q; l++)
 		{
 			lexeme* temp = &Values[l];
-			printf("\"%s\" Name: \"%s\" Type: \"%d\" Line: \"%d\" Start Position: \"%d\" Priority: \"%d\"", _data, _name, _type, _line, _startposition, _priority);
+			printf("\"%s\"", temp->Data());
 			if (l != q - 1)
 				printf(", ");
 		}
