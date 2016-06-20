@@ -2,8 +2,8 @@
 //int [2] a = {5, 2};
 int  f = 0;
 int g = 2;
-for (f; f < 5; f++)
+while (f < 5)
 {
-g = g + 2;
+f++;
 }
 }

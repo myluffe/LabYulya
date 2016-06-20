@@ -211,6 +211,8 @@ class TBinaryOperation : TNode
 			}
 			if (strcmp(m_operation->Data(), "<") == 0)
 			{
+				res->~lexeme();
+				res = new lexeme("Number", BOOL, "0", res1->Line(), res1->Start_Position(), 100);
 				res->DataChange(Parser().BoolToString(o1 < o2));
 			}
 			if (strcmp(m_operation->Data(), ">") == 0)
