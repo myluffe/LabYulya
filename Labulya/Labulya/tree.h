@@ -7,7 +7,6 @@
 #include "ErrorReporter.h"
 #include "cmath"
 
-
 class Lexes : lexeme
 {
 public:
@@ -570,7 +569,7 @@ public:
 	lexeme* exec()
 	{
 		Lexes* a = (Lexes*)_spointer->exec();
-		//return LWorker.GetMassElem(_sarray, a->RetLex());
+		return LWorker.GetMassElem(_sarray, a->RetLex());
 	}
 	void print()
 	{

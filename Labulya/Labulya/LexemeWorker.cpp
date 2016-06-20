@@ -1,8 +1,6 @@
 #include "stdafx.h"
 #include "LexemeWorker.h"
 
-static TList * GetMassElemIndexes(List * expression, lexeme * mass, int * origpos);
-
 bool LexemeWorker::Processing(List* lexes)
 {
 	//изменение

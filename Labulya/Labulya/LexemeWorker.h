@@ -6,6 +6,7 @@
 #include "Parser.h"
 #include "ErrorReporter.h"
 #include "TreeWorker.h"
+#include "tree.h"
 
 static class LexemeWorker
 {
