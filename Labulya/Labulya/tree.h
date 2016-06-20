@@ -7,6 +7,7 @@
 #include "ErrorReporter.h"
 #include "cmath"
 
+
 class Lexes : lexeme
 {
 public:
