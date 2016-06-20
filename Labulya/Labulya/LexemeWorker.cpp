@@ -282,6 +282,7 @@ bool LexemeWorker::Processing(List* lexes)
 		else
 		{
 			i = CorrectExpression(expression, i, storage);
+			if (_error) return false;
 		}
 	}
 
@@ -336,7 +337,8 @@ int LexemeWorker::CorrectExpression(List* expression, int pos, TList* storage)
 		if (tn == nullptr)
 		{
 			tlist->~List();
-			return i;
+			_error = true;
+			return pos;
 		}	
 		storage->addNode(tn);
 		tlist->~List();
@@ -344,6 +346,7 @@ int LexemeWorker::CorrectExpression(List* expression, int pos, TList* storage)
 	}
 
 	tlist->~List();
+	_error = true;
 	return pos;
 }
 

@@ -31,15 +31,14 @@ int main(char* name)
 
 	
 	//вывод обработанных лексем
-	int lcount = temp_lexes->count();
-	for (int j = 0; j < lcount; j++)
+	for (int j = 0; j < temp_lexes->count(); j++)
 	{
-		lexeme tl = *(lexeme*)temp_lexes->get(j);
+		lexeme* tl = (lexeme*)temp_lexes->get(j);
 		printf("%d. ", j);
-		tl.Print();
+		tl->Print();
 	}
 	//конец вывода
-
+	temp_lexes->~List();
 	getc(stdin);
 	return 0;
 }
