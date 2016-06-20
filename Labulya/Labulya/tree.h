@@ -150,7 +150,6 @@ class TUnaryOperation : TNode
 
 class TBinaryOperation : TNode
 {
-	//бинарный "+"
 	public:
 		TBinaryOperation(TNode*  operand1, TNode*  operand2, lexeme* operation)
 		{
