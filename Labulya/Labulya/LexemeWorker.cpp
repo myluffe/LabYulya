@@ -1682,8 +1682,9 @@ static TList * GetMassElemIndexes(List * expression, lexeme * mass, int * origpo
 			lexeme* temp = *(lexeme**)expression->get(i);
 			if (temp == nullptr || strcmp(temp->Data(), "[") != 0)
 			{
-				errorReporter.FReport(logfile, "Ожидается \"[\"!", temp->Line(), temp->Start_Position());
-				return false;
+				break;
+				//errorReporter.FReport(logfile, "Ожидается \"[\"!", temp->Line(), temp->Start_Position());
+				//return false;
 			}
 			List* templ = new List(sizeof(lexeme*));
 			int start = i + 1;
