@@ -1666,7 +1666,7 @@ bool LexemeWorker::GetVariableValue(Lexeme_list * dob, lexeme * place)
 	}
 }
 
-static TList * GetMassElemIndexes(List * expression, lexeme * mass, int * origpos)
+TList * LexemeWorker::GetMassElemIndexes(List * expression, lexeme * mass, int * origpos)
 {
 	//Установить origpos на последнюю скобку
 	if (mass->Rank() > 0)
@@ -1724,7 +1724,7 @@ static TList * GetMassElemIndexes(List * expression, lexeme * mass, int * origpo
 	return nullptr;
 }
 
-static lexeme* GetMassElem(lexeme* mass, List* indexes)
+lexeme* LexemeWorker::GetMassElem(lexeme* mass, List* indexes)
 {
 	if (mass->Rank() > 0)
 	{

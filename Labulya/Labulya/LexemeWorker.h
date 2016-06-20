@@ -12,6 +12,10 @@ static class LexemeWorker
 public:
 	bool Processing(List* lexes); //Вызавается ф-цией MachineWorker().Work после формирования списка из лексем для их последующей обработки (запись переменных в хэш-таблицу и замена этой переменной в коде на ссылку из хэша во всей области видимости этой переменной) и записи в дерево.
 	bool IsNumberExpression(List* expression, bool equal); //Проверяет, что список из лексем expression явл. выражением с переменными типа INT, FLOAT или DOUBLE и включает только доступные для этих типов операции (результат этих операций тоже должен иметь тип INT, FLOAT или DOUBLE).
+	
+	lexeme* GetMassElem(lexeme* mass, List* indexes);
+	TList * GetMassElemIndexes(List * expression, lexeme * mass, int * origpos);
+
 	LexemeWorker();
 	~LexemeWorker();
 protected:
@@ -55,6 +59,3 @@ private:
 	
 	bool WhateverCheck(char ** perone, int c1, int * types, int c2, List * expression, bool equal); //Внутренняя ф-ция, которые используют IsNumberExpression, IsBoolExpression, IsStringExpression, IsNumberExpressionWithBoolOperations, IsStringExpressionWithBoolOperations, загружая в неё свои параметры.
 } LWorker = *new LexemeWorker();
-
-static lexeme* GetMassElem(lexeme* mass, List* indexes);
-static TList * GetMassElemIndexes(List * expression, lexeme * mass, int * origpos);

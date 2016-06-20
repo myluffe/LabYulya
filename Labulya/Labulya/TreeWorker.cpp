@@ -219,7 +219,7 @@ bool TreeWorker::PreprocessingElemMas(List* lexes, int start, int finish)
 		if (lexeme1->Type() == MASSIVE)
 		{
 			int	step = 0;
-			TList* Iters = GetMassElemIndexes(lexes, lexeme1, &step);
+			TList* Iters = LWorker.GetMassElemIndexes(lexes, lexeme1, &step);
 			if (Iters == nullptr)
 			{
 				DoTNode* a = (DoTNode*)heap.get_mem(sizeof(DoTNode));
