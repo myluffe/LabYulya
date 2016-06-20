@@ -91,9 +91,9 @@ void lexeme::DataChange(char* newdata)
 	}
 	if (Type() == FLOAT)
 	{
-		int a = parser.ToFloat(newdata);
+		float a = parser.ToFloat(newdata);
 		_data = (char*)heap.get_mem(sizeof(char) * (int)strlen(newdata) + 1);
-		strcpy_s(_data, strlen(newdata) + 1, parser.FloatToString(a));
+		strcpy_s(_data, (int)strlen(newdata) + 1, parser.FloatToString(a));
 		return;
 	}
 	if (Type() == CHAR)
@@ -113,7 +113,7 @@ void lexeme::Print()
 		printf("\"%s\" Name: \"%s\" Type: \"%d\" Line: \"%d\" Start Position: \"%d\" Priority: \"%d\"\n", _data, _name, _type, _line, _startposition, _priority);
 	else
 	{
-		printf("Array Name: \"%s\" Type: \"%d\" Line: \"%d\" Start Position: \"%d\" Priority: \"%d\"\n", _data, _name, _type, _line, _startposition, _priority);
+		printf("Array Name: \"%s\" Type: \"%d\" Line: \"%d\" Start Position: \"%d\" Priority: \"%d\"\n", _name, _type, _line, _startposition, _priority);
 		printf("Data: ");
 		int q = 1;
 		for (int l = 0; l < Sizes->count(); l++)
