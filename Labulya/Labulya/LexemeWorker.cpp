@@ -1596,7 +1596,7 @@ bool LexemeWorker::GetVariableValue(Lexeme_list * dob, lexeme * place)
 	}
 }
 
-TList * LexemeWorker::GetMassElemIndexes(List * expression, lexeme * mass, int * origpos)
+static TList * GetMassElemIndexes(List * expression, lexeme * mass, int * origpos)
 {
 	//Установить origpos на последнюю скобку
 	if (mass->Rank() > 0)
