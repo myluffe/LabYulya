@@ -310,7 +310,7 @@ LexemeWorker::~LexemeWorker()
 
 int LexemeWorker::CorrectExpression(List* expression, int pos, TList* storage)
 {
-	int start = pos; //fix
+	int start = pos;
 	int i;
 	List* tlist = new List(sizeof(sizeof(lexeme*)));
 
@@ -497,13 +497,13 @@ int LexemeWorker::CorrectSpecial(lexeme* spec, int pos, List* expression, TList*
 	{
 		return CorrectDo(expression, pos, spec, storage);
 	}
-	if (strcmp(spec->Data(), "input ") == 0 || strcmp(spec->Data(), "output ") == 0)
+	if (strcmp(spec->Data(), "output ") == 0)
 	{
 		List* param = new List(sizeof(lexeme*));
 		int	res = FuncWithStringParam(expression, pos, spec, true, param);
 		if (res > pos)
 		{
-			//input or output
+			//output
 			//storage->addNode();
 			param->~List();
 			return res;
@@ -511,7 +511,7 @@ int LexemeWorker::CorrectSpecial(lexeme* spec, int pos, List* expression, TList*
 		res = FuncWithNumberParam(expression, pos, spec, true, param);
 		if (res > pos)
 		{
-			//input or output
+			//output
 			//storage->addNode();
 			param->~List();
 			return res;
@@ -519,12 +519,32 @@ int LexemeWorker::CorrectSpecial(lexeme* spec, int pos, List* expression, TList*
 		res = FuncWithBoolParam(expression, pos, spec, true, param);
 		if (res > pos)
 		{
-			//input or output
-			//storage->addNode();
+			TNode* t = treeWorker.GetTNode(expression, pos + 2, res - 1);
+			if (t == nullptr)
+				return pos;
+			TOutPut* ot = new TOutPut(t);
+			storage->addNode((TNode*)ot);
 			param->~List();
 			return res;
 		}
 		return pos;
+	}
+	if (strcmp(spec->Data(), "input ") == 0)
+	{
+		lexeme* tdevider = *(lexeme**)expression->get(pos + 1);
+		if (tdevider == nullptr || strcmp(tdevider->Data(), "(") != 0)
+		{
+			errorReporter.FReport(logfile, "Ожидается \"(\"!", tdevider->Line(), tdevider->Start_Position());
+			return pos;
+		}
+		lexeme* tdevider = *(lexeme**)expression->get(pos + 2);
+		if (tdevider == nullptr || strcmp(tdevider->Data(), ")") != 0)
+		{
+			errorReporter.FReport(logfile, "Ожидается \")\"!", tdevider->Line(), tdevider->Start_Position());
+			return pos;
+		}
+		//input node
+		return pos + 2;
 	}
 	if (strcmp(spec->Data(), "min ") == 0 || strcmp(spec->Data(), "max ") == 0)
 	{
@@ -1623,7 +1643,7 @@ static TList * GetMassElemIndexes(List * expression, lexeme * mass, int * origpo
 		int i = 0;
 		for (i = pos + 1; i < expression->count(); i++)
 		{
-			lexeme* temp = (lexeme*)expression->get(i);
+			lexeme* temp = *(lexeme**)expression->get(i);
 			if (temp == nullptr || strcmp(temp->Data(), "[") != 0)
 			{
 				errorReporter.FReport(logfile, "Ожидается \"[\"!", temp->Line(), temp->Start_Position());
@@ -1634,7 +1654,7 @@ static TList * GetMassElemIndexes(List * expression, lexeme * mass, int * origpo
 			while (true)
 			{
 				i++;
-				temp = (lexeme*)expression->get(i);
+				temp = *(lexeme**)expression->get(i);
 				if (temp == nullptr)
 				{
 					errorReporter.FReport(logfile, "Ожидается индекс типа int!", temp->Line(), temp->Start_Position());
@@ -1658,7 +1678,7 @@ static TList * GetMassElemIndexes(List * expression, lexeme * mass, int * origpo
 		//Проверка
 		if (indexcount != mass->Sizes->count())
 		{
-			lexeme* temp = (lexeme*)expression->get(pos);
+			lexeme* temp = *(lexeme**)expression->get(pos);
 			errorReporter.FReport(logfile, "Кол-во индексов не верное!", temp->Line(), temp->Start_Position());
 			return false;
 		}

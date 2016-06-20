@@ -469,3 +469,25 @@ protected:
 	TNode* loop;
 	TList* body;
 };
+
+class TOutPut : TNode
+{
+public:
+	TOutPut(TNode* mstringexpression)
+	{
+		stringexpression = mstringexpression;
+	}
+	lexeme* exec()
+	{
+		stringexpression->print();
+		return nullptr;
+	}
+	void print()
+	{
+		printf("output(");
+		stringexpression->print();
+		printf(");\n");
+	}
+protected:
+	TNode* stringexpression;
+};
