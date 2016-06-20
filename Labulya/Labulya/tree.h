@@ -74,7 +74,7 @@ class TVariable : TNode
 	protected:
 		lexeme* m_variable;
 };
-
+/*
 class TElementArray : TNode
 {
 public:
@@ -100,7 +100,7 @@ protected:
 	TList* _pointer;
 };
 
-
+*/
 class TUnaryOperation : TNode
 {
 	public:

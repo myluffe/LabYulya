@@ -15,7 +15,7 @@ private:
 	//Скобки "(" и ")" имеют приоритет 100.
 	int _rank = 0; //степень массива (если не массив, то 0).
 protected:
-	lexeme();
+	lexeme() {};
 public: 
 	lexeme(char* name, char* type, char* data, int line, int startposition, int priority);
 	lexeme(char* name, int type, char* data, int line, int startposition, int priority);

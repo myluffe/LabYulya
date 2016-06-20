@@ -7,8 +7,21 @@
 static class TreeWorker
 {
 public:
-	static bool DoTree(List* lexes);
+	TreeWorker();
+	~TreeWorker();
 	static TNode* GetTNode(List* lexes, int start, int finish);
+	static TNode* GetTNode2(List* lexes, int start, int finish);
+	static bool Preprocessing(List* lexes, int start, int finish);
 	static int GetLexemePositionWithMinimalPriority(List * lexes, int start, int finish);
 	static int GetLexemePositionWithMaximalPriority(List * lexes, int start, int finish);
+private:
+	struct DoTNode
+	{
+		int start;
+		int finish;
+		TNode* node;
+	};
+	
 }treeWorker = *new TreeWorker();
+
+static List* nodes;
