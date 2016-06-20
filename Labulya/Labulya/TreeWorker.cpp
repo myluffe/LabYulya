@@ -41,20 +41,50 @@ TNode* TreeWorker::GetTNode(List* lexes, int start, int finish)
 		lexeme* temp = *(lexeme**)lexes->get(pos_max);
 		if (temp->Type() == BYNARYOPERATION)
 			if (pos_max > start && pos_max < finish)
-				return (TNode*)new TBinaryOperation(GetTNode(lexes, start, pos_max - 1), GetTNode(lexes, pos_max + 1, finish), temp);
+			{
+				TNode* oper1 = GetTNode(lexes, start, pos_max - 1);
+				if (oper1 == nullptr)
+				{
+					ErrorReporter().FReport(logfile, "Не удалось получить первый операнд!", temp->Line(), temp->Start_Position());
+					return nullptr;
+				}
+				TNode* oper2 = GetTNode(lexes, pos_max + 1, finish);
+				if (oper2 == nullptr)
+				{
+					ErrorReporter().FReport(logfile, "Не удалось получить второй операнд!", temp->Line(), temp->Start_Position());
+					return nullptr;
+				}
+				return (TNode*)new TBinaryOperation(oper1, oper2, temp);
+			}
 		if (temp->Type() == UNARYOPERATION)
 		{
 			if (pos_max == finish)
-				return (TNode*)new TUnaryOperation(GetTNode(lexes, start, pos_max - 1), temp, false);
+			{
+				TNode* oper1 = GetTNode(lexes, start, pos_max - 1);
+				if (oper1 == nullptr)
+				{
+					ErrorReporter().FReport(logfile, "Не удалось получить предоперанд!", temp->Line(), temp->Start_Position());
+					return nullptr;
+				}
+				return (TNode*)new TUnaryOperation(oper1, temp, false);
+			}
 			if (pos_max == start)
-				return (TNode*)new TUnaryOperation(GetTNode(lexes, pos_max + 1, finish), temp, true);
+			{
+				TNode* oper2 = GetTNode(lexes, pos_max + 1, finish);
+				if (oper2 == nullptr)
+				{
+					ErrorReporter().FReport(logfile, "Не удалось получить постоперанд!", temp->Line(), temp->Start_Position());
+					return nullptr;
+				}
+				return (TNode*)new TUnaryOperation(oper2, temp, true);
+			}
 		}
 		if (strcmp(temp->Data(), "(") == 0)
 		{
 
 		}
 		ErrorReporter().FReport(logfile, "Не удалось получить операнды!", temp->Line(), temp->Start_Position());
-		return NULL;
+		return nullptr;
 	}
 	else
 	{
@@ -64,6 +94,6 @@ TNode* TreeWorker::GetTNode(List* lexes, int start, int finish)
 		if (temp->Type() == INT || temp->Type() == DOUBLE || temp->Type() == FLOAT || temp->Type() == BOOL || temp->Type() == STRING || temp->Type() == CHAR)
 			return (TNode*)new TVariable(temp);
 		ErrorReporter().FReport(logfile, "Ожидается переменная или константа!", temp->Line(), temp->Start_Position());
-		return NULL;
+		return nullptr;
 	}
 }
