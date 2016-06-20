@@ -231,13 +231,13 @@ bool TreeWorker::PreprocessingElemMas(List* lexes, int start, int finish)
 		lexeme* lexeme1 = *(lexeme**)lexes->get(i);
 		if (lexeme1->Type() == MASSIVE)
 		{
-			int	step = 0;
+			int	step = i;
 			TList* Iters = LWorker.GetMassElemIndexes(lexes, lexeme1, &step);
 			if (Iters != nullptr)
 			{
 				DoTNode* a = (DoTNode*)heap.get_mem(sizeof(DoTNode));
 				a->start = i;
-				a->finish = i + step;
+				a->finish = step;
 				a->type = lexeme1->Type();
 				a->node = (TNode*)Iters;
 				if (a->node == nullptr)

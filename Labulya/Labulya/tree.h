@@ -5,7 +5,6 @@
 #include "Types.h"
 #include "Parser.h"
 #include "ErrorReporter.h"
-#include "LexemeWorker.h"
 #include "cmath"
 
 class Lexes : lexeme
@@ -77,7 +76,7 @@ class TVariable : TNode
 	protected:
 		lexeme* m_variable;
 };
-
+/*
 class TElementArray : TNode
 {
 public:
@@ -101,7 +100,7 @@ protected:
 	lexeme* _array;
 	TList* _pointer;
 };
-
+*/
 class TUnaryOperation : TNode
 {
 	public:
