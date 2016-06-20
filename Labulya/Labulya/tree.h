@@ -503,7 +503,7 @@ public:
 	lexeme* exec()
 	{
 		char* str;
-		scanf_s("%s", str);
+		scanf_s("%s", str, 100);
 		return new lexeme("String", STRING, str, input->Line(), input->Start_Position(), input->Priority());
 	}
 	void print()

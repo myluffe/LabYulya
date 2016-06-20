@@ -543,7 +543,7 @@ int LexemeWorker::CorrectSpecial(lexeme* spec, int pos, List* expression, TList*
 			errorReporter.FReport(logfile, "Ожидается \"(\"!", tdevider->Line(), tdevider->Start_Position());
 			return pos;
 		}
-		lexeme* tdevider = *(lexeme**)expression->get(pos + 2);
+		tdevider = *(lexeme**)expression->get(pos + 2);
 		if (tdevider == nullptr || strcmp(tdevider->Data(), ")") != 0)
 		{
 			errorReporter.FReport(logfile, "Ожидается \")\"!", tdevider->Line(), tdevider->Start_Position());
