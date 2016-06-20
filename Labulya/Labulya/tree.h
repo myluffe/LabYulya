@@ -52,6 +52,32 @@ class TVariable : TNode
 		lexeme* m_variable;
 };
 
+class TElementArray : TNode
+{
+public:
+	TElementArray(lexeme* array, TNode* pointer)
+	{
+		_array = array;
+		_pointer = pointer;
+	}	
+	lexeme* exec()
+	{
+		//нужно вернуть значения из масива под конкретным номером, чтобы можно было его изменить
+		//return _array[_pointer];
+		return nullptr;
+	}
+	void print()
+	{
+		printf("%s[", _array->Name());
+		_pointer->print();
+		printf("]");
+	}
+protected:
+	lexeme* _array;
+	TNode* _pointer;
+};
+
+
 class TUnaryOperation : TNode
 {
 	public:
