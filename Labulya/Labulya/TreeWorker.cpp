@@ -168,19 +168,19 @@ bool TreeWorker::Preprocessing(List* lexes, int start, int finish)
 	for (int i = start; i <= finish; i++)
 	{
 		lexeme* lexeme1 = *(lexeme**)lexes->get(i);
-		if (strcmp(lexeme1->Data(), "(") == 0)
+		if (strcmp(lexeme1->Data(), ")") == 0)
 		{
 			bool flag = false;
-			for (int j = i + 1; j <= finish && !flag; j++)
+			for (int j = i - 1; j >= start && !flag; j--)
 			{
 				lexeme* lexeme2 = *(lexeme**)lexes->get(j);
-				if (strcmp(lexeme2->Data(), ")") == 0)
+				if (strcmp(lexeme2->Data(), "(") == 0)
 				{
 					flag = true;
 					DoTNode* a = (DoTNode*)heap.get_mem(sizeof(DoTNode));
-					a->finish = j;
-					a->start = i;
-					a->node = GetTNode(lexes, i + 1, j - 1);
+					a->start = j;
+					a->finish = i;
+					a->node = GetTNode(lexes, j + 1, i - 1);
 					if (a->node == nullptr)
 					{
 						ErrorReporter().FReport(logfile, "Не удалось получить внутренний операнд!", lexeme1->Line(), lexeme1->Start_Position());
@@ -191,11 +191,32 @@ bool TreeWorker::Preprocessing(List* lexes, int start, int finish)
 			}
 			if (!flag)
 			{
-				ErrorReporter().FReport(logfile, "Не удалось найти \")\"!", lexeme1->Line(), lexeme1->Start_Position());
+				ErrorReporter().FReport(logfile, "Не удалось найти \"(\"!", lexeme1->Line(), lexeme1->Start_Position());
 				return false;
 			}
 
 		}
 	}
+	/*
+	for (int i = start; i <= finish; i++)
+	{
+		lexeme* lexeme1 = *(lexeme**)lexes->get(i);
+		if (lexeme1->Type() == MASSIVE)
+		{
+			for (int g = 0; g <= lexeme1->Rank(); g++)
+			{
+				if (strcmp((*(lexeme**)lexes->get(i + 1))->Data(), "[") == 0)
+				{
+
+				}
+				else
+				{
+					ErrorReporter().FReport(logfile, "Ожидается \"[\"!", lexeme1->Line(), lexeme1->Start_Position());
+					return false;
+				}
+			}
+		}
+	}
+	*/
 	return true;
 }
