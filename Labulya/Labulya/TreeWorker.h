@@ -10,8 +10,10 @@ public:
 	TreeWorker();
 	~TreeWorker();
 	static TNode* GetTNode(List* lexes, int start, int finish);
+	static TNode* GetTNode1(List* lexes, int start, int finish);
 	static TNode* GetTNode2(List* lexes, int start, int finish);
-	static bool Preprocessing(List* lexes, int start, int finish);
+	static bool PreprocessingBrackets(List* lexes, int start, int finish);
+	static bool PreprocessingElemMas(List* lexes, int start, int finish);
 	static int GetLexemePositionWithMinimalPriority(List * lexes, int start, int finish);
 	static int GetLexemePositionWithMaximalPriority(List * lexes, int start, int finish);
 private:
@@ -19,6 +21,7 @@ private:
 	{
 		int start;
 		int finish;
+		int type;
 		TNode* node;
 	};
 	

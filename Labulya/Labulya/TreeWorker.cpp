@@ -45,7 +45,17 @@ int TreeWorker::GetLexemePositionWithMinimalPriority(List * lexes, int start, in
 
 TNode* TreeWorker::GetTNode(List* lexes, int start, int finish)
 {
-	if (Preprocessing(lexes, start, finish))
+	if (PreprocessingElemMas(lexes, start, finish))
+	{
+		return GetTNode1(lexes, start, finish);
+	}
+	ErrorReporter().FReport(logfile, "Не удалось обработать элементы массива!", (*(lexeme**)lexes->get(start))->Line(), (*(lexeme**)lexes->get(start))->Start_Position());
+	return nullptr;
+}
+
+TNode* TreeWorker::GetTNode1(List* lexes, int start, int finish)
+{
+	if (PreprocessingBrackets(lexes, start, finish))
 	{
 		return GetTNode2(lexes, start, finish);
 	}
@@ -163,7 +173,7 @@ TNode* TreeWorker::GetTNode2(List* lexes, int start, int finish)
 	return nullptr;
 }
 
-bool TreeWorker::Preprocessing(List* lexes, int start, int finish)
+bool TreeWorker::PreprocessingBrackets(List* lexes, int start, int finish)
 {
 	for (int i = start; i <= finish; i++)
 	{
@@ -180,7 +190,8 @@ bool TreeWorker::Preprocessing(List* lexes, int start, int finish)
 					DoTNode* a = (DoTNode*)heap.get_mem(sizeof(DoTNode));
 					a->start = j;
 					a->finish = i;
-					a->node = GetTNode(lexes, j + 1, i - 1);
+					a->type = lexeme2->Type();
+					a->node = GetTNode1(lexes, j + 1, i - 1);
 					if (a->node == nullptr)
 					{
 						ErrorReporter().FReport(logfile, "Не удалось получить внутренний операнд!", lexeme1->Line(), lexeme1->Start_Position());
@@ -197,26 +208,34 @@ bool TreeWorker::Preprocessing(List* lexes, int start, int finish)
 
 		}
 	}
-	/*
+	return true;
+}
+
+bool TreeWorker::PreprocessingElemMas(List* lexes, int start, int finish)
+{
 	for (int i = start; i <= finish; i++)
 	{
 		lexeme* lexeme1 = *(lexeme**)lexes->get(i);
 		if (lexeme1->Type() == MASSIVE)
 		{
-			for (int g = 0; g <= lexeme1->Rank(); g++)
+			int	step = 0;
+			TList* Iters = GetMassElemIndexes(lexes, lexeme1, &step);
+			if (Iters == nullptr)
 			{
-				if (strcmp((*(lexeme**)lexes->get(i + 1))->Data(), "[") == 0)
+				DoTNode* a = (DoTNode*)heap.get_mem(sizeof(DoTNode));
+				a->start = i;
+				a->finish = i + step;
+				a->type = lexeme1->Type();
+				a->node = (TNode*)Iters;
+				if (a->node == nullptr)
 				{
-
-				}
-				else
-				{
-					ErrorReporter().FReport(logfile, "Ожидается \"[\"!", lexeme1->Line(), lexeme1->Start_Position());
+					ErrorReporter().FReport(logfile, "Не удалось получить внутренний операнд!", lexeme1->Line(), lexeme1->Start_Position());
 					return false;
 				}
+				nodes->add(&a);
+				i += step;
 			}
 		}
 	}
-	*/
 	return true;
 }
