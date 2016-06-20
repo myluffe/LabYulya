@@ -218,7 +218,7 @@ class TBinaryOperation : TNode
 					res = res1;
 				}
 				else
-					ErrorReporter().FReport(logfile, "Нельзя привечсти типы!", m_operation->Line(), m_operation->Start_Position());
+					ErrorReporter().FReport(logfile, "Нельзя привести типы!", m_operation->Line(), m_operation->Start_Position());
 			}
 			if (strcmp(m_operation->Data(), "==") == 0)
 			{
