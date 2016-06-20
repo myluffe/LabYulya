@@ -503,16 +503,22 @@ int LexemeWorker::CorrectSpecial(lexeme* spec, int pos, List* expression, TList*
 		int	res = FuncWithStringParam(expression, pos, spec, true, param);
 		if (res > pos)
 		{
-			//output
-			//storage->addNode();
+			TNode* t = treeWorker.GetTNode(expression, pos + 2, res - 1);
+			if (t == nullptr)
+				return pos;
+			TOutPut* ot = new TOutPut(t);
+			storage->addNode((TNode*)ot);
 			param->~List();
 			return res;
 		}
 		res = FuncWithNumberParam(expression, pos, spec, true, param);
 		if (res > pos)
 		{
-			//output
-			//storage->addNode();
+			TNode* t = treeWorker.GetTNode(expression, pos + 2, res - 1);
+			if (t == nullptr)
+				return pos;
+			TOutPut* ot = new TOutPut(t);
+			storage->addNode((TNode*)ot);
 			param->~List();
 			return res;
 		}
@@ -543,7 +549,8 @@ int LexemeWorker::CorrectSpecial(lexeme* spec, int pos, List* expression, TList*
 			errorReporter.FReport(logfile, "Ожидается \")\"!", tdevider->Line(), tdevider->Start_Position());
 			return pos;
 		}
-		//input node
+		TInPut* in = new TInPut(spec);
+		storage->addNode((TNode*)in);
 		return pos + 2;
 	}
 	if (strcmp(spec->Data(), "min ") == 0 || strcmp(spec->Data(), "max ") == 0)
@@ -553,8 +560,23 @@ int LexemeWorker::CorrectSpecial(lexeme* spec, int pos, List* expression, TList*
 		int res = FuncWithTwoNumberParams(expression, pos, spec, true, param1, param2);
 		if (res != pos)
 		{
-			//min or max node
-			//storage->addNode();
+			bool max = (strcmp(spec->Data(), "max ") == 0);
+			TNode* tparam1 = treeWorker.GetTNode(param1, 0, param1->count() - 1);
+			if (tparam1 == nullptr)
+			{
+				param1->~List();
+				param2->~List();
+				return pos;
+			}
+			TNode* tparam2 = treeWorker.GetTNode(param2, 0, param2->count() - 1);
+			if (tparam2 == nullptr)
+			{
+				param1->~List();
+				param2->~List();
+				return pos;
+			}
+			TMinMax* tmm = new TMinMax(spec, tparam1, tparam2, max);
+			storage->addNode((TNode*)tmm);
 		}
 		param1->~List();
 		param2->~List();
