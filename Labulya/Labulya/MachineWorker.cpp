@@ -375,11 +375,6 @@ void MachineWorker::GetOperationPriority(mStateMachine * machine)
 			machine->Priority = 3;
 		return;
 	}
-	if (strcmp(machine->CurrentLexName(), "Operation") == 0)
-	{
-		machine->Priority = 50;
-		return;
-	}
 	machine->Priority = 0;
 }
 

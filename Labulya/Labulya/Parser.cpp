@@ -47,7 +47,6 @@ char * Parser::IntToString(int value)
 
 char * Parser::DoubleToString(double value)
 {
-	int decimal, sign;
 	char* res = (char*)heap.get_mem(_CVTBUFSIZE);
 	sprintf_s(res, _CVTBUFSIZE, "%lf", value);
 	return res;
@@ -55,7 +54,6 @@ char * Parser::DoubleToString(double value)
 
 char * Parser::FloatToString(float value)
 {
-	int decimal, sign;
 	char* res = (char*)heap.get_mem(_CVTBUFSIZE);
 	sprintf_s(res, _CVTBUFSIZE, "%f", value);
 	return res;
