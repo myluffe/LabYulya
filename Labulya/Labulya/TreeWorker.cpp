@@ -57,23 +57,30 @@ TNode* TreeWorker::GetTNode2(List* lexes, int start, int finish)
 {
 	if (start != finish)
 	{
+		int pos_max = 0;
 		lexeme* temp = nullptr;
 		for (int y = 0; y < nodes->count(); y++)
 		{
-			if (start == (*(DoTNode**)nodes->get(y))->start && finish == (*(DoTNode**)nodes->get(y))->finish)
-				return (*(DoTNode**)nodes->get(y))->node;
-			if (start == (*(DoTNode**)nodes->get(y))->start && finish > (*(DoTNode**)nodes->get(y))->finish)
+			DoTNode* current = *(DoTNode**)nodes->get(y);
+			if (start == current->start && finish == current->finish)
+				return current->node;
+			if (start == current->start && finish > current->finish)
 			{
-				temp = *(lexeme**)lexes->get((*(DoTNode**)nodes->get(y))->finish + 1);
+				temp = *(lexeme**)lexes->get(current->finish + 1);
+				pos_max = current->finish + 1;
 			}
-			if (start < (*(DoTNode**)nodes->get(y))->start && finish == (*(DoTNode**)nodes->get(y))->finish)
+			if (start < current->start && finish == current->finish)
 			{
-				temp = *(lexeme**)lexes->get((*(DoTNode**)nodes->get(y))->start - 1);
+				temp = *(lexeme**)lexes->get(current->start - 1);
+				pos_max = current->start - 1;
 			}
 		}
-		int pos_max = GetLexemePositionWithMaximalPriority(lexes, start, finish);
-		if(temp == nullptr)
+		
+		if (temp == nullptr)
+		{
+			pos_max = GetLexemePositionWithMaximalPriority(lexes, start, finish);
 			temp = *(lexeme**)lexes->get(pos_max);
+		}
 		if (temp->Type() == BYNARYOPERATION)
 			if (pos_max > start && pos_max < finish)
 			{
@@ -164,17 +171,17 @@ bool TreeWorker::Preprocessing(List* lexes, int start, int finish)
 		if (strcmp(lexeme1->Data(), "(") == 0)
 		{
 			bool flag = false;
-			for (int j = i + 1; i <= finish && !flag; i++)
+			for (int j = i + 1; j <= finish && !flag; j++)
 			{
 				lexeme* lexeme2 = *(lexeme**)lexes->get(j);
 				if (strcmp(lexeme2->Data(), ")") == 0)
 				{
 					flag = true;
-					DoTNode a;
-					a.finish = j;
-					a.start = i;
-					a.node = GetTNode(lexes, i + 1, j + 1);
-					if (a.node == nullptr)
+					DoTNode* a = (DoTNode*)heap.get_mem(sizeof(DoTNode));
+					a->finish = j;
+					a->start = i;
+					a->node = GetTNode(lexes, i + 1, j - 1);
+					if (a->node == nullptr)
 					{
 						ErrorReporter().FReport(logfile, "Ќе удалось получить внутренний операнд!", lexeme1->Line(), lexeme1->Start_Position());
 						return false;
