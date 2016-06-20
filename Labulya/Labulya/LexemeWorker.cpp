@@ -1633,7 +1633,7 @@ static TList * GetMassElemIndexes(List * expression, lexeme * mass, int * origpo
 				}
 				templ->add(&temp);
 			}
-			if (!IsNumberExpression(templ, false))
+			if (!LexemeWorker().IsNumberExpression(templ, false))
 				return false;
 			TNode* tl = treeWorker.GetTNode(expression, start, i - 1);
 			if (tl == nullptr)
