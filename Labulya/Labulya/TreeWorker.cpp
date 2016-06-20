@@ -76,13 +76,19 @@ TNode* TreeWorker::GetTNode2(List* lexes, int start, int finish)
 				return current->node;
 			if (start == current->start && finish > current->finish)
 			{
-				temp = *(lexeme**)lexes->get(current->finish + 1);
-				pos_max = current->finish + 1;
+				if (current->type == DEVIDER)
+				{
+					temp = *(lexeme**)lexes->get(current->finish + 1);
+					pos_max = current->finish + 1;
+				}
 			}
 			if (start < current->start && finish == current->finish)
 			{
-				temp = *(lexeme**)lexes->get(current->start - 1);
-				pos_max = current->start - 1;
+				if (current->type == DEVIDER)
+				{
+					temp = *(lexeme**)lexes->get(current->start - 1);
+					pos_max = current->start - 1;
+				}
 			}
 		}
 		
@@ -227,7 +233,7 @@ bool TreeWorker::PreprocessingElemMas(List* lexes, int start, int finish)
 		{
 			int	step = 0;
 			TList* Iters = LWorker.GetMassElemIndexes(lexes, lexeme1, &step);
-			if (Iters == nullptr)
+			if (Iters != nullptr)
 			{
 				DoTNode* a = (DoTNode*)heap.get_mem(sizeof(DoTNode));
 				a->start = i;
