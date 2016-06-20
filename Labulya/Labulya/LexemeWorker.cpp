@@ -318,16 +318,6 @@ int LexemeWorker::CorrectExpression(List* expression, int pos, TList* storage)
 	{
 		lexeme* temp_lexeme = *(lexeme**)expression->get(i);
 		tlist->add(&temp_lexeme);
-		if (temp_lexeme->Type() == MASSIVE)
-		{
-			TList* indexes = GetMassElemIndexes(expression, temp_lexeme, &i);
-			if (indexes = nullptr)
-			{
-				errorReporter.FReport(logfile, "Не удалось распознать синтаксис элемента массива!", temp_lexeme->Line(), temp_lexeme->Start_Position());
-				return start;
-			}
-			//... Создание нода элемента массива...
-		}
 		if (strcmp(temp_lexeme->Data(), "?") == 0)
 		{
 			i = CorrectShortIfOperation(expression, i, storage);
