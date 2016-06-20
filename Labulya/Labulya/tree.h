@@ -76,31 +76,7 @@ class TVariable : TNode
 	protected:
 		lexeme* m_variable;
 };
-/*
-class TElementArray : TNode
-{
-public:
-	TElementArray(lexeme* array, TList* pointer)
-	{
-		_array = array;
-		_pointer = pointer;
-	}	
-	lexeme* exec()
-	{
-		Lexes* a = (Lexes*)_pointer->exec();
-		return LWorker.GetMassElem(_array, a->RetLex());
-	}
-	void print()
-	{
-		printf("%s[", _array->Name());
-		_pointer->print();
-		printf("]");
-	}
-protected:
-	lexeme* _array;
-	TList* _pointer;
-};
-*/
+
 class TUnaryOperation : TNode
 {
 	public:
@@ -580,4 +556,28 @@ protected:
 	TNode* param;
 	bool msin;
 	lexeme* spec;
+};
+
+class TElementArray : TNode
+{
+public:
+	TElementArray(lexeme* array, TList* pointer)
+	{
+		_sarray = array;
+		_spointer = pointer;
+	}
+	lexeme* exec()
+	{
+		Lexes* a = (Lexes*)_spointer->exec();
+		//return LWorker.GetMassElem(_sarray, a->RetLex());
+	}
+	void print()
+	{
+		printf("%s[", _sarray->Name());
+		_spointer->print();
+		printf("]");
+	}
+protected:
+	lexeme* _sarray;
+	TList* _spointer;
 };
