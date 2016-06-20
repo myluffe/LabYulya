@@ -28,7 +28,7 @@ public:
 
 	int CurrentLexPos(); //Возвращает _currentLexemePosition.
 	int CurrentLexLine(); //Возвращает _curlexline.
-	int Priority = 100; //Приоритет лексемы. У операций меняется в MachineWorker().GetPriority.
+	int Priority = 0; //Приоритет лексемы. У операций меняется в MachineWorker().GetPriority.
 	int ChunkCount(); //Возвращает _chunckcount.
 
 	void AddWord(void * word); //Добавляет слово в список слова _words.

@@ -283,7 +283,7 @@ void MachineWorker::GetOperationPriority(mStateMachine * machine)
 {
 	if (strcmp("(", machine->Buffer()) == 0 || strcmp(")", machine->Buffer()) == 0)
 	{
-		machine->Priority = 0;
+		machine->Priority = 100;
 		return;
 	}
 	if (strcmp("--", machine->Buffer()) == 0 || strcmp("++", machine->Buffer()) == 0)

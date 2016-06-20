@@ -19,18 +19,19 @@ bool LexemeWorker::Processing(List* lexes)
 			lexeme* name = nullptr;
 			List* sizes = new List(sizeof(int));
 			int namepos = 0;
-			if (i - 1 < 0)
-				continue;
 			ttype = (lexeme*)lexes->get(i - 1);
-			if (ttype->Type() != TYPE)
+			if (ttype == nullptr || ttype->Type() != TYPE)
+			{
+				//...
 				continue;
+			}
 			int k = 0;
 			bool open = false;
-			lexeme* tempdevider = (lexeme*)lexes->get(i + k);
+			lexeme* tempdevider;
 			while (true)
 			{
 				tempdevider = (lexeme*)lexes->get(i + k);
-				if (strcmp(tempdevider->Data(), "[") == 0 || strcmp(tempdevider->Data(), "]") == 0)
+				if (tempdevider != nullptr && (strcmp(tempdevider->Data(), "[") == 0 || strcmp(tempdevider->Data(), "]") == 0))
 				{
 					k++;
 					if (strcmp(tempdevider->Data(), "]") == 0)
@@ -51,7 +52,7 @@ bool LexemeWorker::Processing(List* lexes)
 						return false;
 					}
 					tempdevider = (lexeme*)lexes->get(i + k);
-					if (tempdevider->Type() == VARIABLE)
+					if (tempdevider->Type() == VARIABLE || tempdevider->Type() == MASSIVE)
 						if (!GetValue(dob, tempdevider, lexes, i + k))
 						{
 							errorReporter.FReport(logfile, "Неопределенная переменная!", tempdevider->Line(), tempdevider->Start_Position());
@@ -70,7 +71,7 @@ bool LexemeWorker::Processing(List* lexes)
 					}
 					continue;
 				}
-				if (tempdevider->Type() == VARIABLE)
+				if (tempdevider != nullptr && tempdevider->Type() == VARIABLE)
 				{
 					namepos = i + k;
 					name = tempdevider;
