@@ -54,7 +54,6 @@ Diction_lexem::~Diction_lexem()
 
 Lexeme_list::Lexeme_list() :List(sizeof(lexeme))
 {
-	;
 }
 
 Lexeme_list::~Lexeme_list()

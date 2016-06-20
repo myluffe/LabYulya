@@ -570,7 +570,37 @@ public:
 	lexeme* exec()
 	{
 		Lexes* a = (Lexes*)_spointer->exec();
-		//return LWorker.GetMassElem(_sarray, a->RetLex());
+		return GetMassElem(_sarray, a->RetLex());
+		//return nullptr;
+	}
+	lexeme* GetMassElem(lexeme* mass, List* indexes)
+	{
+		if (mass->Rank() > 0)
+		{
+			//Доп проверка!
+			if (indexes->count() != mass->Sizes->count())
+			{
+				errorReporter.FReport(logfile, "Количество индексов не совпадает с размерностью массива!", mass->Line(), mass->Start_Position());
+				return nullptr;
+			}
+			int realindex = 1;
+			for (int p = 0; p < indexes->count(); p++)
+			{
+				int s = *(int*)mass->Sizes->get(p);
+				int index = *(int*)indexes->get(p);
+				realindex *= index;
+				if (index >= s)
+				{
+					char str[100];
+					sprintf_s(str, "Выход за границы диапазона! Индекс \"%d\" >= \"%d\"", index, s);
+					errorReporter.FReport(logfile, str, mass->Line(), mass->Start_Position());
+					return nullptr;
+				}
+				for (int g = p + 1; g < indexes->count(); g++)
+					realindex *= *(int*)indexes->get(g);
+			}
+			return &mass->Values[realindex];
+		}
 		return nullptr;
 	}
 	void print()

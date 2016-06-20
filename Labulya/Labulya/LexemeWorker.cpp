@@ -1722,6 +1722,7 @@ TList * LexemeWorker::GetMassElemIndexes(List * expression, lexeme * mass, int *
 	return nullptr;
 }
 
+/*
 lexeme* LexemeWorker::GetMassElem(lexeme* mass, List* indexes)
 {
 	if (mass->Rank() > 0)
@@ -1752,3 +1753,4 @@ lexeme* LexemeWorker::GetMassElem(lexeme* mass, List* indexes)
 	}
 	return nullptr;
 }
+*/

@@ -14,7 +14,7 @@ public:
 	bool Processing(List* lexes); //¬ызаваетс€ ф-цией MachineWorker().Work после формировани€ списка из лексем дл€ их последующей обработки (запись переменных в хэш-таблицу и замена этой переменной в коде на ссылку из хэша во всей области видимости этой переменной) и записи в дерево.
 	bool IsNumberExpression(List* expression, bool equal); //ѕровер€ет, что список из лексем expression €вл. выражением с переменными типа INT, FLOAT или DOUBLE и включает только доступные дл€ этих типов операции (результат этих операций тоже должен иметь тип INT, FLOAT или DOUBLE).
 	
-	lexeme* GetMassElem(lexeme* mass, List* indexes);
+	//lexeme* GetMassElem(lexeme* mass, List* indexes);
 	TList * GetMassElemIndexes(List * expression, lexeme * mass, int * origpos);
 
 	LexemeWorker();
