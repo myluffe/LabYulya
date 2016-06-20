@@ -1695,7 +1695,7 @@ TList * LexemeWorker::GetMassElemIndexes(List * expression, lexeme * mass, int *
 				if (temp == nullptr)
 				{
 					errorReporter.FReport(logfile, "Ожидается индекс типа int!", temp->Line(), temp->Start_Position());
-					return false;
+					return nullptr;
 				}
 				if (strcmp(temp->Data(), "]") == 0)
 				{
@@ -1705,10 +1705,10 @@ TList * LexemeWorker::GetMassElemIndexes(List * expression, lexeme * mass, int *
 				templ->add(&temp);
 			}
 			if (!LexemeWorker().IsNumberExpression(templ, false))
-				return false;
+				return nullptr;
 			TNode* tl = treeWorker.GetTNode(expression, start, i - 1);
 			if (tl == nullptr)
-				return false;
+				return nullptr;
 			indexes->addNode(tl);
 			indexcount++;
 		}
