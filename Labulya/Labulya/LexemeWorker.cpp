@@ -588,8 +588,15 @@ int LexemeWorker::CorrectSpecial(lexeme* spec, int pos, List* expression, TList*
 		int res = FuncWithNumberParam(expression, pos, spec, true, param);
 		if (res > pos)
 		{
-			//sin or cos
-			//storage->addNode();
+			bool sin = (strcmp(spec->Data(), "sin ") == 0);
+			TNode* tparam = treeWorker.GetTNode(param, 0, param->count() - 1);
+			if (tparam == nullptr)
+			{
+				param->~List();
+				return pos;
+			}
+			TSinCos* tsc = new TSinCos(spec, tparam, sin);
+			storage->addNode((TNode*)tsc);
 			param->~List();
 			return res;
 		}
