@@ -571,6 +571,7 @@ public:
 	{
 		Lexes* a = (Lexes*)_spointer->exec();
 		//return LWorker.GetMassElem(_sarray, a->RetLex());
+		return nullptr;
 	}
 	void print()
 	{

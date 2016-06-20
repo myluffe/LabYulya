@@ -247,7 +247,7 @@ bool TreeWorker::PreprocessingElemMas(List* lexes, int start, int finish)
 					return false;
 				}
 				nodes->add(&a);
-				i += step;
+				i = step;
 			}
 		}
 	}
