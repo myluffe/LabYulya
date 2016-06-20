@@ -1059,7 +1059,7 @@ int LexemeWorker::CorrectWhile(List * expression, int pos, lexeme * spec, TList*
 			{
 				tlex = *(lexeme**)expression->get(pos2);
 				if (strcmp(tlex->Data(), "}") != 0)
-					tlist->add(tlex);
+					tlist->add(&tlex);
 				else
 				{
 					break;
@@ -1498,7 +1498,7 @@ int LexemeWorker::CorrectIf(List * expression, int origpos, lexeme * spec, TList
 			}
 		}
 		TList* body2 = new TList();
-		if (InnerExpression(tlist1, body2))
+		if (InnerExpression(tlist2, body2))
 		{
 			storage->addNode((TNode*)new TIf(h, body, body2));
 			pos = pos3;
