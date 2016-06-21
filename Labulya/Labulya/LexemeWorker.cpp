@@ -208,8 +208,10 @@ bool LexemeWorker::Processing(List* lexes)
 						//замен€ем на ссылку
 						//dob->print_list();
 						int pos = dob->findpos(temp_lexeme->Data());
+						lexeme* ttttttt = (lexeme*)dob->get(pos);
 						if (pos != -1)
-							*temp_lexeme = *(lexeme*)dob->get(pos);
+							lexes->change(i, ttttttt);
+						lexeme* sty = (lexeme*)lexes->get(i);
 						/*
 						List* tlist = LexemeTable.find_list(temp_lexeme->Data());
 						for (int k = 0; k < tlist->count(); k++)
@@ -255,6 +257,7 @@ bool LexemeWorker::Processing(List* lexes)
 		}
 	}
 
+
 	TList* storage = new TList();
 	List* expression = new List(sizeof(lexeme*));
 	for (int km = 0; km < lexes->count(); km++)
@@ -291,9 +294,6 @@ bool LexemeWorker::Processing(List* lexes)
 	printf_s("Tree View:\n");
 	storage->print();
 	storage->exec();
-	printf_s("\n|---------------|\nVariable Table:\n");
-	LexemeTable.print_lexems();
-	printf_s("|---------------|\n");
 	//
 	if(dob != nullptr)
 		dob->~Lexeme_list();
@@ -805,6 +805,7 @@ int LexemeWorker::FuncWithNumberParam(List * expression, int pos, lexeme * spec,
 			break;
 		param->add(&tlex);
 	}
+
 	if (!IsNumberExpression(param, false))
 	{
 		errorReporter.FReport(logfile, "ќжидаетс€ числовое выражение!", devider1->Line(), devider1->Start_Position());

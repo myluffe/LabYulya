@@ -587,8 +587,9 @@ public:
 			for (int p = 0; p < indexes->count(); p++)
 			{
 				int s = *(int*)mass->Sizes->get(p);
-				int index = *(int*)indexes->get(p);
-				realindex *= index;
+				lexeme* sindex = (lexeme*)indexes->get(p);
+				int index = parser.ToInt(sindex->Data());
+				realindex = realindex * index;
 				if (index >= s)
 				{
 					char str[100];

@@ -24,6 +24,8 @@ public:
 	void	   remove(int pos); //удаляет элемент на позиции pos
 	int        count(); //возвращает количество элементов
 	bool       error(); // true if error in last operation
+
+	void change(int pos, void * data); //ЗАМЕНА ССЫЛКИ!
 private:
 	struct Segment
 	{
