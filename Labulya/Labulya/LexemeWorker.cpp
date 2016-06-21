@@ -101,7 +101,7 @@ bool LexemeWorker::Processing(List* lexes)
 			k++;
 			int posend = k + i;
 			//...ф-ция разбора элементов и записи их в память, возвратит ссылку на первый элемент, в posend запишет позицию ";" (конца выражения).
-			lexeme* tempvalues = GetMassValues(lexes, k + i, ttype->Data(), &posend, dob, rank, sizes);
+			List* tempvalues = GetMassValues(lexes, k + i, ttype->Data(), &posend, dob, rank, sizes);
 			if (posend > k + 1)
 			{
 				lexeme* newlex = (lexeme*)lexes->get(namepos);
@@ -257,7 +257,6 @@ bool LexemeWorker::Processing(List* lexes)
 		}
 	}
 
-
 	TList* storage = new TList();
 	List* expression = new List(sizeof(lexeme*));
 	for (int km = 0; km < lexes->count(); km++)
@@ -293,6 +292,13 @@ bool LexemeWorker::Processing(List* lexes)
 	printf_s("\n|---------------|\n");
 	printf_s("Tree View:\n");
 	storage->print();
+
+	for (int h = 0; h < expression->count(); h++)
+	{
+		printf("%d. ", h);
+		(*(lexeme**)expression->get(h))->Print();
+	}
+
 	storage->exec();
 	//
 	if(dob != nullptr)
@@ -955,7 +961,7 @@ bool LexemeWorker::WhateverCheck(char ** perone, int c1, int * types, int c2, Li
 			{
 				for (int f = 0; f < c2; f++)
 				{
-					if ((tlex->Values[0]).Type() == types[f])
+					if ((*(lexeme**)tlex->Values->get(0))->Type() == types[f])
 					{
 						correct = true;
 						varbefore = true;
@@ -1522,7 +1528,7 @@ int LexemeWorker::CorrectIf(List * expression, int origpos, lexeme * spec, TList
 	return pos;
 }
 
-lexeme * LexemeWorker::GetMassValues(List* expression, int start, char* ttype, int* putend, Lexeme_list* dob, int rank, List* sizes)
+List * LexemeWorker::GetMassValues(List* expression, int start, char* ttype, int* putend, Lexeme_list* dob, int rank, List* sizes)
 {
 	List* poses = new List(sizeof(int));
 	int type = GetType(ttype);
@@ -1571,10 +1577,11 @@ lexeme * LexemeWorker::GetMassValues(List* expression, int start, char* ttype, i
 	}
 
 	//запись элементов в память
-	lexeme* a = (lexeme*)heap.get_mem(sizeof(lexeme) * (poses->count() + 1));
+	List* a = new List(sizeof(lexeme*));
 	for (int h = 0; h < poses->count(); h++)
 	{
-		a[h] = *(lexeme*)expression->get(*(int*)poses->get(h));
+		lexeme* ty = (lexeme*)expression->get(*(int*)poses->get(h));
+		a->add(&ty);
 	}
 	heap.free_mem(tempsizes);
 	*putend = currentpos;

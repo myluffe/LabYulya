@@ -25,7 +25,7 @@ lexeme::lexeme(char * name, int type, char * data, int line, int startposition, 
 	_priority = priority;
 }
 
-void lexeme::ToMass(lexeme* name, int type, lexeme* val, int rank, List* sizes)
+void lexeme::ToMass(lexeme* name, int type, List* val, int rank, List* sizes)
 {
 	Sizes = sizes;
 	heap.free_mem(_name);
@@ -120,7 +120,7 @@ void lexeme::Print()
 			q *= *(int*)Sizes->get(l);
 		for (int l = 0; l < q; l++)
 		{
-			lexeme* temp = &Values[l];
+			lexeme* temp = *(lexeme**)Values->get(l);
 			printf("\"%s\"", temp->Data());
 			if (l != q - 1)
 				printf(", ");

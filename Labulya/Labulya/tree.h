@@ -95,35 +95,31 @@ class TUnaryOperation : TNode
 			{
 				res1->DataChange(Parser().DoubleToString(-o));
 				res->DataChange(res1->Data());
-				return res;
+				return res1;
 			}
 			if (strcmp(m_operation->Data(), "++") == 0 && m_left)
 			{
 				res1->DataChange(Parser().DoubleToString(o + 1));
 				res->DataChange(res1->Data());
-				return res;
+				return res1;
 			}
 			if (strcmp(m_operation->Data(), "--") == 0 && m_left)
 			{
 				res1->DataChange(Parser().DoubleToString(o - 1));
 				res->DataChange(res1->Data());
-				return res;
+				return res1;
 			}
 			if (strcmp(m_operation->Data(), "++") == 0 && !m_left)
 			{
 				res->DataChange(res1->Data());
 				res1->DataChange(Parser().DoubleToString(o + 1));
-				return res;
+				return res1;
 			}
 			if (strcmp(m_operation->Data(), "--") == 0 && !m_left)
 			{
 				res->DataChange(res1->Data());
 				res1->DataChange(Parser().DoubleToString(o - 1));
-				return res;
-			}
-			if (strcmp(m_operation->Data(), "++") == 0 && m_left)
-			{
-				return m_operand->exec();
+				return res1;
 			}
 			if (strcmp(m_operation->Data(), "!") == 0 && m_left)
 			{
@@ -195,18 +191,26 @@ class TBinaryOperation : TNode
 			}
 			if (strcmp(m_operation->Data(), "==") == 0)
 			{
+				res->~lexeme();
+				res = new lexeme("Number", BOOL, "0", res1->Line(), res1->Start_Position(), 100);
 				res->DataChange(Parser().BoolToString(o1 == o2));
 			}
 			if (strcmp(m_operation->Data(), "!=") == 0)
 			{
+				res->~lexeme();
+				res = new lexeme("Number", BOOL, "0", res1->Line(), res1->Start_Position(), 100);
 				res->DataChange(Parser().BoolToString(o1 != o2));
 			}
 			if (strcmp(m_operation->Data(), "<=") == 0)
 			{
+				res->~lexeme();
+				res = new lexeme("Number", BOOL, "0", res1->Line(), res1->Start_Position(), 100);
 				res->DataChange(Parser().BoolToString(o1 <= o2));
 			}
 			if (strcmp(m_operation->Data(), ">=") == 0)
 			{
+				res->~lexeme();
+				res = new lexeme("Number", BOOL, "0", res1->Line(), res1->Start_Position(), 100);
 				res->DataChange(Parser().BoolToString(o1 >= o2));
 			}
 			if (strcmp(m_operation->Data(), "<") == 0)
@@ -217,16 +221,22 @@ class TBinaryOperation : TNode
 			}
 			if (strcmp(m_operation->Data(), ">") == 0)
 			{
+				res->~lexeme();
+				res = new lexeme("Number", BOOL, "0", res1->Line(), res1->Start_Position(), 100);
 				res->DataChange(Parser().BoolToString(o1 > o2));
 			}
 			if (strcmp(m_operation->Data(), "&&") == 0)
 			{
+				res->~lexeme();
+				res = new lexeme("Number", BOOL, "0", res1->Line(), res1->Start_Position(), 100);
 				bool b1 = Parser().ToBool(res1->Data());
 				bool b2 = Parser().ToBool(res2->Data());
 				res->DataChange(Parser().BoolToString(b1 && b2));
 			}
 			if (strcmp(m_operation->Data(), "||") == 0)
 			{
+				res->~lexeme();
+				res = new lexeme("Number", BOOL, "0", res1->Line(), res1->Start_Position(), 100);
 				bool b1 = Parser().ToBool(res1->Data());
 				bool b2 = Parser().ToBool(res2->Data());
 				res->DataChange(Parser().BoolToString(b1 || b2));
@@ -293,10 +303,14 @@ class TList : TNode
 		}
 		lexeme* exec()  
 		{  
+			lexems->~Lexes();
+			lexems = new Lexes();
 			for (int i = 0; i < nods->count(); ++i)
 			{
 				TNode* cur = *(TNode**)nods->get(i);
-				lexems->AddLexeme(cur->exec());
+				lexeme* temp = cur->exec();
+				if (temp != nullptr)
+					lexems->AddLexeme(temp);
 			}
             return (lexeme*)lexems;
 		}
@@ -570,7 +584,8 @@ public:
 	lexeme* exec()
 	{
 		Lexes* a = (Lexes*)_spointer->exec();
-		return GetMassElem(_sarray, a->RetLex());
+		lexeme* j = GetMassElem(_sarray, a->RetLex());
+		return j;
 		//return nullptr;
 	}
 	lexeme* GetMassElem(lexeme* mass, List* indexes)
@@ -600,7 +615,7 @@ public:
 				for (int g = p + 1; g < indexes->count(); g++)
 					realindex *= *(int*)indexes->get(g);
 			}
-			return &mass->Values[realindex];
+			return *(lexeme**)(mass->Values->get(realindex));
 		}
 		return nullptr;
 	}
